@@ -30,8 +30,12 @@ class PackedResourceFile(metaclass = RegisteredResource):
             self.records = []
             self.indices = indices[:-1]
             for si, ei in zip(indices[:-1], indices[1:]):
-                self.locations.append(f.tell())
-                self.records.append(self.process_record(np.fromfile(f, count=ei-si, dtype='u1')))
+                loc = f.tell()
+                t = np.fromfile(f, count=ei-si, dtype='u1')
+                if t.tostring() == b"EMPTY\r\n":
+                    continue
+                self.locations.append(loc)
+                self.records.append(self.process_record(t))
             self.process_records()
         self.sizes = [len(_) for _ in self.records]
             
@@ -52,6 +56,23 @@ _REC1_HEADER = np.dtype( [
     ('algo', 'u1'),
     ('field_6', 'u1')]
 )
+
+_REC3_HEADER = np.dtype([
+    ('tickBeat', 'u1'),
+    ('beatMeasure', 'u1'),
+    ('totalTick', '<i4'),
+    ('dataSize', '<i4'),
+    ('nrCommand', '<i4'),
+    ('soundMode', 'u1'),
+    ('pitchBRange', 'u1'),
+    ('basicTempo', '<u2'),
+    ('unknown1', 'u1'),
+    ('unknown2', 'u1'),
+    ('unknown3', 'u1'),
+    ('unknown4', 'u1'),
+    ('unknown5', 'u1'),
+    ('iInstCount', 'u1'),
+])
 
 class ResourceFile(PackedResourceFile):
     name = "resource"
@@ -149,7 +170,8 @@ class PackedRecordFile(metaclass = RegisteredResource):
             s = (obj_data.size - self.footer_size) / n_obj
             if s != np.ceil(s):
                 raise RuntimeError("Size mismatch.")
-            obj_data = obj_data.reshape((n_obj, int(s)))
+            obj_data = obj_data[:-self.footer_size].reshape(
+                    (n_obj, int(s)))
         self.data = pd.DataFrame(obj_data)
         self.process_dataframe()
             
@@ -267,3 +289,10 @@ class KeywordResourceFile(PackedResourceFile):
 
 class NPCRecordFile(PackedRecordFile):
     countsize = 2
+
+class FRecordFile(PackedRecordFile):
+    countsize = 2
+    footer_size = 105
+
+    def read_header(self, f):
+        self.header = np.fromfile(f, dtype="u2", count=3)
