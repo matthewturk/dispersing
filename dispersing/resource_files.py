@@ -35,8 +35,9 @@ class PackedResourceFile(metaclass = RegisteredResource):
                 if t.tostring() == b"EMPTY\r\n":
                     continue
                 self.locations.append(loc)
-                self.records.append(self.process_record(t))
+                self.records.append(self.Process_record(t))
             self.process_records()
+            self.process_footer()
         self.sizes = [len(_) for _ in self.records]
             
     def read_header(self, f):
@@ -46,6 +47,9 @@ class PackedResourceFile(metaclass = RegisteredResource):
         return rec
     
     def process_records(self):
+        pass
+
+    def process_footer(self):
         pass
 
 _REC1_HEADER = np.dtype( [
@@ -81,6 +85,12 @@ class ResourceFile(PackedResourceFile):
     def process_record(self, rec):
         assert(rec[:2].tostring() == b"EH")
         return rec[2:]
+
+    def find_offset(self, offset):
+        """This function takes an offset (for instance, what might come out of
+        a debugger that tracks file I/O) and returns the record."""
+        record_id = int((offset - self.countsize)/self.indexsize)
+        return record_id, self.records[record_id]
 
     def unpack(self, rec_id):
         rec = self.records[rec_id]
@@ -170,8 +180,10 @@ class PackedRecordFile(metaclass = RegisteredResource):
             s = (obj_data.size - self.footer_size) / n_obj
             if s != np.ceil(s):
                 raise RuntimeError("Size mismatch.")
-            obj_data = obj_data[:-self.footer_size].reshape(
-                    (n_obj, int(s)))
+            self.footer = obj_data[-self.footer_size:]
+            if self.footer_size > 0:
+                obj_data = obj_data[:-self.footer_size]
+            obj_data = obj_data.reshape((n_obj, int(s)))
         self.data = pd.DataFrame(obj_data)
         self.process_dataframe()
             
@@ -291,7 +303,10 @@ class NPCRecordFile(PackedRecordFile):
     countsize = 2
 
 class FRecordFile(PackedRecordFile):
+    # For the summoning, the header is 0, 49, 3.
+    # It's not immediately obvious what that means.
     countsize = 2
+    # The footer consists of three records 
     footer_size = 105
 
     def read_header(self, f):
