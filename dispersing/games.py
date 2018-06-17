@@ -1,7 +1,13 @@
+import pandas as pd
 import os
 
-from .resource_files import \
-        resource_registry
+from .kaitai_parsers import summoning
+from . import kaitai_utilities as ku
+
+def make_df(l):
+    cattr = ku.common_attributes(l)
+    flattened = ku.collect_attributes(l, cattr)
+    return pd.DataFrame(flattened)
 
 class Game:
     name = None
@@ -12,26 +18,22 @@ class Game:
     def __init__(self, path):
         self.path = path
         self.assets = {}
-        for asset_file in self.asset_files:
-            if isinstance(asset_file, tuple):
-                asset_type, asset_filename = asset_file
-            else:
-                asset_type = asset_filename = asset_file
-            args = ()
-            if isinstance(asset_type, tuple):
-                asset_type, *args = asset_type
-            fn = os.path.join(self.path, asset_filename.upper())
-            self.assets[asset_filename] = resource_registry[asset_type](fn,
-                    *args)
+        self.records = {}
+        for asset_filename, attr in self.asset_files:
+            fn = os.path.join(self.path, asset_filename)
+            cls = getattr(self.base_mod, asset_filename)
+            d = self.assets[asset_filename] = cls.from_file(fn)
+            self.records[asset_filename] = make_df(getattr(d, attr))
 
 class TheSummoning(Game):
     name = "The Summoning"
+    base_mod = summoning
     asset_files = (
-            "interact",
-            "resource",
-            "objects",
-            "colors",
-            "interact",
-            "text",
-            "keywords",
-            "levels")
+                ("INTERACT", "npc_interactions"),
+                ("RESOURCE", "records"),
+                ("OBJECTS", "object"),
+                ("COLORS", "palettes"),
+                ("TEXT", "text"),
+                ("KEYWORDS", "keyword"),
+                ("LEVELS", "levels")
+            )

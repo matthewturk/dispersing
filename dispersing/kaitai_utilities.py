@@ -1,13 +1,3 @@
-from .kaitai_parsers.summoning_colors import SummoningColors
-from .kaitai_parsers.summoning_colors import SummoningColors
-from .kaitai_parsers.summoning_interact import SummoningInteract
-from .kaitai_parsers.summoning_keywords import SummoningKeywords
-from .kaitai_parsers.summoning_levels import SummoningLevels
-from .kaitai_parsers.summoning_npc import SummoningNpc
-from .kaitai_parsers.summoning_object import SummoningObject
-from .kaitai_parsers.summoning_resources import SummoningResources
-from .kaitai_parsers.summoning_text import SummoningText
-
 def common_attributes(obj_collection):
     shared_attributes = set()
     for obj in obj_collection:
