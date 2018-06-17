@@ -31,7 +31,8 @@ types:
           switch-on: type
           cases:
             record_types::sprite: sprite_header
-            _: empty
+            record_types::music: music_header
+            _: generic_header(header_size)
       - id: contents
         size: record_end - _root._io.pos
     instances:
@@ -45,16 +46,54 @@ types:
         type: u2
       - id: count
         type: u1
-      - id: width
-        type: u2
+      - id: width_over_eight
+        type: u1
+      - id: field_4
+        type: u1
       - id: algo
-        type: u2
-  empty:
+        type: u1
+      - id: field_6
+        type: u1
+  music_header:
+    seq:
+      - id: tick_beat
+        type: u1
+      - id: beat_measure
+        type: u1
+      - id: total_tick
+        type: s4le
+      - id: data_size
+        type: s4le
+      - id: nr_command
+        type: s4le
+      - id: sound_mode
+        type: u1
+      - id: pitch_b_range
+        type: u1
+      - id: basic_tempo
+        type: u2le
+      - id: unknown1
+        type: u1
+      - id: unknown2
+        type: u1
+      - id: unknown3
+        type: u1
+      - id: unknown4
+        type: u1
+      - id: unknown5
+        type: u1
+      - id: i_inst_count
+        type: u1
+  generic_header:
+    params:
+      - id: size
+        type: u4
     seq:
       - id: contents
-        size: 10
+        size: size
 enums:
   record_types:
     1: sprite
     2: unknown2
+    3: music
     5: unknown3
