@@ -35,5 +35,7 @@ class TheSummoning(Game):
                 ("COLORS", "palettes"),
                 ("TEXT", "text"),
                 ("KEYWORDS", "keyword"),
-                ("LEVELS", "levels")
+                ("LEVELS", "levels"),
+                ("NPC", "npcs")
             )
+

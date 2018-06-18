@@ -6,3 +6,9 @@ from .summoning_npc import SummoningNpc as NPC
 from .summoning_object import SummoningObject as OBJECTS
 from .summoning_resources import SummoningResources as RESOURCE
 from .summoning_text import SummoningText as TEXT
+
+# Files still to address:
+#   * INIT
+#   * JAZ
+#   * TAGS
+#   * V
