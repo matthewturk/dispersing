@@ -35,7 +35,7 @@ class PackedResourceFile(metaclass = RegisteredResource):
                 if t.tostring() == b"EMPTY\r\n":
                     continue
                 self.locations.append(loc)
-                self.records.append(self.Process_record(t))
+                self.records.append(self.process_record(t))
             self.process_records()
             self.process_footer()
         self.sizes = [len(_) for _ in self.records]

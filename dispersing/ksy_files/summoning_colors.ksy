@@ -3,19 +3,19 @@ meta:
   file-extension: ""
   endian: le
 seq:
-  - id: count
+  - id: ncolors
     type: u1
   - id: palettes
     type: palette
     repeat: expr
-    repeat-expr: count
+    repeat-expr: (_root._io.size - 1) / (ncolors * 3)
 types:
   palette:
     seq:
       - id: colors
         type: rgb
         repeat: expr
-        repeat-expr: 16
+        repeat-expr: _root.ncolors
   rgb:
     # Note that these are 0 .. 63, not 0 .. 255
     seq:
