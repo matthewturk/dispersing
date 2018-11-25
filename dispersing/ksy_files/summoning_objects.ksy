@@ -14,8 +14,12 @@ seq:
 types:
   object_record:
     seq:
+# the first column gives, in the upper bits, the AC bonus
+# to get AC bonus, ((col0 >> 4) & 15)
+      - id: ac_bonus
+        type: b4
       - id: col0
-        type: u1
+        type: b4
       - id: object_name_id
         type: u1
       - id: weight
@@ -33,18 +37,26 @@ types:
         type: u1
       - id: col5
         type: u1
-      - id: col6
-        type: u1
-      - id: col7
-        type: u1
-      - id: col8
-        type: u1
-      - id: col9
+      # col6 is projectile info
+      - id: act1_dmg
+        type: b4
+      - id: act1_flags
+        type: b4
+      - id: act2_dmg
+        type: b4
+      - id: act2_flags
+        type: b4
+      - id: act3_dmg
+        type: b4
+      - id: act3_flags
+        type: b4
+      - id: charges
         type: u1
       - id: image_id
         type: u1
       - id: col11
         type: u1
+      # col12 seems to be a key for the subroutine to call when it gets used
       - id: col12
         type: u1
       - id: obj_type
@@ -52,6 +64,13 @@ types:
         enum: object_categories
       - id: col14
         type: u1
+    instances:
+      text_record:
+        value: 'object_name_id + _root.name_offset'
+      small_image_record:
+        value: 'image_id + 100'
+      large_image_record:
+        value: 'image_id + 333'
 enums:
   object_categories:
     0: helmet

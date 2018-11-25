@@ -7,6 +7,14 @@ seq:
     # 566 is something else... fonts?
     # 799 is people
     # 1487 is music
+    # 894 is scrolls
+    # 919 looks like an animation of some kind. 54 of them.  Seems to be some
+    # type of walking or something animation.
+    # 963 is maybe wall decorations?  There are 49 of them.
+    # 1080 is enemies and npcs
+    # 1186 is wall decorations
+    # 1232 is the pointer, then intro art
+    # 1315 is the ladder
     # array([ 1232,  1315,  1440,   100,   333,   566,   799,  1487,   894,
     #    919,   963,  1012,  1080,  1186,  7913, 13583,  2582, 25126,
     #   9762,  7972, 10794, 13361, 13592, 11312, 11309, 12333,  7980,

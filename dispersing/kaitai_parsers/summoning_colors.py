@@ -15,9 +15,9 @@ class SummoningColors(KaitaiStruct):
         self._read()
 
     def _read(self):
-        self.count = self._io.read_u1()
-        self.palettes = [None] * (self.count)
-        for i in range(self.count):
+        self.ncolors = self._io.read_u1()
+        self.palettes = [None] * ((self._root._io.size() - 1) // (self.ncolors * 3))
+        for i in range((self._root._io.size() - 1) // (self.ncolors * 3)):
             self.palettes[i] = self._root.Palette(self._io, self, self._root)
 
 
@@ -29,8 +29,8 @@ class SummoningColors(KaitaiStruct):
             self._read()
 
         def _read(self):
-            self.colors = [None] * (16)
-            for i in range(16):
+            self.colors = [None] * (self._root.ncolors)
+            for i in range(self._root.ncolors):
                 self.colors[i] = self._root.Rgb(self._io, self, self._root)
 
 

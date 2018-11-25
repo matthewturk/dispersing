@@ -54,6 +54,9 @@ types:
         type: u1
       - id: field_6
         type: u1
+    instances:
+      width:
+        value: 'width_over_eight * 8'
   music_header:
     seq:
       - id: tick_beat

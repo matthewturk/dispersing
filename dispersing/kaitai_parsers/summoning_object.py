@@ -49,21 +49,51 @@ class SummoningObject(KaitaiStruct):
             self._read()
 
         def _read(self):
-            self.col0 = self._io.read_u1()
+            self.ac_bonus = self._io.read_bits_int(4)
+            self.col0 = self._io.read_bits_int(4)
+            self._io.align_to_byte()
             self.object_name_id = self._io.read_u1()
             self.weight = self._io.read_u1()
             self.container_flags = self._io.read_u1()
             self.col4 = self._io.read_u1()
             self.col5 = self._io.read_u1()
-            self.col6 = self._io.read_u1()
-            self.col7 = self._io.read_u1()
-            self.col8 = self._io.read_u1()
-            self.col9 = self._io.read_u1()
+            self.act1_dmg = self._io.read_bits_int(4)
+            self.act1_flags = self._io.read_bits_int(4)
+            self.act2_dmg = self._io.read_bits_int(4)
+            self.act2_flags = self._io.read_bits_int(4)
+            self.act3_dmg = self._io.read_bits_int(4)
+            self.act3_flags = self._io.read_bits_int(4)
+            self._io.align_to_byte()
+            self.charges = self._io.read_u1()
             self.image_id = self._io.read_u1()
             self.col11 = self._io.read_u1()
             self.col12 = self._io.read_u1()
             self.obj_type = self._root.ObjectCategories(self._io.read_u1())
             self.col14 = self._io.read_u1()
+
+        @property
+        def text_record(self):
+            if hasattr(self, '_m_text_record'):
+                return self._m_text_record if hasattr(self, '_m_text_record') else None
+
+            self._m_text_record = (self.object_name_id + self._root.name_offset)
+            return self._m_text_record if hasattr(self, '_m_text_record') else None
+
+        @property
+        def small_image_record(self):
+            if hasattr(self, '_m_small_image_record'):
+                return self._m_small_image_record if hasattr(self, '_m_small_image_record') else None
+
+            self._m_small_image_record = (self.image_id + 100)
+            return self._m_small_image_record if hasattr(self, '_m_small_image_record') else None
+
+        @property
+        def large_image_record(self):
+            if hasattr(self, '_m_large_image_record'):
+                return self._m_large_image_record if hasattr(self, '_m_large_image_record') else None
+
+            self._m_large_image_record = (self.image_id + 333)
+            return self._m_large_image_record if hasattr(self, '_m_large_image_record') else None
 
 
 
