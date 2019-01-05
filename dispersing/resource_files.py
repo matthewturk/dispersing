@@ -1,11 +1,40 @@
-import os
-import stat
 import numpy as np
 import pandas as pd
-import ipywidgets
-import ipythonblocks
+
+from .kaitai_utilities import unpack_sprite_algo3
+from .kaitai_parsers import summoning as dsk
 
 resource_registry = {}
+
+class ResourceMap:
+    # This one uses kaitai and will replace the others
+    def __init__(self, game):
+        self.records = []
+        self.sprites = {}
+        palettes = game.palettes
+        for i, rec in enumerate(game.assets["RESOURCE"].records):
+            self.records.append(rec)
+            if rec.type.name == "sprite":
+                if rec.header.algo == 3:
+                    rec_data = unpack_sprite_algo3(rec.contents)
+                else:
+                    continue # don't know the others yet
+                h = rec.header.height
+                w = rec.header.width_over_eight * 8
+                c = rec.header.count
+                if c > 1:
+                    c, h = h, c
+                im = rec_data.reshape((c, h, w))
+                im = np.moveaxis(im, 0, -1)
+                ims = []
+                for frame in range(im.shape[-1]):
+                    pal1_id = rec.header.field_4 >> 4
+                    pal2_id = rec.header.field_4 & 15
+                    palette = np.concatenate([
+                            palettes[pal1_id], palettes[pal2_id]],
+                            axis=0)
+                    ims.append(palette[im[:,:,frame]])
+                self.sprites[i] = ims
 
 class RegisteredResource(type):
     def __init__(cls, name, bases, nmspc):

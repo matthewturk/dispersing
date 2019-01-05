@@ -1,8 +1,12 @@
+import numpy as np
 import pandas as pd
 import os
 
 from .kaitai_parsers import summoning
 from . import kaitai_utilities as ku
+from .object_db import ObjectDatabase
+from .level_map import LevelMap
+from .resource_files import ResourceMap
 
 def make_df(l):
     cattr = ku.common_attributes(l)
@@ -25,6 +29,8 @@ class Game:
             d = self.assets[asset_filename] = cls.from_file(fn)
             self.records[asset_filename] = make_df(getattr(d, attr))
 
+        self.setup_resources()
+
 class TheSummoning(Game):
     name = "The Summoning"
     base_mod = summoning
@@ -38,4 +44,17 @@ class TheSummoning(Game):
                 ("LEVELS", "levels"),
                 ("NPC", "npcs")
             )
+
+    def setup_resources(self):
+        self.palettes = []
+        for i, palette in enumerate(self.assets["COLORS"].palettes[::-1]):
+            rgba = np.array([(_.red*4, _.green*4, _.blue*4, 255)
+                            for _ in palette.colors], dtype="u1")
+            self.palettes.append(rgba)
+
+        self.resources = ResourceMap(self)
+        self.objects = ObjectDatabase(self)
+
+        self.levels = [LevelMap(self, i) for i in
+                range(len(self.assets["LEVELS"].levels))]
 
