@@ -3,28 +3,62 @@ meta:
   file-extension: ""
   endian: le
 seq:
-    # 333 seems to be offset for items
-    # 566 is something else... fonts?
-    # 799 is people
-    # 1487 is music
-    # 894 is scrolls
-    # 919 looks like an animation of some kind. 54 of them.  Seems to be some
-    # type of walking or something animation.
-    # 963 is maybe wall decorations?  There are 49 of them.
-    # 1080 is enemies and npcs
-    # 1186 is wall decorations
-    # 1232 is the pointer, then intro art
-    # 1315 is the ladder
-    # array([ 1232,  1315,  1440,   100,   333,   566,   799,  1487,   894,
-    #    919,   963,  1012,  1080,  1186,  7913, 13583,  2582, 25126,
-    #   9762,  7972, 10794, 13361, 13592, 11312, 11309, 12333,  7980,
-    #   3626,  9510,  7985,  7696,  7951,  7441,  7452,  7439,  7440,
-    #   6672,  7440,  7437,  7697,  7185,  3342,  2854,  1573,   294,
-    #   2850,  2086, 13605, 13590, 13846], dtype=uint16)
-    # We eventually have spells.
-  - id: count1
-    type: u2
-  - id: offset1
-    type: u2
-  - id: offset2
-    type: u2
+  - id: sprite_offsets
+    type: sprite_offsets
+  - id: unknown1
+    type: unknown1_t
+  - id: unknown2
+    size: 256
+  - id: unknown3
+    repeat: expr
+    repeat-expr: 29
+    terminator: 0xff
+  - id: unknown4
+    size: 256
+  - id: spells
+    size: 9
+    repeat: expr
+    repeat-expr: 40
+  - id: unknown9
+    type: s1
+    repeat: expr
+    repeat-expr: 51
+types:
+  sprite_offsets:
+    seq:
+      - id: intro_anim_offset
+        type: u2
+      - id: ingame_anim_offset
+        type: u2
+      - id: endgame_anim_offset
+        type: u2
+      - id: small_object
+        type: s2
+      - id: worn_object
+        type: s2
+      - id: tiny_object
+        type: s2
+      - id: people
+        type: s2
+      - id: music
+        type: s2
+      - id: scroll
+        type: s2
+      - id: char_anim # character components
+        type: s2
+      - id: item_anim # held items
+        type: s2
+      - id: terrain
+        type: s2
+      - id: npc
+        type: s2
+      - id: wall_decoration
+        type: s2
+  unknown1_t:
+    seq:
+      - id: count
+        type: u1
+      - id: values
+        type: s2
+        repeat: expr
+        repeat-expr: count
