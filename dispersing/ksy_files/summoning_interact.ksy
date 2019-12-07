@@ -51,79 +51,63 @@ types:
         type:
           switch-on: opcode
           cases:
-            iopcode::end_command: opcode_0args
-            iopcode::continue_conversation: opcode_0args
-            iopcode::start_conversation: opcode_0args
-            iopcode::end_commandlist: opcode_0args
-            iopcode::unknown5: opcode_0args
-            iopcode::receive_keyword: opcode_1args
-            iopcode::unknown7: opcode_0args
-            iopcode::unknown8: opcode_2args
-            iopcode::unknown9: opcode_2args
-            iopcode::unknown10: opcode_2args
-            iopcode::unused11: opcode_0args
-            iopcode::unknown12: opcode_1args
-            iopcode::unknown13: opcode_0args
-            iopcode::unknown14: opcode_1args
-            iopcode::unknown15: opcode_1args
-            iopcode::unknown16: opcode_2args
-            iopcode::unknown17: opcode_0args
-            iopcode::emit_text: opcode_1args
-            iopcode::emit_keyword: opcode_1args
-            iopcode::take_item: opcode_1args
-            iopcode::unknown21: opcode_0args
-            iopcode::set_variable: opcode_2args
-            iopcode::unknown23: opcode_1args
-            iopcode::give_item: opcode_1args
-            iopcode::unknown25: opcode_2args
-            iopcode::heal_character: opcode_0args
-            iopcode::unknown27: opcode_0args
-            iopcode::unknown28: opcode_1args
-            iopcode::unknown29: opcode_1args
-            iopcode::unknown30: opcode_0args
-            iopcode::turn_on_teleporter: opcode_1args
-            iopcode::unused32: opcode_0args
-            iopcode::unused33: opcode_0args
-            iopcode::unknown34: opcode_0args
-            iopcode::unknown35: opcode_0args
-            iopcode::restore: opcode_0args
-            iopcode::unknown37: opcode_0args
-            iopcode::unknown38: opcode_1args
-            iopcode::unknown39: opcode_2args
-            iopcode::unknown40: opcode_1args
-            iopcode::give_items: opcode_6args
-            iopcode::unknown42: opcode_0args
-            iopcode::unknown43: opcode_1args
-            iopcode::unknown44: opcode_1args
-            iopcode::unknown45: opcode_2args
-            iopcode::unknown46: opcode_2args
-  opcode_0args:
-    seq: []
-  opcode_1args:
+            iopcode::end_command: opcode_args("")
+            iopcode::continue_conversation: opcode_args("")
+            iopcode::start_conversation: opcode_args("")
+            iopcode::end_commandlist: opcode_args("")
+            iopcode::unknown4: opcode_args("")
+            iopcode::unknown5: opcode_args("")
+            iopcode::unknown5: opcode_args("")
+            iopcode::receive_keyword: opcode_args("k")
+            iopcode::unknown7: opcode_args("")
+            iopcode::unknown8: opcode_args("uuu")
+            iopcode::unknown9: opcode_args("uu")
+            iopcode::unknown10: opcode_args("uu")
+            iopcode::unused11: opcode_args("")
+            iopcode::unknown12: opcode_args("u")
+            iopcode::unknown13: opcode_args("")
+            iopcode::unknown14: opcode_args("u")
+            iopcode::unknown15: opcode_args("u")
+            iopcode::unknown16: opcode_args("uu")
+            iopcode::unknown17: opcode_args("")
+            iopcode::emit_text: opcode_args("t")
+            iopcode::emit_keyword: opcode_args("k")
+            iopcode::take_item: opcode_args("o")
+            iopcode::unknown21: opcode_args("")
+            iopcode::set_variable: opcode_args("Vv")
+            iopcode::unknown23: opcode_args("u")
+            iopcode::give_item: opcode_args("o")
+            iopcode::unknown25: opcode_args("uu")
+            iopcode::heal_character: opcode_args("")
+            iopcode::unknown27: opcode_args("")
+            iopcode::unknown28: opcode_args("u")
+            iopcode::unknown29: opcode_args("u")
+            iopcode::unknown30: opcode_args("")
+            iopcode::turn_on_teleporter: opcode_args("t")
+            iopcode::unused32: opcode_args("")
+            iopcode::unused33: opcode_args("")
+            iopcode::unknown34: opcode_args("")
+            iopcode::unknown35: opcode_args("")
+            iopcode::restore: opcode_args("")
+            iopcode::unknown37: opcode_args("")
+            iopcode::unknown38: opcode_args("u")
+            iopcode::unknown39: opcode_args("uu")
+            iopcode::unknown40: opcode_args("u")
+            iopcode::give_items: opcode_args("oooooo")
+            iopcode::unknown42: opcode_args("")
+            iopcode::unknown43: opcode_args("u")
+            iopcode::unknown44: opcode_args("u")
+            iopcode::unknown45: opcode_args("uu")
+            iopcode::unknown46: opcode_args("uu")
+  opcode_args:
+    params:
+      - id: targs
+        type: str
     seq:
-      - id: arg1
+      - id: args
         type: s2
-  opcode_2args:
-    seq:
-      - id: arg1
-        type: s2
-      - id: arg2
-        type: s2
-  opcode_6args:
-    seq:
-      - id: arg1
-        type: s2
-      - id: arg2
-        type: s2
-      - id: arg3
-        type: s2
-      - id: arg4
-        type: s2
-      - id: arg5
-        type: s2
-      - id: arg6
-        type: s2
-
+        repeat: expr
+        repeat-expr: targs.length
 # conv 20 has the iron smith, who needs chunk of iron ore and strip of cured leather. and mithril ore.
 # opcodes seem to have the args and the opcode combined.
 enums:
@@ -132,10 +116,11 @@ enums:
     65533: continue_conversation # 0 args
     65534: start_conversation   # 0 args
     65535: end_commandlist      # 0 args
+    4: unknown4                 # 0 args
     5: unknown5                 # 0 args
     6: receive_keyword          # 1 arg
     7: unknown7                 # 0 args
-    8: unknown8                 # some kind of receive? sometimes 2 arg, sometimes 1?
+    8: unknown8                 # some kind of receive? sometimes 2 arg, sometimes 1? sometimes 3?
     9: unknown9                 # 2 args? checking variable? var != val?
     10: unknown10               # 2 args? checking variable?
     11: unused11                # 0 args

@@ -40,7 +40,7 @@ types:
         enum: tile_flags
       - id: tile_args
         if: floor_flags != tile_flags::nothing and floor_flags != tile_flags::movable_object
-        type: 
+        type:
           switch-on: floor_flags
           cases:
             tile_flags::movable_object: u1
@@ -59,7 +59,7 @@ types:
         enum: tile_flags
       - id: wall_args
         if: wall_flags != tile_flags::nothing
-        type: 
+        type:
           switch-on: wall_flags
           cases:
             tile_flags::movable_object: u1
@@ -114,16 +114,47 @@ types:
         # Funny thing is that we teleport from 11,4 to what amounts to the same
         # location as objects 229, 226, 232, which is 2, 3
         # So where do we find out that info?
+  level_props:
+    seq:
+      - id: unk1
+        type: s2
+      - id: unk2
+        type: s2
+      - id: unk3
+        type: s2
+      - id: unk4
+        type: s2
+      - id: unk5
+        type: s2
+      - id: unk6
+        type: s2
+      - id: unk7
+        type: s2
+      - id: unk8
+        type: s2
+      - id: unk9
+        type: s2
+      - id: unk10
+        type: s2
+      - id: blank11
+        contents: [0,0]
+      - id: unk12
+        type: s2
+      - id: unk13
+        type: s2
+      - id: unk14
+        type: s2
+      - id: blank15
+        contents: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
   level:
     seq:
       - id: height
         type: u1
       - id: width
         type: u1
-      - id: vals
-        type: s2
-        repeat: expr
-        repeat-expr: 32
+      - id: properties
+        type: level_props
       - id: map
         size: width * height
       - id: items
