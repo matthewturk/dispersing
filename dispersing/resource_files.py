@@ -11,29 +11,34 @@ class ResourceMap:
     def __init__(self, game):
         self.records = []
         self.sprites = {}
+        self.palette_sprites = {}
         palettes = game.palettes
         for i, rec in enumerate(game.assets["RESOURCE"].records):
             self.records.append(rec)
             if rec.type.name == "sprite":
-                if rec.header.algo == 3:
-                    rec_data = unpack_sprite_algo3(rec.contents)
-                else:
-                    continue # don't know the others yet
                 h = rec.header.height
                 w = rec.header.width_over_eight * 8
                 c = rec.header.count
                 if c > 1:
                     c, h = h, c
+                if rec.header.algo == 3:
+                    rec_data = unpack_sprite_algo3(rec.contents, c * h * w)
+                else:
+                    continue # don't know the others yet
                 im = rec_data.reshape((c, h, w))
                 im = np.moveaxis(im, 0, -1)
                 ims = []
+                pims = []
+                pal1_id = rec.header.field_4 >> 4
+                pal2_id = rec.header.field_4 & 15
+                palette = np.concatenate([
+                        palettes[pal1_id],
+                        palettes[pal2_id]],
+                        axis=0)
                 for frame in range(im.shape[-1]):
-                    pal1_id = rec.header.field_4 >> 4
-                    pal2_id = rec.header.field_4 & 15
-                    palette = np.concatenate([
-                            palettes[pal1_id], palettes[pal2_id]],
-                            axis=0)
+                    pims.append(im[:,:,frame])
                     ims.append(palette[im[:,:,frame]])
+                self.palette_sprites[i] = (pal1_id, pal2_id, pims)
                 self.sprites[i] = ims
 
 class RegisteredResource(type):
@@ -68,13 +73,13 @@ class PackedResourceFile(metaclass = RegisteredResource):
             self.process_records()
             self.process_footer()
         self.sizes = [len(_) for _ in self.records]
-            
+
     def read_header(self, f):
         pass
-    
+
     def process_record(self, rec):
         return rec
-    
+
     def process_records(self):
         pass
 
@@ -193,7 +198,7 @@ class ResourceFile(PackedResourceFile):
             raise KeyError(header['algo'][0])
         d = np.array(d, dtype='uint8')
         return header, d
-    
+
 class PackedRecordFile(metaclass = RegisteredResource):
     name = "packed_record"
     countsize = 2
@@ -215,19 +220,19 @@ class PackedRecordFile(metaclass = RegisteredResource):
             obj_data = obj_data.reshape((n_obj, int(s)))
         self.data = pd.DataFrame(obj_data)
         self.process_dataframe()
-            
+
     def read_header(self, f):
         pass
-    
+
     def process_dataframe(self):
         pass
-    
+
 class UnknownRecordFile(PackedRecordFile):
     name = "unknown_record_file"
     countsize = 1
     def read_header(self, f):
         self.header = np.fromfile(f, dtype="u1", count=4)
-    
+
 class ObjectRecordFile(PackedRecordFile):
     name = "objects"
     def read_header(self, f):
@@ -242,28 +247,28 @@ class ColorRecordFile(PackedRecordFile):
         self.data.rename(cnames, axis="columns", inplace=True)
         self.data.index.name = "Color"
         self.data = self.data.transpose()
-        
+
     def plot(self):
         image = np.zeros((self.data.shape[0], self.data.shape[1]//3, 3))
         image[:,:,0] = self.data.loc[:, pd.IndexSlice[:, "R"]] * 4
         image[:,:,1] = self.data.loc[:, pd.IndexSlice[:, "G"]] * 4
         image[:,:,2] = self.data.loc[:, pd.IndexSlice[:, "B"]] * 4
         return image
-        
+
 class InteractionResourceFile(PackedResourceFile):
     countsize = 2
     indexsize = 4
     name = "interact"
     def read_header(self, f):
         self.offset = np.fromfile(f, dtype='u2', count = 1)
-        
+
 class TextResourceFile(PackedResourceFile):
     countsize = 4
     indexsize = 4
     name = "text"
     def process_record(self, rec):
         return (rec ^ 218).tostring().replace(b"\xda", b"")
-    
+
 class LevelMap:
     def __init__(self, level_id, data):
         # Some info about the level map item data:
@@ -284,10 +289,10 @@ class LevelMap:
         self.n_cells = (self.map_data != 255).sum()
         self.cell_count = np.bincount(self.map_data.ravel(), minlength=256)
         self.size = data.size
-        
+
     def __len__(self):
         return self.size
-        
+
     def block_grid(self):
         bg = ipythonblocks.BlockGrid(width = self.width, height = self.height, lines_on = False, block_size = 20)
         for i in range(self.height):
@@ -297,7 +302,7 @@ class LevelMap:
                 else:
                     bg[i,j].rgb = (100, 100, 100)
         return bg
-    
+
     def highlighter(self):
         lg = self.block_grid()
         @ipywidgets.interact(highlight = np.unique(self.map_data).tolist())
@@ -317,7 +322,7 @@ class LevelMap:
 class LevelResourceFile(PackedResourceFile):
     countsize = 4
     indexsize = 4
-    name = "levels"   
+    name = "levels"
     def process_record(self, rec):
         return LevelMap(-1, rec)
 
@@ -335,7 +340,7 @@ class FRecordFile(PackedRecordFile):
     # For the summoning, the header is 0, 49, 3.
     # It's not immediately obvious what that means.
     countsize = 2
-    # The footer consists of three records 
+    # The footer consists of three records
     footer_size = 105
 
     def read_header(self, f):

@@ -4,6 +4,8 @@
 """The setup script."""
 
 from setuptools import setup, find_packages
+from Cython.Build import cythonize
+import numpy
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -38,7 +40,9 @@ setup(
             'dispersing=dispersing.cli:main'
         ]
     },
+    ext_modules = cythonize("dispersing/fast_utilities.pyx"),
     include_package_data=True,
+    include_dirs = [numpy.get_include()],
     install_requires=requirements,
     license="BSD license",
     zip_safe=False,

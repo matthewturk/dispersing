@@ -1,4 +1,5 @@
 import numpy as np
+from .fast_utilities import unpack_sprite_algo3
 
 def common_attributes(obj_collection):
     shared_attributes = set()
@@ -21,7 +22,7 @@ def collect_attributes(obj_collection, attr_list):
             values[attr].append(getattr(obj, attr))
     return values
 
-def unpack_sprite_algo3(s):
+def py_unpack_sprite_algo3(s):
     s = np.frombuffer(s, dtype="u1")
     history = np.zeros(0x1000, dtype='u1')
     history[:] = 0xFE

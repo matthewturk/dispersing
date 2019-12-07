@@ -18,7 +18,7 @@ The Dispersing
      :alt: Updates
 
 
-A game asset extractor for The Summoning
+A game asset extractor for The Summoning, and maybe eventually the other games that use the same engine from the early 90's.
 
 
 * Free software: BSD license
