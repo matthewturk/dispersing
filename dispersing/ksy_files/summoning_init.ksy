@@ -8,12 +8,8 @@ seq:
   - id: unknown1
     type: unknown1_t
   - id: unknown2
-    size: 256
+    size: 2048
   - id: unknown3
-    repeat: expr
-    repeat-expr: 29
-    terminator: 0xff
-  - id: unknown4
     size: 256
   - id: spells
     size: 9
