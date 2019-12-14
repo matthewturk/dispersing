@@ -25,18 +25,12 @@ types:
       - id: col1
         type: u1
       - id: col2
-        type: u1
+        size: 4
       - id: col3
         type: u1
       - id: col4
         type: u1
       - id: col5
-        type: u1
-      - id: col6
-        type: u1
-      - id: col7
-        type: u1
-      - id: col8
         type: u1
   character:
     seq:
