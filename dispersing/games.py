@@ -27,7 +27,8 @@ class Game:
             fn = os.path.join(self.path, asset_filename)
             cls = getattr(self.base_mod, asset_filename)
             d = self.assets[asset_filename] = cls.from_file(fn)
-            self.records[asset_filename] = make_df(getattr(d, attr))
+            if attr is not None:
+                self.records[asset_filename] = make_df(getattr(d, attr))
 
         self.setup_resources()
 
@@ -42,7 +43,8 @@ class TheSummoning(Game):
                 ("TEXT", "text"),
                 ("KEYWORDS", "keyword"),
                 ("LEVELS", "levels"),
-                ("NPC", "npcs")
+                ("NPC", "npcs"),
+                ("INIT", None),
             )
 
     def setup_resources(self):

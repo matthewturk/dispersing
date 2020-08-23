@@ -116,17 +116,17 @@ types:
         # So where do we find out that info?
   level_props:
     seq:
-      - id: unk1
+      - id: internal_wall_edges
         type: s2
-      - id: unk2
+      - id: floor
         type: s2
-      - id: unk3
+      - id: floor_special_tile
         type: s2
-      - id: unk4
+      - id: wall_edges
         type: s2
-      - id: unk5
+      - id: keys_switches
         type: s2
-      - id: unk6
+      - id: door
         type: s2
       - id: unk7
         type: s2
@@ -140,9 +140,9 @@ types:
         contents: [0,0]
       - id: unk12
         type: s2
-      - id: unk13
+      - id: big_wooden_thing
         type: s2
-      - id: unk14
+      - id: big_boulder
         type: s2
       - id: blank15
         contents: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
