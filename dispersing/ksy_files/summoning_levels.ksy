@@ -134,7 +134,7 @@ types:
         type: s2
       - id: unk9
         type: s2
-      - id: unk10
+      - id: wall_overlay_tiles
         type: s2
       - id: blank11
         contents: [0,0]
