@@ -1,5 +1,8 @@
+import sys
+
 import numpy as np
-import sys, pygame
+import pygame
+
 from dispersing.games import TheSummoning
 
 ts = TheSummoning("../../the-summoning/")

@@ -1,7 +1,7 @@
+import bqplot
+import ipycanvas
 import ipywidgets
 import traitlets
-import ipycanvas
-import bqplot
 
 
 class ObjectViewer(traitlets.HasTraits):

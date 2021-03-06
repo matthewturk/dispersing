@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from .kaitai_utilities import unpack_sprite_algo3
 from .kaitai_parsers import summoning as dsk
+from .kaitai_utilities import unpack_sprite_algo3
 
 resource_registry = {}
 

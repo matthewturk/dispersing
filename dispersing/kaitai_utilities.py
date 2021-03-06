@@ -1,4 +1,5 @@
 import numpy as np
+
 from .fast_utilities import unpack_sprite_algo3
 
 
