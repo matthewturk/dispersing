@@ -2,6 +2,7 @@ import numpy as np
 from .fast_utilities import unpack_sprite_algo3
 import PIL.Image
 
+
 class SpriteResource:
     def __init__(self, rec, palettes):
         self.record = rec
