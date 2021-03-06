@@ -1,8 +1,9 @@
 import numpy as np
 import sys, pygame
 from dispersing.games import TheSummoning
+
 ts = TheSummoning("../../the-summoning/")
-speed=[0,0]
+speed = [0, 0]
 black = 0, 0, 0
 
 pygame.init()
@@ -11,8 +12,9 @@ size = width, height = 1024, 768
 
 screen = pygame.display.set_mode(size)
 
+
 class SpriteDisplay:
-    def __init__(self, game, sprite_id = 0, max_size = 400):
+    def __init__(self, game, sprite_id=0, max_size=400):
         self.game = game
         self.sprite_ids = list(sorted(self.game.resources.palette_sprites.keys()))
         self.max_size = max_size
@@ -54,11 +56,12 @@ class SpriteDisplay:
         self.sprite_rect = self.sprite.get_rect()
 
     def _set_palette(self, pal1_id, pal2_id):
-        palette = np.concatenate([self.game.palettes[pal1_id],
-                                  self.game.palettes[pal2_id]],
-                                 axis=0)
+        palette = np.concatenate(
+            [self.game.palettes[pal1_id], self.game.palettes[pal2_id]], axis=0
+        )
         self._current_palette = palette
         self.sprite.set_palette(palette)
+
 
 sd = SpriteDisplay(ts)
 

@@ -4,8 +4,12 @@ from pkg_resources import parse_version
 from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningF(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -27,7 +31,6 @@ class SummoningF(KaitaiStruct):
         for i in range(self.num_character):
             self.characters[i] = self._root.Character(self._io, self, self._root)
 
-
     class Frecord(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -45,7 +48,6 @@ class SummoningF(KaitaiStruct):
             self.col7 = self._io.read_u1()
             self.col8 = self._io.read_u1()
 
-
     class Character(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -54,7 +56,9 @@ class SummoningF(KaitaiStruct):
             self._read()
 
         def _read(self):
-            self.name = (KaitaiStream.bytes_terminate(self._io.read_bytes(26), 0, False)).decode(u"ASCII")
+            self.name = (
+                KaitaiStream.bytes_terminate(self._io.read_bytes(26), 0, False)
+            ).decode("ASCII")
             self.portrait = self._io.read_u1()
             self.strength = self._io.read_u1()
             self.agility = self._io.read_u1()
@@ -64,6 +68,3 @@ class SummoningF(KaitaiStruct):
             self.power = self._io.read_u1()
             self.spell_type = self._io.read_u1()
             self.weapon_type = self._io.read_u1()
-
-
-

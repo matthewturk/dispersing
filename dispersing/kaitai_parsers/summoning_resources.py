@@ -5,16 +5,20 @@ from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, 
 from enum import Enum
 
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningResources(KaitaiStruct):
-
     class RecordTypes(Enum):
         sprite = 1
         unknown2 = 2
         music = 3
         unknown3 = 5
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -30,7 +34,6 @@ class SummoningResources(KaitaiStruct):
         self.records = [None] * (self.count)
         for i in range(self.count):
             self.records[i] = self._root.ResourceRecord(i, self._io, self, self._root)
-
 
     class ResourceRecord(KaitaiStruct):
         def __init__(self, i, _io, _parent=None, _root=None):
@@ -50,25 +53,34 @@ class SummoningResources(KaitaiStruct):
             elif _on == self._root.RecordTypes.music:
                 self.header = self._root.MusicHeader(self._io, self, self._root)
             else:
-                self.header = self._root.GenericHeader(self.header_size, self._io, self, self._root)
-            self.contents = self._io.read_bytes((self.record_end - self._root._io.pos()))
+                self.header = self._root.GenericHeader(
+                    self.header_size, self._io, self, self._root
+                )
+            self.contents = self._io.read_bytes(
+                (self.record_end - self._root._io.pos())
+            )
 
         @property
         def record_start(self):
-            if hasattr(self, '_m_record_start'):
-                return self._m_record_start if hasattr(self, '_m_record_start') else None
+            if hasattr(self, "_m_record_start"):
+                return (
+                    self._m_record_start if hasattr(self, "_m_record_start") else None
+                )
 
             self._m_record_start = self._parent.offsets[self.i]
-            return self._m_record_start if hasattr(self, '_m_record_start') else None
+            return self._m_record_start if hasattr(self, "_m_record_start") else None
 
         @property
         def record_end(self):
-            if hasattr(self, '_m_record_end'):
-                return self._m_record_end if hasattr(self, '_m_record_end') else None
+            if hasattr(self, "_m_record_end"):
+                return self._m_record_end if hasattr(self, "_m_record_end") else None
 
-            self._m_record_end = (self._parent.offsets[(self.i + 1)] if self.i < (self._parent.count - 1) else self._root._io.size())
-            return self._m_record_end if hasattr(self, '_m_record_end') else None
-
+            self._m_record_end = (
+                self._parent.offsets[(self.i + 1)]
+                if self.i < (self._parent.count - 1)
+                else self._root._io.size()
+            )
+            return self._m_record_end if hasattr(self, "_m_record_end") else None
 
     class SpriteHeader(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -84,7 +96,6 @@ class SummoningResources(KaitaiStruct):
             self.field_4 = self._io.read_u1()
             self.algo = self._io.read_u1()
             self.field_6 = self._io.read_u1()
-
 
     class MusicHeader(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -109,7 +120,6 @@ class SummoningResources(KaitaiStruct):
             self.unknown5 = self._io.read_u1()
             self.i_inst_count = self._io.read_u1()
 
-
     class GenericHeader(KaitaiStruct):
         def __init__(self, size, _io, _parent=None, _root=None):
             self._io = _io
@@ -120,6 +130,3 @@ class SummoningResources(KaitaiStruct):
 
         def _read(self):
             self.contents = self._io.read_bytes(self.size)
-
-
-

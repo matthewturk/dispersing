@@ -4,8 +4,12 @@ from pkg_resources import parse_version
 from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningJaz(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -43,6 +47,3 @@ class SummoningJaz(KaitaiStruct):
             self.col14 = self._io.read_u1()
             self.col15 = self._io.read_u1()
             self.col16 = self._io.read_u1()
-
-
-

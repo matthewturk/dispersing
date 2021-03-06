@@ -4,8 +4,12 @@ from pkg_resources import parse_version
 from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningNpc(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -19,7 +23,6 @@ class SummoningNpc(KaitaiStruct):
         self.npcs = [None] * (self.count)
         for i in range(self.count):
             self.npcs[i] = self._root.Npc(self._io, self, self._root)
-
 
     class Npc(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -45,6 +48,3 @@ class SummoningNpc(KaitaiStruct):
             self.col13 = self._io.read_u1()
             self.col14 = self._io.read_u1()
             self.col15 = self._io.read_u1()
-
-
-

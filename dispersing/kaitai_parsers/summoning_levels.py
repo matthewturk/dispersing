@@ -5,11 +5,14 @@ from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, 
 from enum import Enum
 
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningLevels(KaitaiStruct):
-
     class TileFlags(Enum):
         nothing = 0
         movable_object = 1
@@ -23,6 +26,7 @@ class SummoningLevels(KaitaiStruct):
         npc = 9
         unknown10 = 10
         mouth = 11
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -34,7 +38,6 @@ class SummoningLevels(KaitaiStruct):
         self.levels = [None] * (self.file_header.count)
         for i in range(self.file_header.count):
             self.levels[i] = self._root.Level(self._io, self, self._root)
-
 
     class PortalInfo(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -49,7 +52,6 @@ class SummoningLevels(KaitaiStruct):
             self.dest_x = self._io.read_u1()
             self.dest_y = self._io.read_u1()
 
-
     class ItemData(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -63,8 +65,6 @@ class SummoningLevels(KaitaiStruct):
             if self.x != 255:
                 self.info = self._root.TileInfo(self._io, self, self._root)
 
-
-
     class SpeechStrings(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -75,7 +75,6 @@ class SummoningLevels(KaitaiStruct):
         def _read(self):
             self.size = self._io.read_u2le()
             self.text = self._io.read_bytes(self.size)
-
 
     class LevelProps(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -99,8 +98,9 @@ class SummoningLevels(KaitaiStruct):
             self.unk12 = self._io.read_s2le()
             self.big_wooden_thing = self._io.read_s2le()
             self.big_boulder = self._io.read_s2le()
-            self.blank15 = self._io.ensure_fixed_contents(b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
-
+            self.blank15 = self._io.ensure_fixed_contents(
+                b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            )
 
     class OtherData(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -115,8 +115,6 @@ class SummoningLevels(KaitaiStruct):
             for i in range(self.size):
                 self.contents[i] = self._io.read_u1()
 
-
-
     class TeleporterInfo(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -126,7 +124,6 @@ class SummoningLevels(KaitaiStruct):
 
         def _read(self):
             self.unknown = self._io.read_bytes(5)
-
 
     class Header(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -141,8 +138,6 @@ class SummoningLevels(KaitaiStruct):
             for i in range(self.count):
                 self.offsets[i] = self._io.read_u4le()
 
-
-
     class TileInfo(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -156,11 +151,17 @@ class SummoningLevels(KaitaiStruct):
             for i in range(self.n1):
                 self.items[i] = self._io.read_u1()
 
-            self.floor_flags = KaitaiStream.resolve_enum(self._root.TileFlags, self._io.read_u1())
-            if  ((self.floor_flags != self._root.TileFlags.nothing) and (self.floor_flags != self._root.TileFlags.movable_object)) :
+            self.floor_flags = KaitaiStream.resolve_enum(
+                self._root.TileFlags, self._io.read_u1()
+            )
+            if (self.floor_flags != self._root.TileFlags.nothing) and (
+                self.floor_flags != self._root.TileFlags.movable_object
+            ):
                 _on = self.floor_flags
                 if _on == self._root.TileFlags.teleporter:
-                    self.tile_args = self._root.TeleporterInfo(self._io, self, self._root)
+                    self.tile_args = self._root.TeleporterInfo(
+                        self._io, self, self._root
+                    )
                 elif _on == self._root.TileFlags.unknown4:
                     self.tile_args = self._io.read_u1()
                 elif _on == self._root.TileFlags.movable_object:
@@ -180,13 +181,19 @@ class SummoningLevels(KaitaiStruct):
                 elif _on == self._root.TileFlags.npc:
                     self.tile_args = self._io.read_u1()
                 elif _on == self._root.TileFlags.teleporter_dest:
-                    self.tile_args = self._root.TeleporterInfo(self._io, self, self._root)
+                    self.tile_args = self._root.TeleporterInfo(
+                        self._io, self, self._root
+                    )
 
-            self.wall_flags = KaitaiStream.resolve_enum(self._root.TileFlags, self._io.read_u1())
+            self.wall_flags = KaitaiStream.resolve_enum(
+                self._root.TileFlags, self._io.read_u1()
+            )
             if self.wall_flags != self._root.TileFlags.nothing:
                 _on = self.wall_flags
                 if _on == self._root.TileFlags.teleporter:
-                    self.wall_args = self._root.TeleporterInfo(self._io, self, self._root)
+                    self.wall_args = self._root.TeleporterInfo(
+                        self._io, self, self._root
+                    )
                 elif _on == self._root.TileFlags.unknown4:
                     self.wall_args = self._io.read_u1()
                 elif _on == self._root.TileFlags.movable_object:
@@ -206,9 +213,9 @@ class SummoningLevels(KaitaiStruct):
                 elif _on == self._root.TileFlags.npc:
                     self.wall_args = self._io.read_u1()
                 elif _on == self._root.TileFlags.teleporter_dest:
-                    self.wall_args = self._root.TeleporterInfo(self._io, self, self._root)
-
-
+                    self.wall_args = self._root.TeleporterInfo(
+                        self._io, self, self._root
+                    )
 
     class Level(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -227,11 +234,8 @@ class SummoningLevels(KaitaiStruct):
             while True:
                 _ = self._root.ItemData(self._io, self, self._root)
                 self.items.append(_)
-                if  ((_.x == 255) and (_.y == 255)) :
+                if (_.x == 255) and (_.y == 255):
                     break
                 i += 1
             self.speech = self._root.SpeechStrings(self._io, self, self._root)
             self.other = self._root.OtherData(self._io, self, self._root)
-
-
-

@@ -6,6 +6,7 @@ from .kaitai_parsers import summoning as dsk
 
 resource_registry = {}
 
+
 class ResourceMap:
     # This one uses kaitai and will replace the others
     def __init__(self, game):
@@ -24,22 +25,20 @@ class ResourceMap:
                 if rec.header.algo == 3:
                     rec_data = unpack_sprite_algo3(rec.contents, c * h * w)
                 else:
-                    continue # don't know the others yet
+                    continue  # don't know the others yet
                 im = rec_data.reshape((c, h, w))
                 im = np.moveaxis(im, 0, -1)
                 ims = []
                 pims = []
                 pal1_id = rec.header.field_4 >> 4
                 pal2_id = rec.header.field_4 & 15
-                palette = np.concatenate([
-                        palettes[pal1_id],
-                        palettes[pal2_id]],
-                        axis=0)
+                palette = np.concatenate([palettes[pal1_id], palettes[pal2_id]], axis=0)
                 for frame in range(im.shape[-1]):
-                    pims.append(im[:,:,frame])
-                    ims.append(palette[im[:,:,frame]])
+                    pims.append(im[:, :, frame])
+                    ims.append(palette[im[:, :, frame]])
                 self.palette_sprites[i] = (pal1_id, pal2_id, pims)
                 self.sprites[i] = ims
+
 
 class RegisteredResource(type):
     def __init__(cls, name, bases, nmspc):
@@ -47,17 +46,19 @@ class RegisteredResource(type):
         if getattr(cls, "name", None) is not None:
             resource_registry[cls.name] = cls
 
-class PackedResourceFile(metaclass = RegisteredResource):
+
+class PackedResourceFile(metaclass=RegisteredResource):
     countsize = 1
     indexsize = 2
     name = "packed_resource_file"
-    def __init__(self, filename, countsize = None, indexsize = None):
-        dtype_c = 'u{}'.format(countsize or self.countsize)
-        dtype_i = 'u{}'.format(indexsize or self.indexsize)
+
+    def __init__(self, filename, countsize=None, indexsize=None):
+        dtype_c = "u{}".format(countsize or self.countsize)
+        dtype_i = "u{}".format(indexsize or self.indexsize)
         size = os.stat(filename)[stat.ST_SIZE]
         self.locations = []
         with open(filename, "rb") as f:
-            n_rec, = np.fromfile(f, dtype=dtype_c, count=1)
+            (n_rec,) = np.fromfile(f, dtype=dtype_c, count=1)
             self.read_header(f)
             indices = np.fromfile(f, dtype=dtype_i, count=n_rec)
             indices = np.concatenate([indices, [size]])
@@ -65,7 +66,7 @@ class PackedResourceFile(metaclass = RegisteredResource):
             self.indices = indices[:-1]
             for si, ei in zip(indices[:-1], indices[1:]):
                 loc = f.tell()
-                t = np.fromfile(f, count=ei-si, dtype='u1')
+                t = np.fromfile(f, count=ei - si, dtype="u1")
                 if t.tostring() == b"EMPTY\r\n":
                     continue
                 self.locations.append(loc)
@@ -86,44 +87,51 @@ class PackedResourceFile(metaclass = RegisteredResource):
     def process_footer(self):
         pass
 
-_REC1_HEADER = np.dtype( [
-    ('height', 'u2'),
-    ('count', 'u1'),
-    ('width', 'u1'),
-    ('field_4', 'u1'),
-    ('algo', 'u1'),
-    ('field_6', 'u1')]
+
+_REC1_HEADER = np.dtype(
+    [
+        ("height", "u2"),
+        ("count", "u1"),
+        ("width", "u1"),
+        ("field_4", "u1"),
+        ("algo", "u1"),
+        ("field_6", "u1"),
+    ]
 )
 
-_REC3_HEADER = np.dtype([
-    ('tickBeat', 'u1'),
-    ('beatMeasure', 'u1'),
-    ('totalTick', '<i4'),
-    ('dataSize', '<i4'),
-    ('nrCommand', '<i4'),
-    ('soundMode', 'u1'),
-    ('pitchBRange', 'u1'),
-    ('basicTempo', '<u2'),
-    ('unknown1', 'u1'),
-    ('unknown2', 'u1'),
-    ('unknown3', 'u1'),
-    ('unknown4', 'u1'),
-    ('unknown5', 'u1'),
-    ('iInstCount', 'u1'),
-])
+_REC3_HEADER = np.dtype(
+    [
+        ("tickBeat", "u1"),
+        ("beatMeasure", "u1"),
+        ("totalTick", "<i4"),
+        ("dataSize", "<i4"),
+        ("nrCommand", "<i4"),
+        ("soundMode", "u1"),
+        ("pitchBRange", "u1"),
+        ("basicTempo", "<u2"),
+        ("unknown1", "u1"),
+        ("unknown2", "u1"),
+        ("unknown3", "u1"),
+        ("unknown4", "u1"),
+        ("unknown5", "u1"),
+        ("iInstCount", "u1"),
+    ]
+)
+
 
 class ResourceFile(PackedResourceFile):
     name = "resource"
     countsize = 4
     indexsize = 4
+
     def process_record(self, rec):
-        assert(rec[:2].tostring() == b"EH")
+        assert rec[:2].tostring() == b"EH"
         return rec[2:]
 
     def find_offset(self, offset):
         """This function takes an offset (for instance, what might come out of
         a debugger that tracks file I/O) and returns the record."""
-        record_id = int((offset - self.countsize)/self.indexsize)
+        record_id = int((offset - self.countsize) / self.indexsize)
         return record_id, self.records[record_id]
 
     def unpack(self, rec_id):
@@ -146,24 +154,24 @@ class ResourceFile(PackedResourceFile):
         record = self.records[rec_id]
         header = record[3:10].view(_REC1_HEADER)
         pos = 0
-        s = record[10:].view('i1').copy()
+        s = record[10:].view("i1").copy()
         d = []
         # These are inspired by the Unveiled project
-        if header['algo'][0] == 1:
+        if header["algo"][0] == 1:
             while pos < s.size:
                 v = s[pos]
                 pos += 1
                 if v < 0:
                     count = -v + 1
-                    d.extend(count * s[pos:pos+1].tolist())
+                    d.extend(count * s[pos : pos + 1].tolist())
                     pos += 1
                 else:
                     count = v + 1
-                    d.extend(s[pos:pos+count])
+                    d.extend(s[pos : pos + count])
                     pos += count
-        elif header['algo'][0] == 3:
-            s = s.view('u1')
-            history = np.zeros(0x1000, dtype='u1')
+        elif header["algo"][0] == 3:
+            s = s.view("u1")
+            history = np.zeros(0x1000, dtype="u1")
             history[:] = 0xFE
             it = 0xFEE
             si = 0
@@ -178,7 +186,7 @@ class ResourceFile(PackedResourceFile):
                     pos += 1
                     d.append(v)
                     history[it] = v
-                    it = (it+1) & 0xFFF
+                    it = (it + 1) & 0xFFF
                 else:
                     v1 = s[pos]
                     pos += 1
@@ -192,31 +200,33 @@ class ResourceFile(PackedResourceFile):
                         v = history[bx]
                         d.append(v)
                         history[it] = v
-                        it = (it+1) & 0xFFF
+                        it = (it + 1) & 0xFFF
                         cx += 1
         else:
-            raise KeyError(header['algo'][0])
-        d = np.array(d, dtype='uint8')
+            raise KeyError(header["algo"][0])
+        d = np.array(d, dtype="uint8")
         return header, d
 
-class PackedRecordFile(metaclass = RegisteredResource):
+
+class PackedRecordFile(metaclass=RegisteredResource):
     name = "packed_record"
     countsize = 2
     column_names = None
     footer_size = 0
-    def __init__(self, filename, countsize = None):
+
+    def __init__(self, filename, countsize=None):
         dtype_c = "u{}".format(countsize or self.countsize)
         size = os.stat(filename)[stat.ST_SIZE]
         with open(filename, "rb") as f:
-            n_obj, = np.fromfile(f, dtype=dtype_c, count = 1)
+            (n_obj,) = np.fromfile(f, dtype=dtype_c, count=1)
             self.read_header(f)
             obj_data = np.fromfile(f, dtype="u1")
             s = (obj_data.size - self.footer_size) / n_obj
             if s != np.ceil(s):
                 raise RuntimeError("Size mismatch.")
-            self.footer = obj_data[-self.footer_size:]
+            self.footer = obj_data[-self.footer_size :]
             if self.footer_size > 0:
-                obj_data = obj_data[:-self.footer_size]
+                obj_data = obj_data[: -self.footer_size]
             obj_data = obj_data.reshape((n_obj, int(s)))
         self.data = pd.DataFrame(obj_data)
         self.process_dataframe()
@@ -227,47 +237,60 @@ class PackedRecordFile(metaclass = RegisteredResource):
     def process_dataframe(self):
         pass
 
+
 class UnknownRecordFile(PackedRecordFile):
     name = "unknown_record_file"
     countsize = 1
+
     def read_header(self, f):
         self.header = np.fromfile(f, dtype="u1", count=4)
 
+
 class ObjectRecordFile(PackedRecordFile):
     name = "objects"
+
     def read_header(self, f):
-        self.offset = np.fromfile(f, dtype="u2", count = 1)
+        self.offset = np.fromfile(f, dtype="u2", count=1)
+
 
 class ColorRecordFile(PackedRecordFile):
     name = "colors"
     countsize = 1
+
     def process_dataframe(self):
         self.data.T
-        cnames = dict(enumerate([ ("P%02i" % i, "RGB"[j]) for i in range(16) for j in range(3)]))
+        cnames = dict(
+            enumerate([("P%02i" % i, "RGB"[j]) for i in range(16) for j in range(3)])
+        )
         self.data.rename(cnames, axis="columns", inplace=True)
         self.data.index.name = "Color"
         self.data = self.data.transpose()
 
     def plot(self):
-        image = np.zeros((self.data.shape[0], self.data.shape[1]//3, 3))
-        image[:,:,0] = self.data.loc[:, pd.IndexSlice[:, "R"]] * 4
-        image[:,:,1] = self.data.loc[:, pd.IndexSlice[:, "G"]] * 4
-        image[:,:,2] = self.data.loc[:, pd.IndexSlice[:, "B"]] * 4
+        image = np.zeros((self.data.shape[0], self.data.shape[1] // 3, 3))
+        image[:, :, 0] = self.data.loc[:, pd.IndexSlice[:, "R"]] * 4
+        image[:, :, 1] = self.data.loc[:, pd.IndexSlice[:, "G"]] * 4
+        image[:, :, 2] = self.data.loc[:, pd.IndexSlice[:, "B"]] * 4
         return image
+
 
 class InteractionResourceFile(PackedResourceFile):
     countsize = 2
     indexsize = 4
     name = "interact"
+
     def read_header(self, f):
-        self.offset = np.fromfile(f, dtype='u2', count = 1)
+        self.offset = np.fromfile(f, dtype="u2", count=1)
+
 
 class TextResourceFile(PackedResourceFile):
     countsize = 4
     indexsize = 4
     name = "text"
+
     def process_record(self, rec):
         return (rec ^ 218).tostring().replace(b"\xda", b"")
+
 
 class LevelMap:
     def __init__(self, level_id, data):
@@ -280,12 +303,14 @@ class LevelMap:
         # Maybe it goes:
         #   X Y N_t1(t1 info) N_t2(t2 info) N_t3(t3 info)
         # Could it be item, NPC, portal?
-        #self.name = level_names[level_id]
+        # self.name = level_names[level_id]
         self.height = int(data[0])
         self.width = int(data[1])
-        self.header = data[2:66].view('u2').astype('int64')
-        self.map_data = data[66:66+self.height*self.width].reshape((self.height, self.width), order='C')
-        self.item_data = data[66+self.height*self.width:]
+        self.header = data[2:66].view("u2").astype("int64")
+        self.map_data = data[66 : 66 + self.height * self.width].reshape(
+            (self.height, self.width), order="C"
+        )
+        self.item_data = data[66 + self.height * self.width :]
         self.n_cells = (self.map_data != 255).sum()
         self.cell_count = np.bincount(self.map_data.ravel(), minlength=256)
         self.size = data.size
@@ -294,47 +319,57 @@ class LevelMap:
         return self.size
 
     def block_grid(self):
-        bg = ipythonblocks.BlockGrid(width = self.width, height = self.height, lines_on = False, block_size = 20)
+        bg = ipythonblocks.BlockGrid(
+            width=self.width, height=self.height, lines_on=False, block_size=20
+        )
         for i in range(self.height):
             for j in range(self.width):
-                if self.map_data[i,j] == 255:
-                    bg[i,j].rgb = (0, 0, 0)
+                if self.map_data[i, j] == 255:
+                    bg[i, j].rgb = (0, 0, 0)
                 else:
-                    bg[i,j].rgb = (100, 100, 100)
+                    bg[i, j].rgb = (100, 100, 100)
         return bg
 
     def highlighter(self):
         lg = self.block_grid()
-        @ipywidgets.interact(highlight = np.unique(self.map_data).tolist())
-        def highlight_map(highlight = 0):
+
+        @ipywidgets.interact(highlight=np.unique(self.map_data).tolist())
+        def highlight_map(highlight=0):
             for i in range(self.map_data.shape[0]):
                 for j in range(self.map_data.shape[1]):
-                    if self.map_data[i,j] == highlight:
-                        lg[i,j].rgb = (255, 255, 255)
-                    elif self.map_data[i,j] < 255:
-                        lg[i,j].rgb = (100, 100, 0)
+                    if self.map_data[i, j] == highlight:
+                        lg[i, j].rgb = (255, 255, 255)
+                    elif self.map_data[i, j] < 255:
+                        lg[i, j].rgb = (100, 100, 0)
                     else:
-                        lg[i,j].rgb = (0, 0, 0)
-            print(np.unpackbits(np.array([highlight], dtype='u1')))
+                        lg[i, j].rgb = (0, 0, 0)
+            print(np.unpackbits(np.array([highlight], dtype="u1")))
             return lg
+
         return highlight_map
+
 
 class LevelResourceFile(PackedResourceFile):
     countsize = 4
     indexsize = 4
     name = "levels"
+
     def process_record(self, rec):
         return LevelMap(-1, rec)
+
 
 class KeywordResourceFile(PackedResourceFile):
     countsize = 2
     indexsize = 2
     name = "keywords"
+
     def process_record(self, rec):
         return rec[:-1].tostring().decode("ascii")
 
+
 class NPCRecordFile(PackedRecordFile):
     countsize = 2
+
 
 class FRecordFile(PackedRecordFile):
     # For the summoning, the header is 0, 49, 3.
