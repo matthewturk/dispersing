@@ -1,6 +1,7 @@
 import io
 import ipywidgets
 from IPython.display import display
+import pandas as pd
 
 _display_fields = (
     ("Name", "name"),
@@ -53,6 +54,23 @@ class ObjectDatabase:
             )
             self.images_by_name[name] = self.images_by_id[i]
             obj.name = name
+
+    def to_df(self):
+        obj = self.objects_by_id[0]
+        fields = [
+            _
+            for _ in dir(obj)
+            if not _.startswith("_")
+            and _ not in ("close", "from_file", "from_io", "from_bytes")
+        ]
+        fields.sort()
+        records = []
+        for n, orec in sorted(self.objects_by_id.items()):
+            rec = {_: getattr(orec, _) for _ in fields}
+            rec["obj_type"] = orec.obj_type.name
+            records.append(rec)
+        df = pd.DataFrame(records)
+        return df
 
     def __contains__(self, key):
         return key in self.objects_by_id or key in self.objects_by_name
