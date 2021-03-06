@@ -3,6 +3,7 @@ import ipywidgets
 from IPython.display import display
 
 _display_fields = (
+    ("Name", "name"),
     ("AC Bonus", "ac_bonus"),
     ("col0", "col0"),
     ("weight", "weight"),
@@ -51,6 +52,7 @@ class ObjectDatabase:
                 game.resources.sprites[big_id],
             )
             self.images_by_name[name] = self.images_by_id[i]
+            obj.name = name
 
     def __contains__(self, key):
         return key in self.objects_by_id or key in self.objects_by_name
@@ -75,6 +77,7 @@ class ObjectDatabase:
                     png_images[-1].append(output.read())
         sprite_slider = ipywidgets.IntSlider(min=0, max=n, step=1)
         frame_slider = ipywidgets.IntSlider(min=0, step=1)
+        frame_label = ipywidgets.Label(value="")
         im = ipywidgets.Image(value=b"", format="png", height=200)
         span = ipywidgets.HTML()
 
@@ -86,7 +89,9 @@ class ObjectDatabase:
             im.value = png_images[sprite_slider.value][frame_slider.value]
 
         def update_sprite(change):
-            frame_slider.max = len(png_images[sprite_slider.value])
+            nf = len(png_images[sprite_slider.value])
+            frame_label.value = f"({nf})"
+            frame_slider.max = nf
 
         im.add_class("dispersing-pixelated")
         im.layout.height = "200px"
@@ -95,7 +100,20 @@ class ObjectDatabase:
         sprite_slider.observe(update_sprite, "value")
         sprite_slider.observe(update_image, "value")
         frame_slider.observe(update_image, "value")
+        # There's gotta be a better way to do this, but.
+        sprite_slider.value = 1
         sprite_slider.value = 0
         display(
-            ipywidgets.HBox([ipywidgets.VBox([sprite_slider, frame_slider, span]), im])
+            ipywidgets.HBox(
+                [
+                    ipywidgets.VBox(
+                        [
+                            sprite_slider,
+                            ipywidgets.HBox([frame_slider, frame_label]),
+                            span,
+                        ]
+                    ),
+                    im,
+                ]
+            )
         )
