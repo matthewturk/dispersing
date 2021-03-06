@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class NPCDatabase:
     def __init__(self, game):
         self.npc_asset = game.assets["NPC"]

@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class ObjectDatabase:
     def __init__(self, game):
         self.object_asset = game.assets["OBJECTS"]
@@ -20,7 +17,6 @@ class ObjectDatabase:
             self.images_by_id[i] = (
                 game.resources.sprites[small_id],
                 game.resources.sprites[big_id],
-                game.resources.palette_sprites[big_id],
             )
             self.images_by_name[name] = self.images_by_id[i]
 
