@@ -9,8 +9,12 @@ seq:
     type: unknown1_t
   - id: unknown2
     size: 256
-    repeat: expr
-    repeat-expr: 9
+  - id: unknown3
+    size: 256
+  - id: unknown4
+    size: 96
+  - id: unknown5
+    size: 1536
   - id: spells
     size: 9
     repeat: expr
