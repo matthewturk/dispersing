@@ -1,8 +1,5 @@
 import numpy as np
 
-from .fast_utilities import unpack_sprite_algo3
-
-
 def common_attributes(obj_collection):
     shared_attributes = set()
     for obj in obj_collection:
