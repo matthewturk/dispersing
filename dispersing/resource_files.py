@@ -12,4 +12,3 @@ class ResourceMap:
             self.records.append(rec)
             if rec.type.name == "sprite":
                 self.sprites[i] = SpriteResource(rec, palettes)
-                
