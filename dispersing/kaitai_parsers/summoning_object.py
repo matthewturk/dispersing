@@ -1,15 +1,18 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-from pkg_resources import parse_version
-from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 from enum import Enum
 
+from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct, __version__ as ks_version
+from pkg_resources import parse_version
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
+
 
 class SummoningObject(KaitaiStruct):
-
     class ObjectCategories(Enum):
         helmet = 0
         shirt = 1
@@ -27,6 +30,7 @@ class SummoningObject(KaitaiStruct):
         staff_of_the_serpent = 202
         polearm = 203
         bow = 204
+
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -39,7 +43,6 @@ class SummoningObject(KaitaiStruct):
         self.object = [None] * (self.count)
         for i in range(self.count):
             self.object[i] = self._root.ObjectRecord(self._io, self, self._root)
-
 
     class ObjectRecord(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -73,27 +76,40 @@ class SummoningObject(KaitaiStruct):
 
         @property
         def text_record(self):
-            if hasattr(self, '_m_text_record'):
-                return self._m_text_record if hasattr(self, '_m_text_record') else None
+            if hasattr(self, "_m_text_record"):
+                return self._m_text_record if hasattr(self, "_m_text_record") else None
 
-            self._m_text_record = (self.object_name_id + self._root.name_offset)
-            return self._m_text_record if hasattr(self, '_m_text_record') else None
+            self._m_text_record = self.object_name_id + self._root.name_offset
+            return self._m_text_record if hasattr(self, "_m_text_record") else None
 
         @property
         def small_image_record(self):
-            if hasattr(self, '_m_small_image_record'):
-                return self._m_small_image_record if hasattr(self, '_m_small_image_record') else None
+            if hasattr(self, "_m_small_image_record"):
+                return (
+                    self._m_small_image_record
+                    if hasattr(self, "_m_small_image_record")
+                    else None
+                )
 
-            self._m_small_image_record = (self.image_id + 100)
-            return self._m_small_image_record if hasattr(self, '_m_small_image_record') else None
+            self._m_small_image_record = self.image_id + 100
+            return (
+                self._m_small_image_record
+                if hasattr(self, "_m_small_image_record")
+                else None
+            )
 
         @property
         def large_image_record(self):
-            if hasattr(self, '_m_large_image_record'):
-                return self._m_large_image_record if hasattr(self, '_m_large_image_record') else None
+            if hasattr(self, "_m_large_image_record"):
+                return (
+                    self._m_large_image_record
+                    if hasattr(self, "_m_large_image_record")
+                    else None
+                )
 
-            self._m_large_image_record = (self.image_id + 333)
-            return self._m_large_image_record if hasattr(self, '_m_large_image_record') else None
-
-
-
+            self._m_large_image_record = self.image_id + 333
+            return (
+                self._m_large_image_record
+                if hasattr(self, "_m_large_image_record")
+                else None
+            )

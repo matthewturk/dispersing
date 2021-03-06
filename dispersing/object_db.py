@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ObjectDatabase:
     def __init__(self, game):
         self.object_asset = game.assets["OBJECTS"]
@@ -16,14 +17,15 @@ class ObjectDatabase:
             self.id_to_name[i] = name
             self.objects_by_id[i] = obj
             self.objects_by_name[name] = obj
-            self.images_by_id[i] = (game.resources.sprites[small_id],
-                                    game.resources.sprites[big_id],
-                                    game.resources.palette_sprites[big_id])
+            self.images_by_id[i] = (
+                game.resources.sprites[small_id],
+                game.resources.sprites[big_id],
+                game.resources.palette_sprites[big_id],
+            )
             self.images_by_name[name] = self.images_by_id[i]
 
     def __contains__(self, key):
-        return key in self.objects_by_id \
-            or key in self.objects_by_name
+        return key in self.objects_by_id or key in self.objects_by_name
 
     def __getitem__(self, item):
         if item in self.objects_by_id:

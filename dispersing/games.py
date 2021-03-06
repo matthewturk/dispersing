@@ -1,17 +1,20 @@
-import numpy as np
-import pandas as pd
 import os
 
-from .kaitai_parsers import summoning
+import numpy as np
+import pandas as pd
+
 from . import kaitai_utilities as ku
-from .object_db import ObjectDatabase
+from .kaitai_parsers import summoning
 from .level_map import LevelMap
+from .object_db import ObjectDatabase
 from .resource_files import ResourceMap
+
 
 def make_df(l):
     cattr = ku.common_attributes(l)
     flattened = ku.collect_attributes(l, cattr)
     return pd.DataFrame(flattened)
+
 
 class Game:
     name = None
@@ -32,31 +35,34 @@ class Game:
 
         self.setup_resources()
 
+
 class TheSummoning(Game):
     name = "The Summoning"
     base_mod = summoning
     asset_files = (
-                ("INTERACT", "npc_interactions"),
-                ("RESOURCE", "records"),
-                ("OBJECTS", "object"),
-                ("COLORS", "palettes"),
-                ("TEXT", "text"),
-                ("KEYWORDS", "keyword"),
-                ("LEVELS", "levels"),
-                ("NPC", "npcs"),
-                ("INIT", None),
-            )
+        ("INTERACT", "npc_interactions"),
+        ("RESOURCE", "records"),
+        ("OBJECTS", "object"),
+        ("COLORS", "palettes"),
+        ("TEXT", "text"),
+        ("KEYWORDS", "keyword"),
+        ("LEVELS", "levels"),
+        ("NPC", "npcs"),
+        ("INIT", None),
+    )
 
     def setup_resources(self):
         self.palettes = []
         for i, palette in enumerate(self.assets["COLORS"].palettes[::-1]):
-            rgba = np.array([(_.red*4, _.green*4, _.blue*4, 255)
-                            for _ in palette.colors], dtype="u1")
+            rgba = np.array(
+                [(_.red * 4, _.green * 4, _.blue * 4, 255) for _ in palette.colors],
+                dtype="u1",
+            )
             self.palettes.append(rgba)
 
         self.resources = ResourceMap(self)
         self.objects = ObjectDatabase(self)
 
-        self.levels = [LevelMap(self, i) for i in
-                range(len(self.assets["LEVELS"].levels))]
-
+        self.levels = [
+            LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))
+        ]

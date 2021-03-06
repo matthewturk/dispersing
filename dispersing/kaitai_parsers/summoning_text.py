@@ -1,11 +1,14 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
+from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct, __version__ as ks_version
 from pkg_resources import parse_version
-from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 
+if parse_version(ks_version) < parse_version("0.7"):
+    raise Exception(
+        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
+        % (ks_version)
+    )
 
-if parse_version(ks_version) < parse_version('0.7'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
 
 class SummoningText(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -24,7 +27,6 @@ class SummoningText(KaitaiStruct):
         for i in range(self.count):
             self.text[i] = self._root.Xorstr(self._io, self, self._root)
 
-
     class Xorstrz(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -33,8 +35,9 @@ class SummoningText(KaitaiStruct):
             self._read()
 
         def _read(self):
-            self.text = (self._io.read_bytes_term(218, False, True, True)).decode(u"ascii")
-
+            self.text = (self._io.read_bytes_term(218, False, True, True)).decode(
+                "ascii"
+            )
 
     class Xorstr(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -49,11 +52,8 @@ class SummoningText(KaitaiStruct):
 
         @property
         def value(self):
-            if hasattr(self, '_m_value'):
-                return self._m_value if hasattr(self, '_m_value') else None
+            if hasattr(self, "_m_value"):
+                return self._m_value if hasattr(self, "_m_value") else None
 
             self._m_value = self.text
-            return self._m_value if hasattr(self, '_m_value') else None
-
-
-
+            return self._m_value if hasattr(self, "_m_value") else None

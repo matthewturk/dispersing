@@ -5,10 +5,10 @@
 
 
 import unittest
+
 from click.testing import CliRunner
 
-from dispersing import dispersing
-from dispersing import cli
+from dispersing import cli, dispersing
 
 
 class TestDispersing(unittest.TestCase):
