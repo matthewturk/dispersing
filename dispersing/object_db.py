@@ -2,6 +2,33 @@ import io
 import ipywidgets
 from IPython.display import display
 
+_display_fields = (
+    ("AC Bonus", "ac_bonus"),
+    ("col0", "col0"),
+    ("weight", "weight"),
+    ("Container Flags", "container_flags"),
+    ("col4", "col4"),
+    ("col5", "col5"),
+    ("Action 1 DMG", "act1_dmg"),
+    ("Action 1 Flags", "act1_flags"),
+    ("Action 2 DMG", "act2_dmg"),
+    ("Action 2 Flags", "act2_flags"),
+    ("Action 3 DMG", "act3_dmg"),
+    ("Action 3 Flags", "act3_flags"),
+    ("Charges", "charges"),
+    ("col11", "col11"),
+    ("Sub", "col12"),
+    ("Type", "obj_type"),
+    ("col14", "col14"),
+)
+
+
+def _fill_template(record):
+    html = "<style>.dispersing-pixelated {image-rendering: pixelated;}</style><table>"
+    for title, field in _display_fields:
+        html += f"<tr><td><b>{title}</b></td><td>{getattr(record, field)}</td></tr>\n"
+    return html + "</table>"
+
 
 class ObjectDatabase:
     def __init__(self, game):
@@ -48,7 +75,12 @@ class ObjectDatabase:
                     png_images[-1].append(output.read())
         sprite_slider = ipywidgets.IntSlider(min=0, max=n, step=1)
         frame_slider = ipywidgets.IntSlider(min=0, step=1)
-        im = ipywidgets.Image(value=b"", format="png", width=300)
+        im = ipywidgets.Image(value=b"", format="png", height=200)
+        span = ipywidgets.HTML()
+
+        def update_record(change):
+            new_object_record = self.objects_by_id[sprite_slider.value]
+            span.value = _fill_template(new_object_record)
 
         def update_image(change):
             im.value = png_images[sprite_slider.value][frame_slider.value]
@@ -57,18 +89,13 @@ class ObjectDatabase:
             frame_slider.max = len(png_images[sprite_slider.value])
 
         im.add_class("dispersing-pixelated")
+        im.layout.height = "200px"
+        im.layout.object_fit = "contain"
+        sprite_slider.observe(update_record, "value")
         sprite_slider.observe(update_sprite, "value")
         sprite_slider.observe(update_image, "value")
         frame_slider.observe(update_image, "value")
+        sprite_slider.value = 0
         display(
-            ipywidgets.VBox(
-                [
-                    sprite_slider,
-                    frame_slider,
-                    im,
-                    ipywidgets.HTML(
-                        "<style>.dispersing-pixelated {image-rendering: pixelated;}</style>"
-                    ),
-                ]
-            )
+            ipywidgets.HBox([ipywidgets.VBox([sprite_slider, frame_slider, span]), im])
         )
