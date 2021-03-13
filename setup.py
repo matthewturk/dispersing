@@ -19,7 +19,7 @@ requirements = [
     "ipywidgets>=7",
     "numpy>=1.13.0",
     "pandas",
-    "PIL",
+    "pillow",
     # TODO: put package requirements here
 ]
 
