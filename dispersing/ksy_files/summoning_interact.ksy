@@ -57,7 +57,7 @@ types:
             iopcode::end_commandlist: opcode_args("")
             iopcode::unknown4: opcode_args("")
             iopcode::unknown5: opcode_args("")
-            iopcode::unknown5: opcode_args("")
+            iopcode::unknown6: opcode_args("")
             iopcode::receive_keyword: opcode_args("k")
             iopcode::unknown7: opcode_args("")
             iopcode::unknown8: opcode_args("uuu")
@@ -163,7 +163,7 @@ enums:
      4: speak_again
      5: speak_first
      13: again_fully_healed
-     13: first_fully_healed #??
+     #13: first_fully_healed #??
 
 # Arguments:
 #  6: 1

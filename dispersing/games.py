@@ -7,6 +7,7 @@ from . import kaitai_utilities as ku
 from .kaitai_parsers import summoning
 from .level_map import LevelMap
 from .object_db import ObjectDatabase
+from .npc_db import NPCDatabase
 from .resource_files import ResourceMap
 
 
@@ -62,6 +63,7 @@ class TheSummoning(Game):
 
         self.resources = ResourceMap(self)
         self.objects = ObjectDatabase(self)
+        self.npcs = NPCDatabase(self)
 
         self.levels = [
             LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))

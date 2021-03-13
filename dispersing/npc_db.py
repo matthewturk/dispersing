@@ -1,6 +1,24 @@
-class NPCDatabase:
+class NPC:
+    def __init__(self, game, record):
+        self.game = game
+        self.record = record
+        head_offset = game.assets["INIT"].sprite_offsets.people
+        sprite_offset = game.assets["INIT"].sprite_offsets.npc
+        self.images = {
+            "head": game.resources.sprites[head_offset + record.head_id],
+            "sprite": game.resources.sprites[sprite_offset + record.sprite_id],
+        }
+        # TODO: find this 170
+        self.name = game.assets["TEXT"].text[record.npc_id + 170].value.decode("ascii")
+
+
+class NPCDatabase(dict):
     def __init__(self, game):
-        self.npc_asset = game.assets["NPC"]
+        super(dict, self).__init__()
+        self.game = game
+        for i, npc in enumerate(game.assets["NPC"].npcs):
+            npc_obj = NPC(game, npc)
+            self[i] = self[npc_obj.name] = npc_obj
 
 
 class ConversationCommandList:
