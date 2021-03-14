@@ -1,14 +1,12 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct, __version__ as ks_version
 from pkg_resources import parse_version
+import kaitaistruct
+from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 
-if parse_version(ks_version) < parse_version("0.7"):
-    raise Exception(
-        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
-        % (ks_version)
-    )
 
+if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
+    raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningText(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -25,7 +23,8 @@ class SummoningText(KaitaiStruct):
 
         self.text = [None] * (self.count)
         for i in range(self.count):
-            self.text[i] = self._root.Xorstr(self._io, self, self._root)
+            self.text[i] = SummoningText.Xorstr(self._io, self, self._root)
+
 
     class Xorstrz(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -35,9 +34,8 @@ class SummoningText(KaitaiStruct):
             self._read()
 
         def _read(self):
-            self.text = (self._io.read_bytes_term(218, False, True, True)).decode(
-                "ascii"
-            )
+            self.text = (self._io.read_bytes_term(218, False, True, True)).decode(u"ascii")
+
 
     class Xorstr(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -52,8 +50,11 @@ class SummoningText(KaitaiStruct):
 
         @property
         def value(self):
-            if hasattr(self, "_m_value"):
-                return self._m_value if hasattr(self, "_m_value") else None
+            if hasattr(self, '_m_value'):
+                return self._m_value if hasattr(self, '_m_value') else None
 
             self._m_value = self.text
-            return self._m_value if hasattr(self, "_m_value") else None
+            return self._m_value if hasattr(self, '_m_value') else None
+
+
+
