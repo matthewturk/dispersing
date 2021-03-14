@@ -70,4 +70,27 @@ class LevelMap:
         # Doors I haven't totally worked out.
         # For a wall edge, the sprites are 32 across, 16 high. But, we end up
         # with 2 to make a wall.  So 32x32 net.  Floor tiles are 16 high, 32 across.
-        pass
+        #
+        # We're going to roughly follow
+        # https://stackoverflow.com/questions/892811/drawing-isometric-game-worlds
+        # and note that our tiles are oriented with our origin in what would be
+        # the top of the diamond.
+        # How big does our image need to be?
+        # Add one on to the height for the top/bottom
+        image_shape = (
+            (self.tiles.shape[0] + 0) * 32,
+            (self.tiles.shape[1] + 1) * 2 * 16,
+        )
+        image = np.zeros((image_shape) + (4,), dtype="u1")
+        tile_image = np.swapaxes(
+            np.array(self.terrain_sprites["floor"].frames[0]), 0, 1
+        )
+        # i is for y, j for x
+        for i in range(self.tiles.shape[0]):
+            for j in range(self.tiles.shape[1])[::-1]:
+                if self.tiles[i, j] == 255:
+                    continue
+                start_x = (j * 32 // 2) + (i * 32 // 2)
+                start_y = (i * 16 // 2) - (j * 16 // 2) + image_shape[1] // 2
+                image[start_x : start_x + 32, start_y : start_y + 16] = tile_image
+        return image

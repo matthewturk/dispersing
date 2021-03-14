@@ -57,7 +57,6 @@ types:
             iopcode::end_commandlist: opcode_args("")
             iopcode::unknown4: opcode_args("")
             iopcode::unknown5: opcode_args("")
-            iopcode::unknown6: opcode_args("")
             iopcode::receive_keyword: opcode_args("k")
             iopcode::unknown7: opcode_args("")
             iopcode::unknown8: opcode_args("uuu")

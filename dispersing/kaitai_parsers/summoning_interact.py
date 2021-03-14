@@ -205,8 +205,6 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.start_conversation:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown6:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.emit_text:
                 self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown13:
