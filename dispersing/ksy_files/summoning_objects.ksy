@@ -25,6 +25,7 @@ types:
       - id: weight
         type: u1
 # Field three seems to be related to capacity.
+# Quiver, 12 items, only arrows
 # Chest, 8 items:
 # >>> np.unpackbits(np.array([167], 'u1'))
 # array([1, 0, 1, 0, 0, 1, 1, 1], dtype=uint8)
