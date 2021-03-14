@@ -8,7 +8,7 @@ from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
     raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
 
-class SummoningJaz(KaitaiStruct):
+class SummoningV(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -16,9 +16,19 @@ class SummoningJaz(KaitaiStruct):
         self._read()
 
     def _read(self):
-        self.count = self._io.read_u2le()
-        self.unknown1 = self._io.read_u2le()
-        self.unknown2 = self._io.read_u2le()
+        self.count = self._io.read_u1()
+        self.unk1 = self._io.read_u1()
+        self.unk2 = self._io.read_u1()
+        self.unk3 = self._io.read_u1()
+        self.unk4 = self._io.read_u1()
+        self.rec_info = [None] * (self.count)
+        for i in range(self.count):
+            self.rec_info[i] = self._io.read_u2le()
+
+        self.records = [None] * (self.count)
+        for i in range(self.count):
+            self.records[i] = SummoningV.Frecord(self._io, self, self._root)
+
 
     class Frecord(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -42,8 +52,6 @@ class SummoningJaz(KaitaiStruct):
             self.col12 = self._io.read_u1()
             self.col13 = self._io.read_u1()
             self.col14 = self._io.read_u1()
-            self.col15 = self._io.read_u1()
-            self.col16 = self._io.read_u1()
 
 
 

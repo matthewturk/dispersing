@@ -1,14 +1,12 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
 
-from kaitaistruct import BytesIO, KaitaiStream, KaitaiStruct, __version__ as ks_version
 from pkg_resources import parse_version
+import kaitaistruct
+from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 
-if parse_version(ks_version) < parse_version("0.7"):
-    raise Exception(
-        "Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s"
-        % (ks_version)
-    )
 
+if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
+    raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningInit(KaitaiStruct):
     def __init__(self, _io, _parent=None, _root=None):
@@ -18,12 +16,12 @@ class SummoningInit(KaitaiStruct):
         self._read()
 
     def _read(self):
-        self.sprite_offsets = self._root.SpriteOffsets(self._io, self, self._root)
-        self.unknown1 = self._root.Unknown1T(self._io, self, self._root)
-        self.unknown2 = [None] * (9)
-        for i in range(9):
-            self.unknown2[i] = self._io.read_bytes(256)
-
+        self.sprite_offsets = SummoningInit.SpriteOffsets(self._io, self, self._root)
+        self.unknown1 = SummoningInit.Unknown1T(self._io, self, self._root)
+        self.unknown2 = self._io.read_bytes(256)
+        self.unknown3 = self._io.read_bytes(256)
+        self.unknown4 = self._io.read_bytes(96)
+        self.unknown5 = self._io.read_bytes(1536)
         self.spells = [None] * (40)
         for i in range(40):
             self.spells[i] = self._io.read_bytes(9)
@@ -31,6 +29,7 @@ class SummoningInit(KaitaiStruct):
         self.unknown9 = [None] * (51)
         for i in range(51):
             self.unknown9[i] = self._io.read_s1()
+
 
     class SpriteOffsets(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -55,6 +54,7 @@ class SummoningInit(KaitaiStruct):
             self.npc = self._io.read_s2le()
             self.wall_decoration = self._io.read_s2le()
 
+
     class Unknown1T(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -67,3 +67,7 @@ class SummoningInit(KaitaiStruct):
             self.values = [None] * (self.count)
             for i in range(self.count):
                 self.values[i] = self._io.read_s2le()
+
+
+
+
