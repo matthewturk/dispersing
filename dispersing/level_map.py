@@ -59,3 +59,15 @@ class LevelMap:
 
         # Setup terrain sprites
         self.terrain_sprites = TerrainSprites(self.game, self.level_asset)
+
+    def create_map(self):
+        # OK!  This will be our really hard part.  We have to do an isometric draw.
+        # The way this works is that we have a uint8 for each tile.  The values they take on range from 0 .. 53,
+        # but with a few missing. (18, 19, 20, 22)
+        #
+        # Our walls have 15 "upper" sprites and 15 "lower" sprites (in that order)
+        # We have 8 floor tiles, 8 "special" floor tiles, and 8 "wall edges". 4 keys.
+        # Doors I haven't totally worked out.
+        # For a wall edge, the sprites are 32 across, 16 high. But, we end up
+        # with 2 to make a wall.  So 32x32 net.  Floor tiles are 16 high, 32 across.
+        pass
