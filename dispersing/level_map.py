@@ -1,6 +1,7 @@
 import numpy as np
 import ipywidgets
 from IPython.display import display
+import PIL.Image as Image
 
 _terrain_attrs = (
     "internal_wall_edges",
@@ -81,16 +82,14 @@ class LevelMap:
             (self.tiles.shape[0] + 0) * 32,
             (self.tiles.shape[1] + 1) * 2 * 16,
         )
-        image = np.zeros((image_shape) + (4,), dtype="u1")
-        tile_image = np.swapaxes(
-            np.array(self.terrain_sprites["floor"].frames[0]), 0, 1
-        )
+        image = Image.new("RGBA", image_shape)
+        tile_frame = self.terrain_sprites["floor"].frames[0]
         # i is for y, j for x
         for i in range(self.tiles.shape[0]):
             for j in range(self.tiles.shape[1])[::-1]:
                 if self.tiles[i, j] == 255:
                     continue
                 start_x = (j * 32 // 2) + (i * 32 // 2)
-                start_y = (i * 16 // 2) - (j * 16 // 2) + image_shape[1] // 2
-                image[start_x : start_x + 32, start_y : start_y + 16] = tile_image
+                start_y = image_shape[1] - ((i * 16 // 2) - (j * 16 // 2))
+                image.paste(tile_frame, (start_x, start_y))
         return image
