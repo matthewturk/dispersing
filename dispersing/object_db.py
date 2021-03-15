@@ -24,11 +24,13 @@ _display_fields = (
     ("col14", "col14"),
 )
 
+
 def _fill_template(record):
     html = "<style>.dispersing-pixelated {image-rendering: pixelated;}</style><table>"
     for title, field in _display_fields:
         html += f"<tr><td><b>{title}</b></td><td>{getattr(record, field)}</td></tr>\n"
     return html + "</table>"
+
 
 class GameObject:
     def __init__(self, game, record):
@@ -52,6 +54,7 @@ class GameObject:
             [ipywidgets.HBox([outputs["small"], outputs["tiny"]]), outputs["worn"]]
         )
         display(vb)
+
 
 class ObjectDatabase(dict):
     def __init__(self, game):
