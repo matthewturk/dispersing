@@ -85,18 +85,26 @@ class LevelMap:
         # Add one on to the height for the top/bottom
         w, h = 32, 16
         image_shape = (
-            (self.tiles.shape[0] + self.tiles.shape[1] - 1) * w // 2,
-            (self.tiles.shape[0] + self.tiles.shape[1] - 1) * h // 2,
+            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * w // 2,
+            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * h // 2,
         )
         image = Image.new("RGBA", image_shape)
         tile_frame = self.terrain_sprites["floor"].frames[0]
         offset = (self.tiles.shape[0] - 1) * w // 2
         # i is for y, j for x
         for i in range(self.tiles.shape[0]):
-            for j in range(self.tiles.shape[1]):
-                if self.tiles[i, j] == 255:
+            for j in range(self.tiles.shape[1])[::-1]:
+                tile_key = self.tiles[i, j]
+                if tile_key == 255:
                     continue
                 start_x = j * w // 2 - i * w // 2 + offset
                 start_y = i * h // 2 + j * h // 2
+                # Figure out the tile type
+                if tile_key & (15 << 4) == 0:
+                    tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
+                        tile_key
+                    ]
+                else:
+                    tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
                 image.paste(tile_frame, (start_x, start_y))
         return image
