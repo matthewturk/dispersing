@@ -35,12 +35,17 @@ class TerrainSprites(dict):
 
     def _ipython_display_(self):
         children = []
+        titles = []
         for attr in _terrain_attrs + ("wall_overlay_tiles",):
+            titles.append(attr.replace("_", " ").capitalize())
             o = ipywidgets.Output()
             with o:
                 display(self[attr])
             children.append(ipywidgets.HBox([ipywidgets.Label(attr), o]))
-        display(ipywidgets.VBox(children))
+        t = ipywidgets.Tab(children)
+        for i, title in enumerate(titles):
+            t.set_title(i, title)
+        display(t)
 
 
 class LevelMap:
@@ -78,18 +83,20 @@ class LevelMap:
         # the top of the diamond.
         # How big does our image need to be?
         # Add one on to the height for the top/bottom
+        w, h = 32, 16
         image_shape = (
-            (self.tiles.shape[0] + 0) * 32,
-            (self.tiles.shape[1] + 1) * 2 * 16,
+            (self.tiles.shape[0] + self.tiles.shape[1] - 1) * w // 2,
+            (self.tiles.shape[0] + self.tiles.shape[1] - 1) * h // 2,
         )
         image = Image.new("RGBA", image_shape)
         tile_frame = self.terrain_sprites["floor"].frames[0]
+        offset = (self.tiles.shape[0] - 1) * w // 2
         # i is for y, j for x
         for i in range(self.tiles.shape[0]):
-            for j in range(self.tiles.shape[1])[::-1]:
+            for j in range(self.tiles.shape[1]):
                 if self.tiles[i, j] == 255:
                     continue
-                start_x = (j * 32 // 2) + (i * 32 // 2)
-                start_y = image_shape[1] - ((i * 16 // 2) - (j * 16 // 2))
+                start_x = j * w // 2 - i * w // 2 + offset
+                start_y = i * h // 2 + j * h // 2
                 image.paste(tile_frame, (start_x, start_y))
         return image
