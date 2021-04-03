@@ -103,14 +103,14 @@ class LevelMap:
                 if tile_key & (15 << 4) == 0:
                     # We have to paste twice here
                     tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
-                        tile_key
-                    ]
-                    image.paste(tile_frame, (start_x, start_y - h))
-                    tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
                         tile_key + 15
+                    ]
+                    image.paste(tile_frame, (start_x, start_y + h))
+                    tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
+                        tile_key
                     ]
                     image.paste(tile_frame, (start_x, start_y))
                 else:
                     tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
-                    image.paste(tile_frame, (start_x, start_y))
+                    # image.paste(tile_frame, (start_x, start_y))
         return image

@@ -1,6 +1,6 @@
 import dispersing
 
-ts = dispersing.TheSummoning("/home/matthewturk/the-summoning/")
+ts = dispersing.TheSummoning("the-summoning/")
 
 for i, level in enumerate(ts.levels[:10]):
     image = level.create_map()
