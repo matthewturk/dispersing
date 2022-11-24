@@ -35,13 +35,13 @@ types:
         type: u1
         repeat: expr
         repeat-expr: n1
-      - id: floor_flags
+      - id: wall_flags
         type: u1
         enum: tile_flags
-      - id: tile_args
-        if: floor_flags != tile_flags::nothing and floor_flags != tile_flags::movable_object
+      - id: wall_args
+        if: wall_flags != tile_flags::nothing and wall_flags != tile_flags::movable_object
         type:
-          switch-on: floor_flags
+          switch-on: wall_flags
           cases:
             tile_flags::movable_object: u1
             tile_flags::unknown2: u1
@@ -54,13 +54,13 @@ types:
             tile_flags::npc: u1
             tile_flags::unknown10: u1
             tile_flags::mouth: u1
-      - id: wall_flags
+      - id: floor_flags
         type: u1
         enum: tile_flags
-      - id: wall_args
-        if: wall_flags != tile_flags::nothing
+      - id: floor_args
+        if: floor_flags != tile_flags::nothing
         type:
-          switch-on: wall_flags
+          switch-on: floor_flags
           cases:
             tile_flags::movable_object: u1
             tile_flags::unknown2: u1
@@ -137,7 +137,7 @@ types:
       - id: wall_overlay_tiles
         type: s2
       - id: blank11
-        contents: [0,0]
+        contents: [0, 0]
       - id: unk12
         type: s2
       - id: big_wooden_thing
@@ -145,7 +145,45 @@ types:
       - id: big_boulder
         type: s2
       - id: blank15
-        contents: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        contents:
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ]
 
   level:
     seq:

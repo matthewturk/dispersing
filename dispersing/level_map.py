@@ -48,6 +48,36 @@ class TerrainSprites(dict):
         display(t)
 
 
+class TileInfo:
+    def __init__(self, game, tile_item_record):
+        # Note that we will not have coordinate info
+        self.tile_info_record = tile_item_record.info
+        self.x = tile_item_record.x
+        self.y = tile_item_record.y
+        self.items = [game.objects[_] for _ in tile_item_record.info.items]
+        self.wall_flags = tile_item_record.info.wall_flags
+        self.wall_args = getattr(tile_item_record.info, "wall_args", None)
+        self.floor_flags = tile_item_record.info.floor_flags
+        self.floor_args = getattr(tile_item_record.info, "floor_args", None)
+
+    def _ipython_display_(self):
+        output = []
+        if (self.items) > 0:
+            children = []
+            names = []
+            for item in self.items:
+                o = ipywidgets.Output()
+                with o:
+                    display(item)
+                children.append(o)
+                names.append(item.name)
+            items = ipywidgets.Tab(children)
+            for i, n in enumerate(names):
+                items.set_title(i, n)
+            output.append(items)
+        display(ipywidgets.VBox(output))
+
+
 class LevelMap:
     def __init__(self, game, level_number):
         self.game = game
@@ -56,12 +86,10 @@ class LevelMap:
             (self.level_asset.height, self.level_asset.width)
         )
 
-        self.items = {}
         self.info = {}
         # Always one extra to signal terminus of item list
         for item in self.level_asset.items[:-1]:
-            self.items[item.x, item.y] = [game.objects[_] for _ in item.info.items]
-            self.info[item.x, item.y] = item.info
+            self.info[item.x, item.y] = TileInfo(game, item)
 
         # Setup terrain sprites
         self.terrain_sprites = TerrainSprites(self.game, self.level_asset)
@@ -83,34 +111,61 @@ class LevelMap:
         # the top of the diamond.
         # How big does our image need to be?
         # Add one on to the height for the top/bottom
+        #
+        #   0       corner - top
+        #   1       edge - left/up to right/down
+        #   2       corner - right
+        #   3       edge - left/down to right/up
+        #   4       corner - left
+        #   5       corner - bottom
         w, h = 32, 16
         image_shape = (
-            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * w // 2,
-            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * h // 2,
+            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * w,
+            (self.tiles.shape[0] + self.tiles.shape[1] + 1) * h,
         )
         image = Image.new("RGBA", image_shape)
         tile_frame = self.terrain_sprites["floor"].frames[0]
-        offset = (self.tiles.shape[0] - 1) * w // 2
-        # i is for y, j for x
-        for i in range(self.tiles.shape[0]):
-            for j in range(self.tiles.shape[1])[::-1]:
-                tile_key = self.tiles[i, j]
-                if tile_key == 255:
-                    continue
-                start_x = j * w // 2 - i * w // 2 + offset
-                start_y = i * h // 2 + j * h // 2
-                # Figure out the tile type
-                if tile_key & (15 << 4) == 0:
-                    # We have to paste twice here
-                    tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
-                        tile_key + 15
-                    ]
-                    image.paste(tile_frame, (start_x, start_y + h))
-                    tile_frame = self.terrain_sprites["internal_wall_edges"].frames[
-                        tile_key
-                    ]
-                    image.paste(tile_frame, (start_x, start_y))
-                else:
-                    tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
-                    # image.paste(tile_frame, (start_x, start_y))
+        offset = (self.tiles.shape[0] - 1) * w
+        # I feel confident there's a single-pass method that I just haven't
+        # figured out yet.
+        for p in [0, 1]:
+            # i is for y, j for x
+            for i in range(self.tiles.shape[0]):
+                for j in range(self.tiles.shape[1])[::-1]:
+                    tile_key = self.tiles[i, j]
+                    if tile_key == 255:
+                        continue
+                    start_x = j * w - i * w + offset
+                    start_y = i * h + j * h
+                    # Figure out the tile type
+                    if tile_key & (15 << 4) == 0:
+                        if p == 1:
+                            continue
+                        # We have to paste twice here
+                        tile_offsets = [
+                            (0, (0, 0, None)),
+                            (15, (0, 1, None)),
+                            (11, (1, 0.0, None)),
+                            # (15, (0, -1.5, Image.ROTATE_180)),
+                            # (8, (1, 0, None)),
+                            # (7, (-1, 0, None)),
+                            # (7, (1, 1, None)),
+                        ]
+                        # if tile_key & 1 == 1:
+                        #    tile_offsets.append((-1, (-1, 0, None)))
+                        for foff, (xoff, yoff, r) in tile_offsets:
+                            tile_frame = self.terrain_sprites[
+                                "internal_wall_edges"
+                            ].frames[tile_key + foff]
+                            if r:
+                                tile_frame = tile_frame.transpose(method=r)
+                            image.alpha_composite(
+                                tile_frame,
+                                (start_x + int(w * xoff), start_y + int(h * yoff)),
+                            )
+                    else:
+                        if p == 0:
+                            continue
+                        tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
+                        # image.alpha_composite(tile_frame, (start_x, start_y + h // 2))
         return image
