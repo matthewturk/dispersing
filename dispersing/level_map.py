@@ -2,6 +2,7 @@ import numpy as np
 import ipywidgets
 from IPython.display import display
 import PIL.Image as Image
+import os
 
 _terrain_attrs = (
     "internal_wall_edges",
@@ -47,6 +48,13 @@ class TerrainSprites(dict):
             t.set_title(i, title)
         display(t)
 
+    def export_all_frames(self, folder_name):
+        if not os.path.isdir(folder_name):
+            os.makedirs(folder_name)
+            for key in sorted(self):
+                for i, frame in enumerate(self[key].frames):
+                    frame.save(os.path.join(folder_name, f"{key}-{i:04d}.png"))
+
 
 class TileInfo:
     def __init__(self, game, tile_item_record):
@@ -62,7 +70,7 @@ class TileInfo:
 
     def _ipython_display_(self):
         output = []
-        if (self.items) > 0:
+        if len(self.items) > 0:
             children = []
             names = []
             for item in self.items:
@@ -169,3 +177,14 @@ class LevelMap:
                         tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
                         # image.alpha_composite(tile_frame, (start_x, start_y + h // 2))
         return image
+
+    def extract_tiles(self):
+        # We'll come up with a few layers here.
+        # Our first layer will be the floor.
+        # We'll make it a 64 bit array
+        floor_tiles = np.zeros(self.tiles.shape, dtype="u8")
+        has_floor = (self.tiles & 15 << 4) != 0
+        floor_tiles[has_floor] = self.tiles[has_floor] & 7
+        floor_tiles += 1
+        floor_tiles[self.tiles == 255] = 0
+        return floor_tiles
