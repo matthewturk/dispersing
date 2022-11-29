@@ -98,9 +98,8 @@ types:
       - id: size
         type: u2
       - id: contents
-        type: u1
-        repeat: expr
-        repeat-expr: size
+        type: procedure_defs
+        size: size
         # Some notes on this:
         #   It once again seems to have coordinates embedded.  For instance, in
         #   level 0, there's this sequence:
@@ -114,6 +113,32 @@ types:
         # Funny thing is that we teleport from 11,4 to what amounts to the same
         # location as objects 229, 226, 232, which is 2, 3
         # So where do we find out that info?
+  procedure_defs:
+    seq:
+        - id: procedures
+          type: procedure_info
+          repeat: eos
+  procedure_info:
+    seq:
+      - id: opcode_count
+        type: u1
+      - id: procedures
+        type: procedure
+        repeat: expr
+        repeat-expr: opcode_count
+  procedure:
+    seq:
+      - id: opcode
+        type: u1
+        enum: procedure_opcode
+      - id: arg1
+        type: u1
+      - id: arg2
+        type: u1
+      - id: arg3
+        type: u1
+      - id: arg4
+        type: u1
   level_props:
     seq:
       - id: internal_wall_edges
@@ -217,3 +242,16 @@ enums:
     9: npc
     10: unknown10
     11: mouth
+  procedure_opcode:
+    0: teleporter_enable
+    1: unknown1
+    2: unknown2
+    3: unknown3
+    4: unknown4
+    5: unknown5
+    6: unknown6
+    7: unknown7
+    8: unknown8
+    9: unknown9
+    10: unknown10
+    11: create_object
