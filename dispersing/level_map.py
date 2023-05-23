@@ -1,6 +1,7 @@
 import numpy as np
 import ipywidgets
 from IPython.display import display
+from collections import defaultdict
 import PIL.Image as Image
 import os
 
@@ -101,6 +102,29 @@ class LevelMap:
 
         # Setup terrain sprites
         self.terrain_sprites = TerrainSprites(self.game, self.level_asset)
+
+    def to_cp437(self):
+        # This is a pretty simple and straightforward mapping of the tiles to cp437.
+        tile_map = defaultdict(lambda: b'\xb1')
+        tile_map.update({
+            0: b'\xc9',
+            1: b'\xcd',
+            2: b'\xbb',
+            3: b'\xba',
+            4: b'\xc8',
+            5: b'\xbc',
+            6: b'\xcb',
+            7: b'\xcc',
+            8: b'\xb9',
+            9: b'\xca',
+            10: b'\xce',
+            11: b'\xc4',
+            14: b'\xb3',
+            17: b'\xc4',
+            255: b'\xb0',
+        })
+        new_string = b'\n'.join(b''.join(tile_map[_] for _ in row) for row in self.tiles)
+        return new_string.decode('cp437')
 
     def create_map(self):
         # OK!  This will be our really hard part.  We have to do an isometric draw.
