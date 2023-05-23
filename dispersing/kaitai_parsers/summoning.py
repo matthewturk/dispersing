@@ -12,3 +12,19 @@ from .summoning_text import SummoningText as TEXT
 #   * JAZ
 #   * TAGS
 #   * V
+
+try:
+    from IPython.display import display
+    import ipywidgets
+except ImportError:
+    pass  # Things just won't work
+
+# We monkeypatch some stuff here so that we can have vanilla compilation for the
+# ksy files.
+
+
+def _COLORS_ipython_display(self):
+    display(ipywidgets.Label("Colors"))
+
+
+COLORS._ipython_display_ = _COLORS_ipython_display

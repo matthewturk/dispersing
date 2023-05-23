@@ -35,13 +35,13 @@ types:
         type: u1
         repeat: expr
         repeat-expr: n1
-      - id: floor_flags
+      - id: wall_flags
         type: u1
         enum: tile_flags
-      - id: tile_args
-        if: floor_flags != tile_flags::nothing and floor_flags != tile_flags::movable_object
+      - id: wall_args
+        if: wall_flags != tile_flags::nothing and wall_flags != tile_flags::movable_object
         type:
-          switch-on: floor_flags
+          switch-on: wall_flags
           cases:
             tile_flags::movable_object: u1
             tile_flags::unknown2: u1
@@ -54,13 +54,13 @@ types:
             tile_flags::npc: u1
             tile_flags::unknown10: u1
             tile_flags::mouth: u1
-      - id: wall_flags
+      - id: floor_flags
         type: u1
         enum: tile_flags
-      - id: wall_args
-        if: wall_flags != tile_flags::nothing
+      - id: floor_args
+        if: floor_flags != tile_flags::nothing
         type:
-          switch-on: wall_flags
+          switch-on: floor_flags
           cases:
             tile_flags::movable_object: u1
             tile_flags::unknown2: u1
@@ -98,9 +98,8 @@ types:
       - id: size
         type: u2
       - id: contents
-        type: u1
-        repeat: expr
-        repeat-expr: size
+        type: procedure_defs
+        size: size
         # Some notes on this:
         #   It once again seems to have coordinates embedded.  For instance, in
         #   level 0, there's this sequence:
@@ -114,6 +113,32 @@ types:
         # Funny thing is that we teleport from 11,4 to what amounts to the same
         # location as objects 229, 226, 232, which is 2, 3
         # So where do we find out that info?
+  procedure_defs:
+    seq:
+        - id: procedures
+          type: procedure_info
+          repeat: eos
+  procedure_info:
+    seq:
+      - id: opcode_count
+        type: u1
+      - id: procedures
+        type: procedure
+        repeat: expr
+        repeat-expr: opcode_count
+  procedure:
+    seq:
+      - id: opcode
+        type: u1
+        enum: procedure_opcode
+      - id: arg1
+        type: u1
+      - id: arg2
+        type: u1
+      - id: arg3
+        type: u1
+      - id: arg4
+        type: u1
   level_props:
     seq:
       - id: internal_wall_edges
@@ -137,7 +162,7 @@ types:
       - id: wall_overlay_tiles
         type: s2
       - id: blank11
-        contents: [0,0]
+        contents: [0, 0]
       - id: unk12
         type: s2
       - id: big_wooden_thing
@@ -145,7 +170,45 @@ types:
       - id: big_boulder
         type: s2
       - id: blank15
-        contents: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        contents:
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ]
 
   level:
     seq:
@@ -179,3 +242,16 @@ enums:
     9: npc
     10: unknown10
     11: mouth
+  procedure_opcode:
+    0: teleporter_enable
+    1: unknown1
+    2: unknown2
+    3: unknown3
+    4: unknown4
+    5: unknown5
+    6: unknown6
+    7: unknown7
+    8: unknown8
+    9: unknown9
+    10: unknown10
+    11: create_object

@@ -1,0 +1,12 @@
+ksdump -f json the-summoning/COLORS dispersing/ksy_files/summoning_colors.ksy > json/colors.json
+ksdump -f json the-summoning/F dispersing/ksy_files/summoning_f.ksy > json/f.json
+ksdump -f json the-summoning/INIT dispersing/ksy_files/summoning_init.ksy > json/init.json
+ksdump -f json the-summoning/INTERACT dispersing/ksy_files/summoning_interact.ksy > json/interact.json
+ksdump -f json the-summoning/JAZ dispersing/ksy_files/summoning_jaz.ksy > json/jaz.json
+ksdump -f json the-summoning/KEYWORDS dispersing/ksy_files/summoning_keywords.ksy > json/keywords.json
+ksdump -f json the-summoning/LEVELS dispersing/ksy_files/summoning_levels.ksy > json/levels.json
+ksdump -f json the-summoning/NPC dispersing/ksy_files/summoning_npc.ksy > json/npc.json
+ksdump -f json the-summoning/OBJECTS dispersing/ksy_files/summoning_objects.ksy > json/objects.json
+ksdump -f json the-summoning/RESOURCE dispersing/ksy_files/summoning_resources.ksy > json/resource.json
+ksdump -f json the-summoning/TEXT dispersing/ksy_files/summoning_text.ksy > json/text.json
+ksdump -f json the-summoning/V dispersing/ksy_files/summoning_v.ksy > json/v.json

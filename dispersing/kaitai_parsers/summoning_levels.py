@@ -161,34 +161,8 @@ class SummoningLevels(KaitaiStruct):
             for i in range(self.n1):
                 self.items[i] = self._io.read_u1()
 
-            self.floor_flags = KaitaiStream.resolve_enum(SummoningLevels.TileFlags, self._io.read_u1())
-            if  ((self.floor_flags != SummoningLevels.TileFlags.nothing) and (self.floor_flags != SummoningLevels.TileFlags.movable_object)) :
-                _on = self.floor_flags
-                if _on == SummoningLevels.TileFlags.teleporter:
-                    self.tile_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.unknown4:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.movable_object:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown6:
-                    self.tile_args = self._io.read_u2le()
-                elif _on == SummoningLevels.TileFlags.mouth:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown10:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.level_exit:
-                    self.tile_args = SummoningLevels.PortalInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.unknown2:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown5:
-                    self.tile_args = SummoningLevels.PortalInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.npc:
-                    self.tile_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.teleporter_dest:
-                    self.tile_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
-
             self.wall_flags = KaitaiStream.resolve_enum(SummoningLevels.TileFlags, self._io.read_u1())
-            if self.wall_flags != SummoningLevels.TileFlags.nothing:
+            if  ((self.wall_flags != SummoningLevels.TileFlags.nothing) and (self.wall_flags != SummoningLevels.TileFlags.movable_object)) :
                 _on = self.wall_flags
                 if _on == SummoningLevels.TileFlags.teleporter:
                     self.wall_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
@@ -212,6 +186,32 @@ class SummoningLevels(KaitaiStruct):
                     self.wall_args = self._io.read_u1()
                 elif _on == SummoningLevels.TileFlags.teleporter_dest:
                     self.wall_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
+
+            self.floor_flags = KaitaiStream.resolve_enum(SummoningLevels.TileFlags, self._io.read_u1())
+            if self.floor_flags != SummoningLevels.TileFlags.nothing:
+                _on = self.floor_flags
+                if _on == SummoningLevels.TileFlags.teleporter:
+                    self.floor_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.TileFlags.unknown4:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.movable_object:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.unknown6:
+                    self.floor_args = self._io.read_u2le()
+                elif _on == SummoningLevels.TileFlags.mouth:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.unknown10:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.level_exit:
+                    self.floor_args = SummoningLevels.PortalInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.TileFlags.unknown2:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.unknown5:
+                    self.floor_args = SummoningLevels.PortalInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.TileFlags.npc:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.TileFlags.teleporter_dest:
+                    self.floor_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
 
 
 

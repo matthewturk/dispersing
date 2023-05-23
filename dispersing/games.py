@@ -59,6 +59,7 @@ class TheSummoning(Game):
                 [(_.red * 4, _.green * 4, _.blue * 4, 255) for _ in palette.colors],
                 dtype="u1",
             )
+            rgba[(rgba == [252, 252, 252, 255]).all(axis=1)] = [0, 0, 0, 0]
             self.palettes.append(rgba)
 
         self.resources = ResourceMap(self)
