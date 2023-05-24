@@ -106,7 +106,7 @@ class LevelMap:
     def to_cp437(self):
         # This is a pretty simple and straightforward mapping of the tiles to cp437.
         tile_map = defaultdict(lambda: b'\xb1')
-        tile_map.update({
+        i = {
             0: b'\xc9',
             1: b'\xcd',
             2: b'\xbb',
@@ -125,9 +125,21 @@ class LevelMap:
             15: b'\x45',
             16: b'\xb3',
             17: b'\xc4',
-            255: b'\xb0',
-        })
+            27: b'\xb0',
+            28: b'\xb1',
+            31: b'\xdf',
+            32: b'\xdc',
+            33: b'\xe4',
+            34: b'\xe5',
+            35: b'\xe6',
+            36: b'\xf8',
+            37: b'\x76',
+            255: b'\x20',
+        }
+        tile_map.update(i)
         new_string = b'\n'.join(b''.join(tile_map[_] for _ in row) for row in self.tiles)
+        k = sorted(set(tile_map.keys()) - set(i.keys()))
+        print(len(k), k)
         return new_string.decode('cp437')
 
     def create_map(self):
