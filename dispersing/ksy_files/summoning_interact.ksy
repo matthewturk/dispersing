@@ -72,7 +72,7 @@ types:
             iopcode::emit_text: opcode_args("t")
             iopcode::emit_keyword: opcode_args("k")
             iopcode::take_item: opcode_args("o")
-            iopcode::set_hostile: opcode_args("")
+            iopcode::terminate_reset: opcode_args("")
             iopcode::set_variable: opcode_args("Vv")
             iopcode::unknown23: opcode_args("u")
             iopcode::give_item: opcode_args("o")
@@ -132,7 +132,7 @@ enums:
     18: emit_text               # 1 arg
     19: emit_keyword            # 1 arg
     20: take_item               # 1 arg
-    21: set_hostile             # 0 args some form of termination
+    21: terminate_reset         # 0 args some form of termination
     22: set_variable            # 2 args
     23: unknown23               # 1 arg, does something to variable
     24: give_item               # 1 arg
