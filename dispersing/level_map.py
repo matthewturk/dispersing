@@ -118,8 +118,12 @@ class LevelMap:
             8: b'\xb9',
             9: b'\xca',
             10: b'\xce',
-            11: b'\xc4',
-            14: b'\xb3',
+            11: b'\xcd', # bit too thick
+            12: b'\xcd',
+            13: b'\xba', # bit too thick
+            14: b'\xba',
+            15: b'\x45',
+            16: b'\xb3',
             17: b'\xc4',
             255: b'\xb0',
         })
