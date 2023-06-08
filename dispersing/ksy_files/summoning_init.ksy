@@ -15,14 +15,26 @@ seq:
     size: 96
   - id: unknown5
     size: 1536
-  - id: spells
-    size: 9
+  - id: spell_cost # one for each spell
+    type: u1
     repeat: expr
     repeat-expr: 40
-  - id: unknown9
-    type: s1
+  - id: unknown7 # 3 for each spell
+    type: spell_info
     repeat: expr
-    repeat-expr: 51
+    repeat-expr: 40
+  - id: spells # spell info
+    size: 9
+    type: str
+    encoding: ascii
+    repeat: expr
+    repeat-expr: 40
+  - id: unknown8
+    type: u4
+  - id: unknown9
+    size: 11
+  - id: unknown10
+    size: 20
 types:
   sprite_offsets:
     seq:
@@ -62,3 +74,11 @@ types:
         type: s2
         repeat: expr
         repeat-expr: count
+  spell_info:
+    seq:
+      - id: unknown1
+        type: u1
+      - id: unknown2
+        type: u1
+      - id: unknown3
+        type: u1
