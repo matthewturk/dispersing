@@ -6,12 +6,12 @@ import PIL.Image as Image
 import os
 
 _terrain_attrs = (
-    "internal_wall_edges",
-    "floor",
-    "floor_special_tile",
-    "wall_edges",
+    "wall_tiles",
+    "floor_tiles",
+    "floor_special_tiles",
+    "gate_tiles",
     "keys_switches",
-    "door",
+    "door_tiles",
     "unk7",
     "unk8",
     "unk9",
@@ -171,7 +171,7 @@ class LevelMap:
             (self.tiles.shape[0] + self.tiles.shape[1] + 1) * h,
         )
         image = Image.new("RGBA", image_shape)
-        tile_frame = self.terrain_sprites["floor"].frames[0]
+        tile_frame = self.terrain_sprites["floor_tiles"].frames[0]
         offset = (self.tiles.shape[0] - 1) * w
         # I feel confident there's a single-pass method that I just haven't
         # figured out yet.
@@ -202,7 +202,7 @@ class LevelMap:
                         #    tile_offsets.append((-1, (-1, 0, None)))
                         for foff, (xoff, yoff, r) in tile_offsets:
                             tile_frame = self.terrain_sprites[
-                                "internal_wall_edges"
+                                "wall_tiles"
                             ].frames[tile_key + foff]
                             if r:
                                 tile_frame = tile_frame.transpose(method=r)
@@ -213,7 +213,7 @@ class LevelMap:
                     else:
                         if p == 0:
                             continue
-                        tile_frame = self.terrain_sprites["floor"].frames[tile_key & 7]
+                        tile_frame = self.terrain_sprites["floor_tiles"].frames[tile_key & 7]
                         # image.alpha_composite(tile_frame, (start_x, start_y + h // 2))
         return image
 

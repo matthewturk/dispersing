@@ -13,6 +13,7 @@ class SpriteResource:
         w = rec.header.width_over_eight * 8
         c = rec.header.count
         self.frames = []
+        # I don't know why this is.
         if c > 1:
             c, h = h, c
         if rec.header.algo == 3:

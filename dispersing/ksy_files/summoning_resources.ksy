@@ -62,9 +62,9 @@ types:
         value: 'width_over_eight * 8'
   sprite_header:
     seq:
-      - id: height
+      - id: field1 # previously height
         type: u2
-      - id: count
+      - id: field2 # previously count
         type: u1
       - id: width_over_eight
         type: u1
@@ -75,6 +75,11 @@ types:
       - id: field_6
         type: u1
     instances:
+      # I'm not sure why this is the case.
+      count:
+        value: 'field2 > 1 ? field1 : field2'
+      height:
+        value: 'field2 > 1 ? field2 : field1'
       width:
         value: 'width_over_eight * 8'
   music_header:

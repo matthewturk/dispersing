@@ -141,17 +141,17 @@ types:
         type: u1
   level_props:
     seq:
-      - id: internal_wall_edges
+      - id: wall_tiles
         type: s2
-      - id: floor
+      - id: floor_tiles
         type: s2
-      - id: floor_special_tile
+      - id: floor_special_tiles
         type: s2
-      - id: wall_edges
+      - id: gate_tiles
         type: s2
       - id: keys_switches
         type: s2
-      - id: door
+      - id: door_tiles
         type: s2
       - id: unk7
         type: s2
