@@ -204,7 +204,7 @@ class SummoningLevels(KaitaiStruct):
 
 
     class LevelProps(KaitaiStruct):
-        SEQ_FIELDS = ["wall_tiles", "floor_tiles", "floor_special_tiles", "gate_tiles", "keys_switches", "door_tiles", "unk7", "unk8", "unk9", "wall_overlay_tiles", "blank11", "unk12", "big_wooden_thing", "big_boulder", "blank15"]
+        SEQ_FIELDS = ["wall_tiles", "floor_tiles", "floor_special_tiles", "gate_tiles", "keys_switches", "door_tiles", "wall_decor1", "wall_decor2", "wall_decor3", "wall_overlay_tiles", "blank11", "unk12", "big_wooden_thing", "big_boulder", "blank15"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -231,15 +231,15 @@ class SummoningLevels(KaitaiStruct):
             self._debug['door_tiles']['start'] = self._io.pos()
             self.door_tiles = self._io.read_s2le()
             self._debug['door_tiles']['end'] = self._io.pos()
-            self._debug['unk7']['start'] = self._io.pos()
-            self.unk7 = self._io.read_s2le()
-            self._debug['unk7']['end'] = self._io.pos()
-            self._debug['unk8']['start'] = self._io.pos()
-            self.unk8 = self._io.read_s2le()
-            self._debug['unk8']['end'] = self._io.pos()
-            self._debug['unk9']['start'] = self._io.pos()
-            self.unk9 = self._io.read_s2le()
-            self._debug['unk9']['end'] = self._io.pos()
+            self._debug['wall_decor1']['start'] = self._io.pos()
+            self.wall_decor1 = self._io.read_s2le()
+            self._debug['wall_decor1']['end'] = self._io.pos()
+            self._debug['wall_decor2']['start'] = self._io.pos()
+            self.wall_decor2 = self._io.read_s2le()
+            self._debug['wall_decor2']['end'] = self._io.pos()
+            self._debug['wall_decor3']['start'] = self._io.pos()
+            self.wall_decor3 = self._io.read_s2le()
+            self._debug['wall_decor3']['end'] = self._io.pos()
             self._debug['wall_overlay_tiles']['start'] = self._io.pos()
             self.wall_overlay_tiles = self._io.read_s2le()
             self._debug['wall_overlay_tiles']['end'] = self._io.pos()
@@ -262,6 +262,14 @@ class SummoningLevels(KaitaiStruct):
             self._debug['blank15']['end'] = self._io.pos()
             if not self.blank15 == b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00":
                 raise kaitaistruct.ValidationNotEqualError(b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", self.blank15, self._io, u"/types/level_props/seq/14")
+
+        @property
+        def wall_corners(self):
+            if hasattr(self, '_m_wall_corners'):
+                return self._m_wall_corners if hasattr(self, '_m_wall_corners') else None
+
+            self._m_wall_corners = (self.wall_tiles + 1)
+            return self._m_wall_corners if hasattr(self, '_m_wall_corners') else None
 
 
     class OtherData(KaitaiStruct):

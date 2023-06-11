@@ -7,17 +7,22 @@ import os
 
 _terrain_attrs = (
     "wall_tiles",
+    "wall_corners",
     "floor_tiles",
     "floor_special_tiles",
     "gate_tiles",
     "keys_switches",
     "door_tiles",
-    "unk7",
-    "unk8",
-    "unk9",
     "unk12",
     "big_wooden_thing",
     "big_boulder",
+)
+
+_wall_attrs = (
+    "wall_decor1",
+    "wall_decor2",
+    "wall_decor3",
+    "wall_overlay_tiles",
 )
 
 _tile_conversions = {
@@ -52,6 +57,18 @@ _tile_conversions = {
     255: b'\x20',
 }
 
+def concat_horizontal(im1, im2):
+    dst = Image.new('RGBA', (im1.width + im2.width, im1.height))
+    dst.paste(im1, (0, 0))
+    dst.paste(im2, (im1.width, 0))
+    return dst
+
+def concat_vertical(im1, im2):
+    dst = Image.new('RGBA', (im1.width, im1.height + im2.height))
+    dst.paste(im1, (0, 0))
+    dst.paste(im2, (0, im1.height))
+    return dst
+
 class TerrainSprites(dict):
     def __init__(self, game, level_asset):
         super(dict, self).__init__()
@@ -64,12 +81,45 @@ class TerrainSprites(dict):
         for attr in _terrain_attrs:
             self[attr] = sprites[offset + getattr(props, attr)]
         offset = self.game.assets["INIT"].sprite_offsets.wall_decoration
-        self["wall_overlay_tiles"] = sprites[offset + props.wall_overlay_tiles]
+        for attr in _wall_attrs:
+            self[attr] = sprites[offset + getattr(props, attr)]
+
+    def get_wall_sprite(self, wall_id, scale = 1, aspect_ratio = 1.0):
+        # This returns the full 32x32 sprite of the wall
+        # But it also requires that wall_id be between 0 .. 14.
+        if wall_id < 0 or wall_id > 14:
+            raise KeyError(wall_id)
+        # We concatenate the two PIL images
+        tile = concat_vertical(
+            self["wall_tiles"].frames[wall_id],
+            self["wall_tiles"].frames[wall_id + 15]
+        )
+        if scale > 1:
+            nw = round(tile.height * scale)
+            nh = round(tile.height * scale * aspect_ratio)
+            tile = tile.resize((nw, nh), resample = Image.NEAREST)
+        return tile
+
+    def get_floor_sprite(self, floor_id, scale = 1, aspect_ratio = 1.0):
+        # This returns a 32x32 sprite of the floor
+        # But it also requires that the floor_id be between 0 .. 3
+        if floor_id < 0 or floor_id > 3:
+            raise KeyError(floor_id)
+        # We concatenate the two PIL images
+        tile = concat_vertical(
+            self["floor_tiles"].frames[floor_id * 2 + 0],
+            self["floor_tiles"].frames[floor_id * 2 + 1],
+        )
+        if scale > 1:
+            nw = round(tile.height * scale)
+            nh = round(tile.height * scale * aspect_ratio)
+            tile = tile.resize((nw, nh), resample = Image.NEAREST)
+        return tile
 
     def _ipython_display_(self):
         children = []
         titles = []
-        for attr in _terrain_attrs + ("wall_overlay_tiles",):
+        for attr in _terrain_attrs + _wall_attrs:
             titles.append(attr.replace("_", " ").capitalize())
             o = ipywidgets.Output()
             with o:
