@@ -28,9 +28,7 @@ types:
     seq:
       - id: level_id
         type: s2
-      - id: unknown
-        type: u4
       - id: level_size
-        type: u2
+        type: u4
       - id: level_info
-        size: 0x2800
+        size: 0x49e2
