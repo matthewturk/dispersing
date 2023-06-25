@@ -20,6 +20,7 @@ seq:
   - id: unknown
     size: 0x54f7
   - id: character_info
+    type: character_table
     size: 0x326
   - id: object_table
     size: 10000
@@ -32,3 +33,17 @@ types:
         type: u4
       - id: level_info
         size: 0x49e2
+  character_table:
+    seq:
+      - id: character_name
+        type: strz
+        encoding: ascii
+        size: 30
+      - id: unknown1
+        size: 79
+      - id: spells
+        size: 14
+        repeat: expr
+        repeat-expr: 40
+      - id: unknown2
+        size: 137
