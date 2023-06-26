@@ -42,18 +42,28 @@ types:
       - id: unknown1
         type: u1
         repeat: expr
-        repeat-expr: 59
+        repeat-expr: 49
+      - id: hp_max
+        type: u2
+      - id: hp_cur
+        type: u2
+      - id: mp_max
+        type: u2
+      - id: mp_cur
+        type: u2
+      - id: unknown2
+        type: u2
       - id: current_attributes
         type: attributes
       - id: maximum_attributes
         type: attributes
-      - id: unknown2
+      - id: unknown3
         size: 8
       - id: spells
         size: 14
         repeat: expr
         repeat-expr: 40
-      - id: unknown3
+      - id: unknown4
         size: 137
   attributes:
     seq:
