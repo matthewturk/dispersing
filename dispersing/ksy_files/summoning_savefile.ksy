@@ -40,10 +40,32 @@ types:
         encoding: ascii
         size: 30
       - id: unknown1
-        size: 79
+        type: u1
+        repeat: expr
+        repeat-expr: 59
+      - id: current_attributes
+        type: attributes
+      - id: maximum_attributes
+        type: attributes
+      - id: unknown2
+        size: 8
       - id: spells
         size: 14
         repeat: expr
         repeat-expr: 40
-      - id: unknown2
+      - id: unknown3
         size: 137
+  attributes:
+    seq:
+      - id: strength
+        type: u1
+      - id: agility
+        type: u1
+      - id: endurance
+        type: u1
+      - id: accuracy
+        type: u1
+      - id: talent
+        type: u1
+      - id: power
+        type: u1
