@@ -39,32 +39,70 @@ types:
         type: strz
         encoding: ascii
         size: 30
-      - id: unknown1
+      - id: magic_levels
+        type: magic_levels
+      - id: weapon_levels
+        type: weapon_levels
+      - id: character_level
         type: u1
+      - id: current_magic_exp
+        type: u2
         repeat: expr
-        repeat-expr: 49
-      - id: hp_max
+        repeat-expr: 4
+      - id: next_magic_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: current_weapon_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: next_weapon_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: current_exp
+        type: u2
+      - id: last_level_exp
+        type: u2
+      - id: next_level_exp
+        type: u2
+      - id: unknown1
         type: u2
       - id: hp_cur
         type: u2
-      - id: mp_max
+      - id: hp_max
         type: u2
       - id: mp_cur
         type: u2
-      - id: unknown2
+      - id: mp_max
+        type: u2
+      - id: armor_class
         type: u2
       - id: current_attributes
         type: attributes
       - id: maximum_attributes
         type: attributes
+      - id: unknown2
+        type: s1
+      - id: agility_modifier
+        type: s1
+      - id: fatigue
+        type: s1
       - id: unknown3
-        size: 8
+        size: 3
+      - id: endurance_modifier
+        type: s1
       - id: spells
-        size: 14
+        type: spell_record
         repeat: expr
         repeat-expr: 40
+      - id: currently_memorized
+        type: u1
+        repeat: expr
+        repeat-expr: 4
       - id: unknown4
-        size: 137
+        size: 133
   attributes:
     seq:
       - id: strength
@@ -79,3 +117,35 @@ types:
         type: u1
       - id: power
         type: u1
+  magic_levels:
+    seq:
+      - id: wizardry
+        type: u1
+      - id: sorcery
+        type: u1
+      - id: enchantry
+        type: u1
+      - id: healing
+        type: u1
+  weapon_levels:
+    seq:
+      - id: long_edged
+        type: u1
+      - id: hacking
+        type: u1
+      - id: polearms
+        type: u1
+      - id: projectile
+        type: u1
+  spell_record:
+    seq:
+      - id: memorized
+        type: u1
+      - id: cost
+        type: u1
+      - id: info
+        size: 3
+      - id: gestures
+        type: strz
+        encoding: ascii
+        size: 9
