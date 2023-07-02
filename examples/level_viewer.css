@@ -1,0 +1,21 @@
+LevelViewer .level-viewer--wall {
+    color: $accent;
+    background: $background;
+}
+
+LevelViewer .level-viewer--floor {
+    color: $secondary-background;
+    background: $background;
+}
+
+LevelViewer .level-viewer--unknown {
+    color: $primary;
+}
+
+LevelViewer .level-viewer--highlighted {
+    background: $warning-darken-2;
+}
+
+LevelViewer .level-viewer--empty {
+    background: $background-lighten-1;
+}

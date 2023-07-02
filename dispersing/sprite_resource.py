@@ -13,8 +13,6 @@ class SpriteResource:
         w = rec.header.width_over_eight * 8
         c = rec.header.count
         self.frames = []
-        if c > 1:
-            c, h = h, c
         if rec.header.algo == 3:
             rec_data = unpack_sprite_algo3(rec.contents, c * h * w)
         else:

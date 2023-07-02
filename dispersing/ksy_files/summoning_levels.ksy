@@ -141,23 +141,23 @@ types:
         type: u1
   level_props:
     seq:
-      - id: internal_wall_edges
+      - id: wall_tiles
         type: s2
-      - id: floor
+      - id: floor_tiles
         type: s2
-      - id: floor_special_tile
+      - id: floor_special_tiles
         type: s2
-      - id: wall_edges
+      - id: gate_tiles
         type: s2
       - id: keys_switches
         type: s2
-      - id: door
+      - id: door_tiles
         type: s2
-      - id: unk7
+      - id: wall_decor1
         type: s2
-      - id: unk8
+      - id: wall_decor2
         type: s2
-      - id: unk9
+      - id: wall_decor3
         type: s2
       - id: wall_overlay_tiles
         type: s2
@@ -209,7 +209,9 @@ types:
             0,
             0,
           ]
-
+    instances:
+      wall_corners:
+        value: 'wall_tiles + 1'
   level:
     seq:
       - id: height
