@@ -30,11 +30,13 @@ seq:
     repeat: expr
     repeat-expr: 40
   - id: unknown8
-    type: u4
+    size: 16
   - id: unknown9
     size: 11
   - id: unknown10
     size: 20
+  - id: unknown11
+    size: 3
 types:
   sprite_offsets:
     seq:
