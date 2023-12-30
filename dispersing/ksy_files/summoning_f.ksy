@@ -3,16 +3,16 @@ meta:
   file-extension: ""
   endian: le
 seq:
-  - id: count
+  - id: num_portraits
     type: u2
-  - id: unknown1
+  - id: portraits_offset
     type: u2
   - id: unknown2
     type: u2
   - id: num_character
     type: u2
-  - id: records
-    type: frecord
+  - id: portraits
+    type: portrai
     repeat: expr
     repeat-expr: count
   - id: characters
@@ -20,17 +20,17 @@ seq:
     repeat: expr
     repeat-expr: num_character
 types:
-  frecord:
+  portrait:
     seq:
       - id: col1
         type: u1
       - id: col2
         size: 4
-      - id: col3
+      - id: portrait_id
         type: u1
       - id: col4
         type: u1
-      - id: col5
+      - id: gender
         type: u1
   character:
     seq:
