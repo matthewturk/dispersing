@@ -12,9 +12,9 @@ seq:
   - id: num_character
     type: u2
   - id: portraits
-    type: portrai
+    type: portrait
     repeat: expr
-    repeat-expr: count
+    repeat-expr: num_portraits
   - id: characters
     type: character
     repeat: expr
