@@ -1,4 +1,5 @@
 from .sprite_resource import SpriteResource
+from .font_resource import FontResource
 import numpy as np
 
 
@@ -7,6 +8,7 @@ class ResourceMap:
     def __init__(self, game):
         self.game = game
         self.records = []
+        self.fonts = {}
         self.sprites = {}
         self.palette_sprites = {}
         palettes = game.palettes
@@ -14,6 +16,8 @@ class ResourceMap:
             self.records.append(rec)
             if rec.type.name == "sprite":
                 self.sprites[i] = SpriteResource(rec, palettes)
+            elif rec.type.name == "font":
+                self.fonts[i] = FontResource(rec, palettes)
 
     def palettes_to_array(self):
         # Note that these run 0 .. 63, not 0 .. 255.

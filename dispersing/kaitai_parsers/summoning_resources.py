@@ -14,7 +14,7 @@ class SummoningResources(KaitaiStruct):
 
     class RecordTypes(Enum):
         sprite = 1
-        padded_sprite = 2
+        font = 2
         music = 3
         unknown3 = 5
     SEQ_FIELDS = ["count", "offsets", "records"]
@@ -130,8 +130,8 @@ class SummoningResources(KaitaiStruct):
             _on = self.type
             if _on == SummoningResources.RecordTypes.sprite:
                 self.header = SummoningResources.SpriteHeader(self._io, self, self._root)
-            elif _on == SummoningResources.RecordTypes.padded_sprite:
-                self.header = SummoningResources.PaddedSpriteHeader(self._io, self, self._root)
+            elif _on == SummoningResources.RecordTypes.font:
+                self.header = SummoningResources.FontHeader(self._io, self, self._root)
             elif _on == SummoningResources.RecordTypes.music:
                 self.header = SummoningResources.MusicHeader(self._io, self, self._root)
             else:
@@ -156,47 +156,6 @@ class SummoningResources(KaitaiStruct):
 
             self._m_record_end = (self._parent.offsets[(self.i + 1)] if self.i < (self._parent.count - 1) else self._root._io.size())
             return self._m_record_end if hasattr(self, '_m_record_end') else None
-
-
-    class PaddedSpriteHeader(KaitaiStruct):
-        SEQ_FIELDS = ["empty", "height", "count", "width_over_eight", "field_4", "algo", "field_6"]
-        def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
-            self._parent = _parent
-            self._root = _root if _root else self
-            self._debug = collections.defaultdict(dict)
-            self._read()
-
-        def _read(self):
-            self._debug['empty']['start'] = self._io.pos()
-            self.empty = self._io.read_bytes(26)
-            self._debug['empty']['end'] = self._io.pos()
-            self._debug['height']['start'] = self._io.pos()
-            self.height = self._io.read_u2le()
-            self._debug['height']['end'] = self._io.pos()
-            self._debug['count']['start'] = self._io.pos()
-            self.count = self._io.read_u1()
-            self._debug['count']['end'] = self._io.pos()
-            self._debug['width_over_eight']['start'] = self._io.pos()
-            self.width_over_eight = self._io.read_u1()
-            self._debug['width_over_eight']['end'] = self._io.pos()
-            self._debug['field_4']['start'] = self._io.pos()
-            self.field_4 = self._io.read_u1()
-            self._debug['field_4']['end'] = self._io.pos()
-            self._debug['algo']['start'] = self._io.pos()
-            self.algo = self._io.read_u1()
-            self._debug['algo']['end'] = self._io.pos()
-            self._debug['field_6']['start'] = self._io.pos()
-            self.field_6 = self._io.read_u1()
-            self._debug['field_6']['end'] = self._io.pos()
-
-        @property
-        def width(self):
-            if hasattr(self, '_m_width'):
-                return self._m_width if hasattr(self, '_m_width') else None
-
-            self._m_width = (self.width_over_eight * 8)
-            return self._m_width if hasattr(self, '_m_width') else None
 
 
     class GenericHeader(KaitaiStruct):
@@ -267,6 +226,24 @@ class SummoningResources(KaitaiStruct):
             self._debug['i_inst_count']['start'] = self._io.pos()
             self.i_inst_count = self._io.read_u1()
             self._debug['i_inst_count']['end'] = self._io.pos()
+
+
+    class FontHeader(KaitaiStruct):
+        SEQ_FIELDS = ["clip_info", "font_sprite_header"]
+        def __init__(self, _io, _parent=None, _root=None):
+            self._io = _io
+            self._parent = _parent
+            self._root = _root if _root else self
+            self._debug = collections.defaultdict(dict)
+            self._read()
+
+        def _read(self):
+            self._debug['clip_info']['start'] = self._io.pos()
+            self.clip_info = self._io.read_bytes(128)
+            self._debug['clip_info']['end'] = self._io.pos()
+            self._debug['font_sprite_header']['start'] = self._io.pos()
+            self.font_sprite_header = SummoningResources.SpriteHeader(self._io, self, self._root)
+            self._debug['font_sprite_header']['end'] = self._io.pos()
 
 
 
