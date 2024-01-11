@@ -31,7 +31,7 @@ types:
           switch-on: type
           cases:
             record_types::sprite: sprite_header
-            record_types::padded_sprite: padded_sprite_header
+            record_types::font: font_header
             record_types::music: music_header
             _: generic_header(header_size)
       - id: contents
@@ -41,30 +41,17 @@ types:
         value: '_parent.offsets[i]'
       record_end:
         value: 'i < _parent.count - 1 ? _parent.offsets[i + 1] : _root._io.size'
-  padded_sprite_header:
+  font_header:
     seq:
-      - id: empty
-        size: 26
-      - id: height
-        type: u2
-      - id: count
-        type: u1
-      - id: width_over_eight
-        type: u1
-      - id: field_4
-        type: u1
-      - id: algo
-        type: u1
-      - id: field_6
-        type: u1
-    instances:
-      width:
-        value: 'width_over_eight * 8'
+      - id: unknown_field
+        size: 128
+      - id: font_sprite_header
+        type: sprite_header
   sprite_header:
     seq:
-      - id: field1 # previously height
+      - id: field1
         type: u2
-      - id: field2 # previously count
+      - id: field2
         type: u1
       - id: width_over_eight
         type: u1
@@ -122,6 +109,6 @@ types:
 enums:
   record_types:
     1: sprite
-    2: padded_sprite
+    2: font
     3: music
     5: unknown3
