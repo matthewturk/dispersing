@@ -43,7 +43,7 @@ types:
         value: 'i < _parent.count - 1 ? _parent.offsets[i + 1] : _root._io.size'
   font_header:
     seq:
-      - id: unknown_field
+      - id: clip_info
         size: 128
       - id: font_sprite_header
         type: sprite_header

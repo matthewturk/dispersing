@@ -35,7 +35,7 @@ class SpriteResource:
         frame_slider = ipywidgets.IntSlider(min=0, max=len(png_images) - 1, step=1)
         im = ipywidgets.Image(value=b"", format="png", height=200)
         html = (
-            "<style>.dispersing-pixelated {image-rendering: pixelated;}</style><table>"
+            "<style>.dispersing-pixelated {image-rendering: pixelated;} img.vga-aspect-ratio {aspect-ratio: 4/3;}</style><table>"
         )
         display(ipywidgets.HTML(html))
 
@@ -43,6 +43,7 @@ class SpriteResource:
             im.value = png_images[frame_slider.value]
 
         im.add_class("dispersing-pixelated")
+        im.add_class("vga-aspect-ratio")
         im.layout.height = "200px"
         im.layout.object_fit = "contain"
         frame_slider.observe(update_image, "value")
