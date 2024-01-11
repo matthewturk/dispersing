@@ -122,6 +122,8 @@ types:
         type: u2le
       - id: i_car_wave_sel
         type: u2le
+      - id: extra
+        type: u2le
   snd_oplregs:
     seq:
       - id: ksl
