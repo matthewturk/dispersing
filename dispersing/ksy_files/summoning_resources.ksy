@@ -99,6 +99,12 @@ types:
         type: u1
       - id: i_inst_count
         type: u1
+      - id: instruments
+        type: instrument_parameters
+        repeat: expr
+        repeat-expr: i_inst_count
+      - id: music_commands
+        size: data_size
   generic_header:
     params:
       - id: size
@@ -106,6 +112,44 @@ types:
     seq:
       - id: contents
         size: size
+  instrument_parameters:
+    seq:
+      - id: opl_modulator
+        type: snd_oplregs
+      - id: opl_carrier
+        type: snd_oplregs
+      - id: i_mod_wave_sel
+        type: u2le
+      - id: i_car_wave_sel
+        type: u2le
+  snd_oplregs:
+    seq:
+      - id: ksl
+        type: u2le
+      - id: multiple
+        type: u2le
+      - id: feedback
+        type: u2le
+      - id: attack
+        type: u2le
+      - id: sustain
+        type: u2le
+      - id: eg
+        type: u2le
+      - id: decay
+        type: u2le
+      - id: release_rate
+        type: u2le
+      - id: total_level
+        type: u2le
+      - id: am
+        type: u2le
+      - id: vib
+        type: u2le
+      - id: ksr
+        type: u2le
+      - id: con
+        type: u2le
 enums:
   record_types:
     1: sprite
