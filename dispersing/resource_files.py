@@ -11,6 +11,7 @@ class ResourceMap:
         self.fonts = {}
         self.sprites = {}
         self.palette_sprites = {}
+        self.music = {}
         palettes = game.palettes
         for i, rec in enumerate(game.assets["RESOURCE"].records):
             self.records.append(rec)
@@ -18,6 +19,8 @@ class ResourceMap:
                 self.sprites[i] = SpriteResource(rec, palettes)
             elif rec.type.name == "font":
                 self.fonts[i] = FontResource(rec, palettes)
+            elif rec.type.name == "music":
+                self.music[i] = rec
 
     def palettes_to_array(self):
         # Note that these run 0 .. 63, not 0 .. 255.
