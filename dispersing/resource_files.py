@@ -1,5 +1,6 @@
 from .sprite_resource import SpriteResource
 from .font_resource import FontResource
+from .music_resource import MusicResource
 import numpy as np
 
 
@@ -20,7 +21,7 @@ class ResourceMap:
             elif rec.type.name == "font":
                 self.fonts[i] = FontResource(rec, palettes)
             elif rec.type.name == "music":
-                self.music[i] = rec
+                self.music[i] = MusicResource(rec)
 
     def palettes_to_array(self):
         # Note that these run 0 .. 63, not 0 .. 255.
