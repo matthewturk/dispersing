@@ -2,6 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
+import IPython
+from IPython.display import display
+import ipywidgets
 
 from . import kaitai_utilities as ku
 from .kaitai_parsers import summoning
@@ -69,3 +72,41 @@ class TheSummoning(Game):
         self.levels = [
             LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))
         ]
+
+    def _ipython_display_(self):
+        def get_level_widget(event):
+            level = int(event["new"])
+            level_widget.children = [level_id, get_output(self.levels[level])]
+
+        def get_output(w):
+            o = ipywidgets.Output()
+            with o:
+                display(w)
+            return o
+
+        level_id = ipywidgets.IntSlider(min=0, max=len(self.levels), step=1)
+        level_id.observe(get_level_widget, "value")
+        level_widget = ipywidgets.VBox([level_id])
+        v = ipywidgets.Tab(
+            children=[
+                ipywidgets.HBox(),  # Music
+                ipywidgets.HBox(),  # Fonts
+                level_widget,
+                ipywidgets.HBox(),  # Color Palettes
+                ipywidgets.HBox(),  # Interactions
+                ipywidgets.HBox(),  # NPCs
+                ipywidgets.HBox(),
+                get_output(self.objects),
+            ],
+            titles=[
+                "Music",
+                "Fonts",
+                "Levels",
+                "Color Palettes",
+                "Interactions",
+                "NPCs",
+                "Sprites",
+                "Objects",
+            ],
+        )
+        display(v)

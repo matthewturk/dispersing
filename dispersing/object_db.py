@@ -42,6 +42,8 @@ class GameObject:
             self.images[img_type] = game.resources.sprites[
                 getattr(offsets, img_type + "_object") + record.image_id
             ]
+        for _, k in _display_fields:
+            setattr(self, k, getattr(record, k, ""))
         self.name = game.assets["TEXT"].text[record.text_record].value.decode("ascii")
 
     def _ipython_display_(self):
@@ -60,12 +62,13 @@ class ObjectDatabase(dict):
     def __init__(self, game):
         super(dict, self).__init__()
         self.game = game
+        self.n_objs = len(game.assets["OBJECTS"].object)
         for i, rec in enumerate(game.assets["OBJECTS"].object):
             obj_inst = GameObject(game, rec)
             self[i] = self[obj_inst.name] = obj_inst
 
     def to_df(self):
-        obj = self.objects_by_id[0]
+        obj = self[0]
         fields = [
             _
             for _ in dir(obj)
@@ -74,7 +77,7 @@ class ObjectDatabase(dict):
         ]
         fields.sort()
         records = []
-        for n, orec in sorted(self.objects_by_id.items()):
+        for n, orec in sorted(self.items()):
             rec = {_: getattr(orec, _) for _ in fields}
             rec["obj_type"] = orec.obj_type.name
             records.append(rec)
@@ -82,23 +85,23 @@ class ObjectDatabase(dict):
         return df
 
     def _ipython_display_(self):
-        n = len(self.objects_by_id)
+        n = self.n_objs
         png_images = []
         for i in range(n):
             png_images.append([])
-            for fr in self[i][1][1].frames:
+            for fr in self[i].images["small"].frames:
                 with io.BytesIO() as output:
                     fr.save(output, format="PNG")
                     output.seek(0)
                     png_images[-1].append(output.read())
-        sprite_slider = ipywidgets.IntSlider(min=0, max=n, step=1)
+        sprite_slider = ipywidgets.IntSlider(min=0, max=n - 1, step=1)
         frame_slider = ipywidgets.IntSlider(min=0, step=1)
         frame_label = ipywidgets.Label(value="")
         im = ipywidgets.Image(value=b"", format="png", height=200)
         span = ipywidgets.HTML()
 
         def update_record(change):
-            new_object_record = self.objects_by_id[sprite_slider.value]
+            new_object_record = self[sprite_slider.value]
             span.value = _fill_template(new_object_record)
 
         def update_image(change):
@@ -107,7 +110,7 @@ class ObjectDatabase(dict):
         def update_sprite(change):
             nf = len(png_images[sprite_slider.value])
             frame_label.value = f"({nf})"
-            frame_slider.max = nf
+            frame_slider.max = nf - 1
 
         im.add_class("dispersing-pixelated")
         im.layout.height = "200px"
