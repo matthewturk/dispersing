@@ -12,6 +12,7 @@ from .level_map import LevelMap
 from .object_db import ObjectDatabase
 from .npc_db import NPCDatabase
 from .resource_files import ResourceMap
+from .text_db import TextDatabase
 
 
 def make_df(l):
@@ -68,6 +69,7 @@ class TheSummoning(Game):
         self.resources = ResourceMap(self)
         self.objects = ObjectDatabase(self)
         self.npcs = NPCDatabase(self)
+        self.text = TextDatabase(self)
 
         self.levels = [
             LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))
@@ -97,6 +99,7 @@ class TheSummoning(Game):
                 ipywidgets.HBox(),  # NPCs
                 ipywidgets.HBox(),
                 get_output(self.objects),
+                get_output(self.text),
             ],
             titles=[
                 "Music",
@@ -107,6 +110,7 @@ class TheSummoning(Game):
                 "NPCs",
                 "Sprites",
                 "Objects",
+                "Text",
             ],
         )
         display(v)
