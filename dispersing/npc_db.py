@@ -1,3 +1,7 @@
+from IPython.display import display
+import ipywidgets
+
+
 class NPC:
     def __init__(self, index, game, record):
         self.game = game
@@ -16,6 +20,33 @@ class NPC:
                 game.assets["TEXT"].text[record.head_id + 170].value.decode("ascii")
             )
 
+    def _ipython_display_(self):
+        attrs = (
+            ["npc_id", "head_id", "flags"]
+            + [f"col{_}" for _ in range(3, 7)]
+            + ["sprite_id"]
+            + [f"col{_}" for _ in range(8, 16)]
+        )
+        html = (
+            f"<h3>{self.name}</h3>"
+            + "<table>\n<tr>"
+            + "".join(f"<th>{attr}</th>" for attr in attrs)
+            + "</tr>\n"
+            + "".join(f"<td>{getattr(self.record, attr)}</td>" for attr in attrs)
+            + "</tr>\n"
+        )
+        out_head = ipywidgets.Output()
+        with out_head:
+            display(self.images["head"])
+        out_sprite = ipywidgets.Output()
+        with out_sprite:
+            display(self.images["sprite"])
+        display(
+            ipywidgets.VBox(
+                [ipywidgets.HTML(html), ipywidgets.HBox([out_head, out_sprite])]
+            )
+        )
+
 
 class NPCDatabase(dict):
     def __init__(self, game):
@@ -24,6 +55,20 @@ class NPCDatabase(dict):
         for i, npc in enumerate(game.assets["NPC"].npcs):
             npc_obj = NPC(i, game, npc)
             self[i] = self[npc_obj.name] = npc_obj
+
+    def _ipython_display_(self):
+        npc_id = ipywidgets.IntSlider(min=0, max=len(self) // 2 - 1, step=1)
+        npc_id.value = 0
+        out = ipywidgets.Output()
+
+        def change_npc(event):
+            with out:
+                out.clear_output(wait=True)
+                display(self[event["new"]])
+
+        npc_id.observe(change_npc, "value")
+
+        display(ipywidgets.VBox([npc_id, out]))
 
 
 class ConversationCommandList:

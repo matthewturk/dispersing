@@ -28,11 +28,13 @@ types:
         type: u1
       - id: sprite_id
         type: u1
-      - id: col8
+      - id: body_sprite
         type: u1
-      - id: col9
-        type: u1
-      - id: col10
+      - id: action_dmg_ndice
+        type: b4
+      - id: action_dmg_nsides
+        type: b4
+      - id: agility
         type: u1
       - id: col11
         type: u1

@@ -13,6 +13,7 @@ from .object_db import ObjectDatabase
 from .npc_db import NPCDatabase
 from .resource_files import ResourceMap
 from .text_db import TextDatabase
+from .sprite_db import SpriteDatabase
 
 
 def make_df(l):
@@ -70,6 +71,7 @@ class TheSummoning(Game):
         self.objects = ObjectDatabase(self)
         self.npcs = NPCDatabase(self)
         self.text = TextDatabase(self)
+        self.sprites = SpriteDatabase(self)
 
         self.levels = [
             LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))
@@ -96,8 +98,8 @@ class TheSummoning(Game):
                 level_widget,
                 ipywidgets.HBox(),  # Color Palettes
                 ipywidgets.HBox(),  # Interactions
-                ipywidgets.HBox(),  # NPCs
-                ipywidgets.HBox(),
+                get_output(self.npcs),
+                ipywidgets.HBox(),  # Sprites
                 get_output(self.objects),
                 get_output(self.text),
             ],

@@ -19,7 +19,7 @@ seq:
     type: u1
     repeat: expr
     repeat-expr: 40
-  - id: unknown7 # 3 for each spell
+  - id: spell_dice # 3 for each spell
     type: spell_info
     repeat: expr
     repeat-expr: 40
@@ -104,9 +104,9 @@ types:
         type: s1
   spell_info:
     seq:
-      - id: unknown1
+      - id: num_dice
         type: u1
-      - id: unknown2
+      - id: dice_faces
         type: u1
-      - id: unknown3
+      - id: offset_dice_faces
         type: u1

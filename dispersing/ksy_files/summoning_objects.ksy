@@ -36,20 +36,19 @@ types:
         type: u1
       - id: col4
         type: u1
-      - id: col5
+      - id: middle_icon
         type: u1
-      # col6 is projectile info
-      - id: act1_dmg
+      - id: act1_ndice
         type: b4
-      - id: act1_flags
+      - id: act1_nsides
         type: b4
-      - id: act2_dmg
+      - id: act2_ndice
         type: b4
-      - id: act2_flags
+      - id: act2_nsides
         type: b4
-      - id: act3_dmg
+      - id: act3_ndice
         type: b4
-      - id: act3_flags
+      - id: act3_nsides
         type: b4
       - id: charges
         type: u1
@@ -58,12 +57,13 @@ types:
       - id: col11
         type: u1
       # col12 seems to be a key for the subroutine to call when it gets used
-      - id: col12
+      # 29 seems to be healing
+      - id: subroutine
         type: u1
       - id: obj_type
         type: u1
         enum: object_categories
-      - id: col14
+      - id: scroll_id
         type: u1
     instances:
       text_record:
