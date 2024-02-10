@@ -95,7 +95,7 @@ types:
             iopcode::give_items: opcode_args("oooooo")
             iopcode::unknown42: opcode_args("")
             iopcode::teach_spell: opcode_args("u")
-            iopcode::unknown44: opcode_args("u")
+            iopcode::change_npc_portrait: opcode_args("u")
             iopcode::return_to_main_menu: opcode_args("uu")
             iopcode::get_save_game_name: opcode_args("uu")
   opcode_args:
@@ -155,7 +155,7 @@ enums:
     41: give_items              # ... (6 arg?)
     42: unknown42               # 0 arg
     43: teach_spell             # 1 arg hand movement?  give?
-    44: unknown44               # 1 arg (tr[22,5])
+    44: change_npc_portrait     # 1 arg (tr[22,5])
     45: return_to_main_menu     # 2 args? 1st is something, 2nd is text
     46: get_save_game_name      # 2 args? 1st is something (var?) and 2nd is text
   conv_flags:

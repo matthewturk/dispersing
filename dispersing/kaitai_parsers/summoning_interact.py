@@ -16,15 +16,15 @@ class SummoningInteract(KaitaiStruct):
         unknown4 = 4
         unknown5 = 5
         receive_keyword = 6
-        unknown7 = 7
+        interaction_end = 7
         check_items = 8
-        check_var_neq = 9
+        check_var_gt = 9
         check_var_eq = 10
-        unused11 = 11
+        check_var_lt = 11
         unknown12 = 12
-        unknown13 = 13
-        unknown14 = 14
-        unknown15 = 15
+        check_max_health = 13
+        count_coins = 14
+        check_wearing_any_item = 15
         check_item_wearing = 16
         unknown17 = 17
         emit_text = 18
@@ -32,30 +32,30 @@ class SummoningInteract(KaitaiStruct):
         take_item = 20
         terminate_reset = 21
         set_variable = 22
-        unknown23 = 23
+        increment_variable = 23
         give_item = 24
         unknown25 = 25
         heal_character = 26
         unknown27 = 27
-        unknown28 = 28
+        toggle_transcription = 28
         unknown29 = 29
         unknown30 = 30
         run_procedure = 31
-        unused32 = 32
-        unused33 = 33
-        unknown34 = 34
-        unknown35 = 35
-        restore = 36
-        unknown37 = 37
+        continue = 32
+        end_game_sequence = 33
+        quit = 34
+        save_game = 35
+        restore_game = 36
+        delete_save_game = 37
         unknown38 = 38
         player_emit_text = 39
         unknown40 = 40
         give_items = 41
         unknown42 = 42
-        unknown43 = 43
-        unknown44 = 44
-        unknown45 = 45
-        unknown46 = 46
+        teach_spell = 43
+        change_npc_portrait = 44
+        return_to_main_menu = 45
+        get_save_game_name = 46
         end_command = 65532
         continue_conversation = 65533
         start_conversation = 65534
@@ -225,26 +225,24 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown40:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.reset_variable:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.check_max_health:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.quit:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.emit_keyword:
                 self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown42:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unused11:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown37:
+            elif _on == SummoningInteract.Iopcode.end_game_sequence:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.set_variable:
                 self.args = SummoningInteract.OpcodeArgs(u"Vv", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown35:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.receive_keyword:
                 self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown7:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown28:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unused33:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.check_items:
                 self.args = SummoningInteract.OpcodeArgs(u"uuu", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.terminate_reset:
@@ -253,56 +251,56 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown12:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unused32:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.heal_character:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.player_emit_text:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.start_conversation:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.save_game:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.emit_text:
                 self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown13:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown14:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown44:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown46:
+            elif _on == SummoningInteract.Iopcode.return_to_main_menu:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.end_command:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.toggle_transcription:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.restore_game:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.take_item:
                 self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown34:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.check_wearing_any_item:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown5:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown4:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown23:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown27:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.continue_conversation:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown30:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown43:
+            elif _on == SummoningInteract.Iopcode.teach_spell:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.change_npc_portrait:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown29:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.count_coins:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.continue:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.end_commandlist:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.check_var_neq:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.restore:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown45:
+            elif _on == SummoningInteract.Iopcode.get_save_game_name:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown15:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.interaction_end:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.give_items:
                 self.args = SummoningInteract.OpcodeArgs(u"oooooo", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.check_item_wearing:
@@ -311,6 +309,8 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.check_var_eq:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.delete_save_game:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             self._debug['args']['end'] = self._io.pos()
 
 
