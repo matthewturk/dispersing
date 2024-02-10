@@ -42,7 +42,5 @@ types:
         type: u1
       - id: col13
         type: u1
-      - id: col14
-        type: u1
-      - id: col15
-        type: u1
+      - id: behavior_flags
+        type: u2

@@ -136,9 +136,9 @@ enums:
     22: set_variable            # 2 args
     23: increment_variable      # 1 arg, does something to variable
     24: give_item               # 1 arg
-    25: unknown25               # 2 args, maybe another head and text
+    25: unknown25               # 2 args, maybe another head and text.  calls kill_charpos on the NPC.
     26: heal_character          # 0 arg
-    27: unknown27               # 0 arg -- maybe something with saves?
+    27: unknown27               # 0 arg -- maybe something with saves?  It calls memory-fill with 0xc.
     28: toggle_transcription    # 1 arg
     29: unknown29               # 1 arg?
     30: unknown30               # 0 arg
