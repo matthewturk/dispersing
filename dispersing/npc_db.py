@@ -21,12 +21,24 @@ class NPC:
             )
 
     def _ipython_display_(self):
-        attrs = (
-            ["npc_id", "head_id", "flags"]
-            + [f"col{_}" for _ in range(3, 7)]
-            + ["sprite_id"]
-            + [f"col{_}" for _ in range(8, 16)]
-        )
+        attrs = [
+            "npc_id",
+            "head_id",
+            "flags",
+            "col3",
+            "col4",
+            "col5",
+            "col6",
+            "sprite_id",
+            "body_sprite",
+            "action_dmg_ndice",
+            "action_dmg_nsides",
+            "agility",
+            "col11",
+            "col12",
+            "col13",
+            "behavior_flags",
+        ]
         html = (
             f"<h3>{self.name}</h3>"
             + "<table>\n<tr>"
@@ -87,6 +99,34 @@ class ConversationCommandList:
                     print("KEYWORD", kw[arg])
                 elif t == "t":
                     print("EMIT", text[arg].value)
+                else:
+                    print("ARG", t, arg)
+
+    def _return_table_row_(self, i=-1):
+        kw = self.conversation.db.keyword_asset.keyword
+        text = self.conversation.db.text_records
+        objs = self.conversation.db.game.objects
+        html = []
+        html.append(f"<tr><td>{i: 3d}</td><td><b>{self.opcode}</b></td></tr>")
+        for c in self.command_list:
+            for t, arg in zip(c.args.targs, c.args.args):
+                html.append(f"</tr><td><b>{c.opcode}</b></td>")
+                if t == "k":
+                    html.append(f"<td>KEYWORD</td><td>{kw[arg]}</td>")
+                elif t == "t":
+                    html.append(
+                        f"<td>EMIT</td><td>{text[arg].value.decode('ascii')}</td>"
+                    )
+                elif t == "o":
+                    html.append(f"<td>OBJECT</td><td>{objs[arg].name}</td>")
+                else:
+                    html.append(f"<td>ARG</td><td>{t} {arg}</td>")
+        return "\n".join(html)
+
+    def _ipython_display_(
+        self,
+    ):
+        display(ipywidgets.HTML("<table>" + self._return_table_row_() + "</table>"))
 
 
 class Conversation:
@@ -98,6 +138,10 @@ class Conversation:
 
     def __repr__(self):
         return "Conversation with {}".format(self.npc_name)
+
+    def _ipython_display_(self):
+        table_rows = [c._return_table_row_(i) for (i, c) in enumerate(self.components)]
+        display(ipywidgets.HTML("<table>" + "".join(table_rows) + "</table>"))
 
 
 class ConversationDatabase:
@@ -126,3 +170,11 @@ class ConversationDatabase:
             return self.conv_by_name[item]
         else:
             raise KeyError(item)
+
+    def find_opcode(self, opcode_num):
+        found = {}
+        for i, conv in self.conv_by_id.items():
+            for component in conv.components:
+                if any(c.opcode.value == opcode_num for c in component.command_list):
+                    found[i] = conv
+        return found

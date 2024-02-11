@@ -60,12 +60,12 @@ types:
             iopcode::receive_keyword: opcode_args("k")
             iopcode::interaction_end: opcode_args("")
             iopcode::check_items: opcode_args("uuu")
-            iopcode::check_var_neq: opcode_args("uu")
-            iopcode::check_var_eq: opcode_args("uu")
-            iopcode::unused11: opcode_args("")
+            iopcode::check_var_gt: opcode_args("Vv")
+            iopcode::check_var_eq: opcode_args("Vv")
+            iopcode::check_var_lt: opcode_args("Vv")
             iopcode::unknown12: opcode_args("u")
             iopcode::check_max_health: opcode_args("")
-            iopcode::count_coins: opcode_args("u")
+            iopcode::count_coins: opcode_args("n")
             iopcode::check_wearing_any_item: opcode_args("u")
             iopcode::check_item_wearing: opcode_args("uu")
             iopcode::unknown17: opcode_args("")
@@ -74,28 +74,28 @@ types:
             iopcode::take_item: opcode_args("o")
             iopcode::terminate_reset: opcode_args("")
             iopcode::set_variable: opcode_args("Vv")
-            iopcode::reset_variable: opcode_args("u")
+            iopcode::increment_variable: opcode_args("V")
             iopcode::give_item: opcode_args("o")
             iopcode::unknown25: opcode_args("uu")
             iopcode::heal_character: opcode_args("")
             iopcode::unknown27: opcode_args("")
             iopcode::toggle_transcription: opcode_args("u")
-            iopcode::unknown29: opcode_args("u")
+            iopcode::play_animation: opcode_args("u")
             iopcode::unknown30: opcode_args("")
-            iopcode::run_procedure: opcode_args("t")
-            iopcode::continue: opcode_args("")
+            iopcode::run_procedure: opcode_args("n")
+            iopcode::continue2: opcode_args("")
             iopcode::end_game_sequence: opcode_args("")
             iopcode::quit: opcode_args("")
             iopcode::save_game: opcode_args("")
             iopcode::restore_game: opcode_args("")
             iopcode::delete_save_game: opcode_args("")
             iopcode::unknown38: opcode_args("u")
-            iopcode::player_emit_text: opcode_args("uu")
+            iopcode::emit_with_portrait: opcode_args("pt")
             iopcode::unknown40: opcode_args("u")
             iopcode::give_items: opcode_args("oooooo")
             iopcode::unknown42: opcode_args("")
             iopcode::teach_spell: opcode_args("u")
-            iopcode::change_npc_portrait: opcode_args("u")
+            iopcode::change_npc_portrait: opcode_args("p")
             iopcode::return_to_main_menu: opcode_args("uu")
             iopcode::get_save_game_name: opcode_args("uu")
   opcode_args:
@@ -140,20 +140,20 @@ enums:
     26: heal_character          # 0 arg
     27: unknown27               # 0 arg -- maybe something with saves?  It calls memory-fill with 0xc.
     28: toggle_transcription    # 1 arg
-    29: unknown29               # 1 arg?
+    29: play_animation          # 1 arg?
     30: unknown30               # 0 arg
     31: run_procedure           # 1 args -- procedure id
-    32: continue                # 0 args
+    32: continue2               # 0 args
     33: end_game_sequence       # 0 args
     34: quit                    # 0 args
     35: save_game               # 0 args
     36: restore_game            # 0 args
     37: delete_save_game        # 0 args
     38: unknown38               # 1 arg?
-    39: player_emit_text        # 2 args -- player character head, then text
+    39: emit_with_portrait      # 2 args -- other NPC/character head then text
     40: unknown40               # 1 arg
     41: give_items              # ... (6 arg?)
-    42: unknown42               # 0 arg
+    42: unknown42               # 0 arg -- sets DAT_3226_8cc1 to 1
     43: teach_spell             # 1 arg hand movement?  give?
     44: change_npc_portrait     # 1 arg (tr[22,5])
     45: return_to_main_menu     # 2 args? 1st is something, 2nd is text

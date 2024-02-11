@@ -10,7 +10,7 @@ from . import kaitai_utilities as ku
 from .kaitai_parsers import summoning
 from .level_map import LevelMap
 from .object_db import ObjectDatabase
-from .npc_db import NPCDatabase
+from .npc_db import NPCDatabase, ConversationDatabase
 from .resource_files import ResourceMap
 from .text_db import TextDatabase
 from .sprite_db import SpriteDatabase
@@ -72,6 +72,7 @@ class TheSummoning(Game):
         self.npcs = NPCDatabase(self)
         self.text = TextDatabase(self)
         self.sprites = SpriteDatabase(self)
+        self.conversations = ConversationDatabase(self)
 
         self.levels = [
             LevelMap(self, i) for i in range(len(self.assets["LEVELS"].levels))
