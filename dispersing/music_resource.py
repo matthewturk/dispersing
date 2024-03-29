@@ -28,38 +28,39 @@ class MusicResource:
         instruments = _instrument_types[self.record.header.sound_mode]
         for i, (n, d) in enumerate(instruments):
             dest_midi.instruments.append(pretty_midi.Instrument(i, is_drum=d, name=n))
+        start_times = {i: [] for i in range(self.num_channels)}
+        stop_times = {i: [] for i in range(self.num_channels)}
+        notes = {i: [] for i in range(self.num_channels)}
+        volumes = {i: [] for i in range(self.num_channels)}
         # Now let's figure out our note durations!
-        for channel, _ in enumerate(self.instruments):
-            events = self.events_by_channel(channel)
+        current_time = 0
+        for event in self.record.contents.music_commands:
             # We need to figure out the note durations.
-            start_times = []
-            stop_times = []
-            notes = []
-            volumes = []
-            current_time = 0
-            for event in events:
-                current_time += event.v_time.value
-                if event.event_type == 0x90:
-                    if event.event_body.volume > 0:
-                        volumes.append(event.event_body.volume)
-                        start_times.append(current_time)
-                        notes.append(event.event_body.note)
-                    else:
-                        stop_times.append(current_time)
-                elif event.event_type == 0xF0 and event.channel == 0:
-                    # This is where we'd do tempo change
-                    pass
-                elif event.event_type == 0x80:
-                    stop_times.append(current_time)
-                elif event.event_type == 0xE0:
-                    v = (event.event_body.b2 << 8) | (event.event_body.b1) - 8192
-                    print(current_time, v)
-                    dest_midi.instruments[channel].pitch_bends.append(
-                        pretty_midi.PitchBend(v, current_time)
-                    )
-            for n, v, t0, t1 in zip(notes, volumes, start_times, stop_times):
-                note = pretty_midi.Note(v, n, t0 / (240 * factor), t1 / (240 * factor))
-                dest_midi.instruments[channel].notes.append(note)
+            current_time += event.v_time.value
+            c = event.channel
+            if event.event_type == 0x90:
+                if event.event_body.volume > 0:
+                    volumes[c].append(event.event_body.volume)
+                    start_times[c].append(current_time)
+                    notes[c].append(event.event_body.note)
+                else:
+                    stop_times[c].append(current_time)
+            elif event.event_type == 0xF0 and event.channel == 0:
+                # This is where we'd do tempo change
+                pass
+            elif event.event_type == 0xc0:
+                print("PROGRAM CHANGE", event.channel, event.event_body.program)
+            elif event.event_type == 0x80:
+                stop_times[c].append(current_time)
+            elif event.event_type == 0xE0:
+                v = (event.event_body.b2 << 8) | (event.event_body.b1) - 8192
+                dest_midi.instruments[c].pitch_bends.append(
+                    pretty_midi.PitchBend(v, current_time)
+                )
+        for c in range(self.num_channels):
+            for n, v, t0, t1 in zip(notes[c], volumes[c], start_times[c], stop_times[c]):
+                note = pretty_midi.Note(v, n, t0 / (120 * factor), t1 / (120 * factor))
+                dest_midi.instruments[c].notes.append(note)
         return dest_midi
 
     def events_by_channel(self, channel):
