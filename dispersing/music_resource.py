@@ -1,5 +1,5 @@
 try:
-    import pretty_midi
+    import midi_writer
 except ImportError:
     pass
 
@@ -21,7 +21,11 @@ class MusicResource:
         self.num_channels = len(_instrument_types[rec.header.sound_mode])
 
     def convert_to_midi(self, factor=1):
+
+        dest_midi = midi_writer.MIDIFile(self.num_channels)
         dest_midi = pretty_midi.PrettyMIDI(initial_tempo=self.record.header.basic_tempo)
+        for i in range(self.num_channels):
+            dest_midi.add_tempo(i, 0, self.record.header.basic_tempo)
 
         # Note!  We are not using the instruments from the music resource,
         # because they are meant to be used in an SND bank.
