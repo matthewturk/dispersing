@@ -139,23 +139,23 @@ enums:
     25: unknown25               # 2 args, maybe another head and text
     26: heal_character          # 0 arg
     27: unknown27               # 0 arg -- maybe something with saves?
-    28: unknown28               # 1 arg
+    28: unknown28               # 1 arg -- toggle transcription
     29: unknown29               # 1 arg?
-    30: unknown30               # 0 arg
+    30: unknown30               # 0 arg -- activate Korguz
     31: run_procedure           # 1 args -- procedure id
-    32: unused32                # 0 args
-    33: unused33                # 0 args
-    34: unknown34               # 0 args
-    35: unknown35               # 0 args
-    36: restore                 # 0 args
-    37: unknown37               # 0 args
+    32: unused32                # 0 args -- NO-OP in code
+    33: unused33                # 0 args -- end game sequence
+    34: unknown34               # 0 args -- prompt to quit
+    35: unknown35               # 0 args -- save game
+    36: restore                 # 0 args -- restore game
+    37: unknown37               # 0 args -- delete saved game
     38: unknown38               # 1 arg?
     39: player_emit_text        # 2 args -- player character head, then text
     40: unknown40               # 1 arg
     41: give_items              # ... (6 arg?)
-    42: unknown42               # 0 arg
-    43: unknown43               # 1 arg hand movement?  give?
-    44: unknown44               # 1 arg (tr[22,5])
+    42: set_flag_true           # 0 arg -- set flag
+    43: teach_spell             # 1 arg hand movement?  give?  teach spell?
+    44: switch_npc_portrait     # 1 arg (tr[22,5]) switch NPC portrait
     45: unknown45               # 2 args? 1st is something, 2nd is text
     46: unknown46               # 2 args? 1st is something (var?) and 2nd is text
   conv_flags:
