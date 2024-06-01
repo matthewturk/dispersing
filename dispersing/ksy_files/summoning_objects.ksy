@@ -18,7 +18,7 @@ types:
 # to get AC bonus, ((col0 >> 4) & 15)
       - id: ac_bonus
         type: b4
-      - id: col0
+      - id: col0 # the size of the object
         type: b4
       - id: object_name_id
         type: u1
@@ -32,7 +32,7 @@ types:
 # Sack, 10 items:
 # >>> np.unpackbits(np.array([233], 'u1'))
 # array([1, 1, 1, 0, 1, 0, 0, 1], dtype=uint8)
-      - id: container_flags
+      - id: container_flags # 0xf0 is the size it can contain
         type: u1
       - id: col4
         type: u1
@@ -55,10 +55,12 @@ types:
         type: u1
       - id: image_id
         type: u1
+        # col11 0x80 checked in the random object routine, 0x7f in
+        # helmetshirtsboots. might be something about wearable.
       - id: col11
         type: u1
       # col12 seems to be a key for the subroutine to call when it gets used
-      - id: col12
+      - id: subroutine_id
         type: u1
       - id: obj_type
         type: u1

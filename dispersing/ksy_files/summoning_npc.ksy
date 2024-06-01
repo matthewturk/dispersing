@@ -18,29 +18,47 @@ types:
         type: u1
       - id: flags
         type: u1
-      - id: col3
+      - id: maybe_n_hit_dice # maybe n hit dice
         type: u1
-      - id: col4
+      - id: damage_resistance # col4
         type: u1
-      - id: col5
+      - id: damage_bonus # col5
         type: u1
-      - id: col6
+        # seems like this is 0 or 2, where 2 requires specific conditions like
+        # footwear removal and shadow weaver costume.  col6
+      - id: conditionally_hostile 
         type: u1
       - id: sprite_id
         type: u1
       - id: col8
         type: u1
-      - id: col9
+      - id: action
         type: u1
-      - id: col10
+      - id: col10 # maybe accuracy
         type: u1
       - id: col11
         type: u1
-      - id: col12
+      - id: magic_attack # not sure about this one; col12
         type: u1
-      - id: col13
+        enum: magic_attack_types
+      - id: weapon_vulnerabilities
         type: u1
+        enum: weapon_classes
       - id: col14
         type: u1
-      - id: col15
+      - id: behavior_flags
         type: u1
+enums:
+  weapon_classes:
+    0: none
+    9: edged
+    10: bashing
+    11: polearms
+    12: projectile
+  magic_attack_types:
+    0: none
+    1: stone
+    3: poison
+    4: fire
+    5: lightning
+    9: unknown
