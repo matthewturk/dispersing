@@ -32,11 +32,16 @@ types:
 # Sack, 10 items:
 # >>> np.unpackbits(np.array([233], 'u1'))
 # array([1, 1, 1, 0, 1, 0, 0, 1], dtype=uint8)
-      - id: container_flags # 0xf0 is the size it can contain
+#- id: container_flags # 0xf0 is the size it can contain
+# 0x0f is the number of items
+#        type: u1
+      - id: container_size
+        type: b4
+      - id: container_capacity
+        type: b4
+      - id: act1_icon
         type: u1
-      - id: col4
-        type: u1
-      - id: col5
+      - id: act2_icon
         type: u1
       # col6 is projectile info
       - id: act1_dmg

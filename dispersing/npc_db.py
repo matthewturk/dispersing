@@ -9,7 +9,7 @@ class NPC:
             "head": game.resources.sprites[head_offset + record.head_id],
             "sprite": game.resources.sprites[sprite_offset + record.sprite_id],
         }
-        # TODO: find this 170
+        # As near as I can tell, this 170 is hardcoded (0xaa) in the game.
         self.name = game.assets["TEXT"].text[index + 170].value.decode("ascii")
         if record.head_id:
             self.display_name = (
