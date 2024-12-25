@@ -36,6 +36,15 @@ _variables = (
     ("unknown2", 0x6D8E, "B"),
     ("maybe_agility_modifier", 0x6D8F, "B"),
     ("maybe_fatigue", 0x6D90, "B"),
+    ("maybe_endurance_modifier", 0x6D94, "B"),
+    # This is actually 40 in a row, but not sure yet how to represent this without going full Kaitai.
+    # Which, of course, is the ultimate destination here anyway.
+    ("spell_table", 0x6D95, "5B9s"),
+    ("current_memorized", 0x6FC5, "4B"),
+    ("inventory_occupancy_map", 0x7AAC, "41B"),
+    ("maybe_inventory_1", 0x7AD7, "40B"),
+    ("maybe_inventory_2", 0x7AFF, "40B"),
+    ("maybe_inventory_3", 0x7B27, "41B"),
 )
 
 

@@ -12,6 +12,7 @@ except ImportError:
 class MemoryLocation(traitlets.HasTraits):
     name = traitlets.Unicode("Unknown")
     address = traitlets.Int()
+    display_address = traitlets.Unicode()
     data = traitlets.Bytes()
     value = traitlets.Any()
     display_value = traitlets.Unicode()
@@ -25,6 +26,12 @@ class MemoryLocation(traitlets.HasTraits):
         self.value = struct.unpack(
             self.data_type, self.data[self.address : self.address + size]
         )
+
+    @traitlets.observe("address")
+    def _address_changed(self, change):
+        # Would be better to use a formatter in the traits display, but I like
+        # the iteration there too much.
+        self.display_address = hex(self.address)
 
     @traitlets.observe("value")
     def _value_changed(self, change):
@@ -66,7 +73,7 @@ class Coredump(traitlets.HasTraits):
 
         if len(self.labels) > 0:
             rows = []
-            attrs = ("name", "address", "data_type", "display_value")
+            attrs = ("name", "display_address", "data_type", "display_value")
             gs = ipywidgets.GridspecLayout(
                 n_rows=len(self.labels), n_columns=len(attrs)
             )
