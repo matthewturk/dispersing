@@ -5,11 +5,9 @@ meta:
   imports:
     - summoning_objects
 instances:
-  character_name:
+  character_info:
     pos: 0x6d29
-    type: str
-    size: 26
-    encoding: ascii
+    type: character_record
   spell_table:
     pos: 0x6d95
     type: spell_info
@@ -26,6 +24,12 @@ instances:
     type: object_record
     repeat: expr
     repeat-expr: _root.object_template_table_count
+  keywords_table_ptr:
+    pos: 0x8cbd
+    type: u2
+  keywords_table:
+    pos: _root.keywords_table_ptr
+    size: 20
 types:
   spell_info:
     seq:
@@ -98,6 +102,77 @@ types:
         enum: object_categories
       - id: col14
         type: u1
+  character_attributes:
+    seq:
+      - id: strength
+        type: u1
+      - id: agility
+        type: u1
+      - id: endurance
+        type: u1
+      - id: accuracy
+        type: u1
+      - id: talent
+        type: u1
+      - id: power
+        type: u1
+  character_record:
+    seq:
+      - id: character_name
+        type: str
+        encoding: ascii
+        size: 26
+      - id: unknown1
+        size: 4
+      - id: magic_levels
+        type: u1
+        repeat: expr
+        repeat-expr: 4
+      - id: weapon_levels
+        type: u1
+        repeat: expr
+        repeat-expr: 4
+      - id: character_level
+        type: u1
+      - id: current_magic_level_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: next_magic_level_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: current_weapon_level_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: next_weapon_level_exp
+        type: u2
+        repeat: expr
+        repeat-expr: 4
+      - id: current_experience
+        type: u2
+      - id: next_experience
+        type: u2
+      - id: next_level_experience
+        type: u2
+      - id: unknown2
+        type: u2
+      - id: hp_current
+        type: u2
+      - id: hp_max
+        type: u2
+      - id: mp_current
+        type: u2
+      - id: mp_max
+        type: u2
+      - id: armor_class
+        type: u2
+      - id: current_attributes
+        type: character_attributes
+      - id: max_attributes
+        type: character_attributes
+
 enums:
   object_categories:
     0: helmet
