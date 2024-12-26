@@ -1,0 +1,118 @@
+meta:
+  id: summoning_datasegment
+  file-extension: .bin
+  endian: le
+  imports:
+    - summoning_objects
+instances:
+  character_name:
+    pos: 0x6d29
+    type: str
+    size: 26
+    encoding: ascii
+  spell_table:
+    pos: 0x6d95
+    type: spell_info
+    repeat: expr
+    repeat-expr: 40
+  object_template_table_ptr:
+    pos: 0x7c9f
+    type: u2
+  object_template_table_count:
+    pos: 0x870c
+    type: u2
+  object_template_table:
+    pos: _root.object_template_table_ptr
+    type: object_record
+    repeat: expr
+    repeat-expr: _root.object_template_table_count
+types:
+  spell_info:
+    seq:
+      - id: elem1
+        type: u1
+      - id: elem2
+        type: u1
+      - id: elem3
+        type: u1
+      - id: elem4
+        type: u1
+      - id: elem5
+        type: u1
+      - id: gestures
+        type: str
+        size: 9
+        encoding: ascii
+  object_record:
+    seq:
+      # the first column gives, in the upper bits, the AC bonus
+      # to get AC bonus, ((col0 >> 4) & 15)
+      - id: ac_bonus
+        type: b4
+      - id: col0 # the size of the object
+        type: b4
+      - id: object_name_id
+        type: u1
+      - id: weight
+        type: u1
+      # Field three seems to be related to capacity.
+      # Quiver, 12 items, only arrows
+      # Chest, 8 items:
+      # >>> np.unpackbits(np.array([167], 'u1'))
+      # array([1, 0, 1, 0, 0, 1, 1, 1], dtype=uint8)
+      # Sack, 10 items:
+      # >>> np.unpackbits(np.array([233], 'u1'))
+      # array([1, 1, 1, 0, 1, 0, 0, 1], dtype=uint8)
+      - id: container_flags # 0xf0 is the size it can contain
+        type: u1
+      - id: col4
+        type: u1
+      - id: col5
+        type: u1
+      # col6 is projectile info
+      - id: act1_dmg
+        type: b4
+      - id: act1_flags
+        type: b4
+      - id: act2_dmg
+        type: b4
+      - id: act2_flags
+        type: b4
+      - id: act3_dmg
+        type: b4
+      - id: act3_flags
+        type: b4
+      - id: charges
+        type: u1
+      - id: image_id
+        type: u1
+        # col11 0x80 checked in the random object routine, 0x7f in
+        # helmetshirtsboots. might be something about wearable.
+      - id: col11
+        type: u1
+      # col12 seems to be a key for the subroutine to call when it gets used
+      - id: subroutine_id
+        type: u1
+      - id: obj_type
+        type: u1
+        enum: object_categories
+      - id: col14
+        type: u1
+enums:
+  object_categories:
+    0: helmet
+    1: shirt
+    2: boots
+    3: gloves
+    4: quiver
+    5: medallion
+    6: object
+    7: arrow
+    8: bottle
+    73: sword_1handed
+    74: shield_axe
+    76: projectile
+    201: sword_2handed
+    202: staff_of_the_serpent
+    203: polearm
+    204: bow

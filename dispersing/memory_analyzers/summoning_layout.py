@@ -45,6 +45,16 @@ _variables = (
     ("maybe_inventory_1", 0x7AD7, "40B"),
     ("maybe_inventory_2", 0x7AFF, "40B"),
     ("maybe_inventory_3", 0x7B27, "41B"),
+    # Counters
+    ("counter", 0x7B80, "H"),
+    # Some text stuff
+    ("keyword_buffer", 0x8BF0, "40s"),
+    ("prompt_text", 0x8C1C, "40s"),
+    # Input management
+    ("last_scancode", 0x90AE, "B"),
+    ("last_key_pressed", 0x90AF, "B"),
+    ("function_pointer", 0x90C2, "H"),
+    ("function_pointer_id", 0x90C4, "H"),
 )
 
 
