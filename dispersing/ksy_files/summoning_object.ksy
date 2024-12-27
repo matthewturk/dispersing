@@ -32,11 +32,19 @@ types:
 # Sack, 10 items:
 # >>> np.unpackbits(np.array([233], 'u1'))
 # array([1, 1, 1, 0, 1, 0, 0, 1], dtype=uint8)
-      - id: container_flags # 0xf0 is the size it can contain
+#- id: container_flags # 0xf0 is the size it can contain
+# 0x0f is the number of items
+#        type: u1
+      - id: container_size
+        type: b4
+      - id: container_capacity
+        type: b4
+      # So I *think* the way this works (according to the functions at 1f74:4c67
+      # 1f74:4bad, and 1f74:43c0) is that if this value is greater than 100,
+      # they subtract 100 from it and divide by 10 and add 1.  
+      - id: act1_icon
         type: u1
-      - id: col4
-        type: u1
-      - id: col5
+      - id: act2_icon
         type: u1
       # col6 is projectile info
       - id: act1_dmg
@@ -65,11 +73,12 @@ types:
       - id: obj_type
         type: u1
         enum: object_categories
-      - id: col14
+      - id: scroll_id
         type: u1
     instances:
       text_record:
         value: 'object_name_id + _root.name_offset'
+      # 100 and 333 both come from INIT
       small_image_record:
         value: 'image_id + 100'
       large_image_record:

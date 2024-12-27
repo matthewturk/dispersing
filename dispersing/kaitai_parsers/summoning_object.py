@@ -56,7 +56,7 @@ class SummoningObject(KaitaiStruct):
         self._debug['object']['end'] = self._io.pos()
 
     class ObjectRecord(KaitaiStruct):
-        SEQ_FIELDS = ["ac_bonus", "col0", "object_name_id", "weight", "container_flags", "col4", "col5", "act1_dmg", "act1_flags", "act2_dmg", "act2_flags", "act3_dmg", "act3_flags", "charges", "image_id", "col11", "subroutine_id", "obj_type", "col14"]
+        SEQ_FIELDS = ["ac_bonus", "col0", "object_name_id", "weight", "container_size", "container_capacity", "act1_icon", "act2_icon", "act1_dmg", "act1_flags", "act2_dmg", "act2_flags", "act3_dmg", "act3_flags", "charges", "image_id", "col11", "subroutine_id", "obj_type", "scroll_id"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -78,15 +78,19 @@ class SummoningObject(KaitaiStruct):
             self._debug['weight']['start'] = self._io.pos()
             self.weight = self._io.read_u1()
             self._debug['weight']['end'] = self._io.pos()
-            self._debug['container_flags']['start'] = self._io.pos()
-            self.container_flags = self._io.read_u1()
-            self._debug['container_flags']['end'] = self._io.pos()
-            self._debug['col4']['start'] = self._io.pos()
-            self.col4 = self._io.read_u1()
-            self._debug['col4']['end'] = self._io.pos()
-            self._debug['col5']['start'] = self._io.pos()
-            self.col5 = self._io.read_u1()
-            self._debug['col5']['end'] = self._io.pos()
+            self._debug['container_size']['start'] = self._io.pos()
+            self.container_size = self._io.read_bits_int_be(4)
+            self._debug['container_size']['end'] = self._io.pos()
+            self._debug['container_capacity']['start'] = self._io.pos()
+            self.container_capacity = self._io.read_bits_int_be(4)
+            self._debug['container_capacity']['end'] = self._io.pos()
+            self._io.align_to_byte()
+            self._debug['act1_icon']['start'] = self._io.pos()
+            self.act1_icon = self._io.read_u1()
+            self._debug['act1_icon']['end'] = self._io.pos()
+            self._debug['act2_icon']['start'] = self._io.pos()
+            self.act2_icon = self._io.read_u1()
+            self._debug['act2_icon']['end'] = self._io.pos()
             self._debug['act1_dmg']['start'] = self._io.pos()
             self.act1_dmg = self._io.read_bits_int_be(4)
             self._debug['act1_dmg']['end'] = self._io.pos()
@@ -121,9 +125,9 @@ class SummoningObject(KaitaiStruct):
             self._debug['obj_type']['start'] = self._io.pos()
             self.obj_type = KaitaiStream.resolve_enum(SummoningObject.ObjectCategories, self._io.read_u1())
             self._debug['obj_type']['end'] = self._io.pos()
-            self._debug['col14']['start'] = self._io.pos()
-            self.col14 = self._io.read_u1()
-            self._debug['col14']['end'] = self._io.pos()
+            self._debug['scroll_id']['start'] = self._io.pos()
+            self.scroll_id = self._io.read_u1()
+            self._debug['scroll_id']['end'] = self._io.pos()
 
         @property
         def text_record(self):
