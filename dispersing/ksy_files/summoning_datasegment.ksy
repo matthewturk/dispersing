@@ -2,8 +2,6 @@ meta:
   id: summoning_datasegment
   file-extension: .bin
   endian: le
-  imports:
-    - summoning_objects
 instances:
   pc_info:
     pos: 0x2325
