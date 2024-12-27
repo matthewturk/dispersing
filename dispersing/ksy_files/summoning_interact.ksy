@@ -93,9 +93,9 @@ types:
             iopcode::player_emit_text: opcode_args("uu")
             iopcode::unknown40: opcode_args("u")
             iopcode::give_items: opcode_args("oooooo")
-            iopcode::unknown42: opcode_args("")
-            iopcode::unknown43: opcode_args("u")
-            iopcode::unknown44: opcode_args("u")
+            iopcode::set_flag_true: opcode_args("")
+            iopcode::teach_spell: opcode_args("u")
+            iopcode::switch_npc_portrait: opcode_args("u")
             iopcode::unknown45: opcode_args("uu")
             iopcode::unknown46: opcode_args("uu")
   opcode_args:
