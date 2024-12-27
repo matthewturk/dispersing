@@ -227,11 +227,11 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.emit_keyword:
                 self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown42:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unused11:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown37:
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.set_flag_true:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.set_variable:
                 self.args = SummoningInteract.OpcodeArgs(u"Vv", self._io, self, self._root)
@@ -267,8 +267,6 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown14:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown44:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown46:
                 self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.end_command:
@@ -289,9 +287,11 @@ class SummoningInteract(KaitaiStruct):
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown30:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown43:
+            elif _on == SummoningInteract.Iopcode.teach_spell:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.unknown29:
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.switch_npc_portrait:
                 self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
             elif _on == SummoningInteract.Iopcode.end_commandlist:
                 self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
