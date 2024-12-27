@@ -5,6 +5,14 @@ meta:
   imports:
     - summoning_objects
 instances:
+  pc_info:
+    pos: 0x2325
+    type: character_position
+  npc_info:
+    pos: 0x2325 + 0x22
+    type: character_position
+    repeat: expr
+    repeat-expr: 99
   character_info:
     pos: 0x6d29
     type: character_record
@@ -172,6 +180,58 @@ types:
         type: character_attributes
       - id: max_attributes
         type: character_attributes
+  character_position:
+    seq:
+      - id: x_pos_32
+        type: u2
+      - id: y_pos_32
+        type: u2
+      - id: maybe_num_charges
+        type: u2
+      - id: unknown1
+        type: u2
+      - id: final_object
+        type: u2
+      - id: maybe_direction
+        type: u1
+      - id: unknown2
+        type: u1
+      - id: unknown3
+        type: u1
+      - id: unknown4
+        type: u1
+      - id: maybe_creation_time
+        type: u2
+      - id: unknown5
+        type: u1
+      - id: unknown6
+        type: u1
+      - id: unknown7
+        type: u1
+      - id: unknown8
+        type: u1
+      - id: unknown9
+        type: u1
+      - id: index
+        type: u1
+      - id: unknown10
+        type: u1
+      - id: unk_field
+        type: u1
+      - id: base_npc_id
+        type: u1
+      - id: unknown11
+        type: u1
+      - id: sprite_id
+        type: u2
+      - id: unknown12
+        type: u2
+      - id: maybe_current_hp
+        type: u2
+      - id: unknown13
+        type: u1
+      - id: unknown14
+        type: u1
 
 enums:
   object_categories:
