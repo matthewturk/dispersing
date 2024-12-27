@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 ksyrebuild
 .DEFAULT_GOAL := help
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -85,6 +85,8 @@ servedocs: docs ## compile the docs watching for changes
 release: clean ## package and upload a release
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
+
+ksyrebuild: $(COMPILED_KSY)
 
 dist: clean $(COMPILED_KSY) ## builds source and wheel package
 	python setup.py sdist
