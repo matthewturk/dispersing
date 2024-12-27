@@ -10,7 +10,7 @@ if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
     raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningF(KaitaiStruct):
-    SEQ_FIELDS = ["count", "unknown1", "unknown2", "num_character", "records", "characters"]
+    SEQ_FIELDS = ["num_portraits", "portraits_offset", "unknown2", "num_character", "portraits", "characters"]
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -19,28 +19,28 @@ class SummoningF(KaitaiStruct):
         self._read()
 
     def _read(self):
-        self._debug['count']['start'] = self._io.pos()
-        self.count = self._io.read_u2le()
-        self._debug['count']['end'] = self._io.pos()
-        self._debug['unknown1']['start'] = self._io.pos()
-        self.unknown1 = self._io.read_u2le()
-        self._debug['unknown1']['end'] = self._io.pos()
+        self._debug['num_portraits']['start'] = self._io.pos()
+        self.num_portraits = self._io.read_u2le()
+        self._debug['num_portraits']['end'] = self._io.pos()
+        self._debug['portraits_offset']['start'] = self._io.pos()
+        self.portraits_offset = self._io.read_u2le()
+        self._debug['portraits_offset']['end'] = self._io.pos()
         self._debug['unknown2']['start'] = self._io.pos()
         self.unknown2 = self._io.read_u2le()
         self._debug['unknown2']['end'] = self._io.pos()
         self._debug['num_character']['start'] = self._io.pos()
         self.num_character = self._io.read_u2le()
         self._debug['num_character']['end'] = self._io.pos()
-        self._debug['records']['start'] = self._io.pos()
-        self.records = [None] * (self.count)
-        for i in range(self.count):
-            if not 'arr' in self._debug['records']:
-                self._debug['records']['arr'] = []
-            self._debug['records']['arr'].append({'start': self._io.pos()})
-            self.records[i] = SummoningF.Frecord(self._io, self, self._root)
-            self._debug['records']['arr'][i]['end'] = self._io.pos()
+        self._debug['portraits']['start'] = self._io.pos()
+        self.portraits = [None] * (self.num_portraits)
+        for i in range(self.num_portraits):
+            if not 'arr' in self._debug['portraits']:
+                self._debug['portraits']['arr'] = []
+            self._debug['portraits']['arr'].append({'start': self._io.pos()})
+            self.portraits[i] = SummoningF.Portrait(self._io, self, self._root)
+            self._debug['portraits']['arr'][i]['end'] = self._io.pos()
 
-        self._debug['records']['end'] = self._io.pos()
+        self._debug['portraits']['end'] = self._io.pos()
         self._debug['characters']['start'] = self._io.pos()
         self.characters = [None] * (self.num_character)
         for i in range(self.num_character):
@@ -52,8 +52,8 @@ class SummoningF(KaitaiStruct):
 
         self._debug['characters']['end'] = self._io.pos()
 
-    class Frecord(KaitaiStruct):
-        SEQ_FIELDS = ["col1", "col2", "col3", "col4", "col5"]
+    class Portrait(KaitaiStruct):
+        SEQ_FIELDS = ["col1", "col2", "portrait_id", "col4", "gender"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -68,15 +68,15 @@ class SummoningF(KaitaiStruct):
             self._debug['col2']['start'] = self._io.pos()
             self.col2 = self._io.read_bytes(4)
             self._debug['col2']['end'] = self._io.pos()
-            self._debug['col3']['start'] = self._io.pos()
-            self.col3 = self._io.read_u1()
-            self._debug['col3']['end'] = self._io.pos()
+            self._debug['portrait_id']['start'] = self._io.pos()
+            self.portrait_id = self._io.read_u1()
+            self._debug['portrait_id']['end'] = self._io.pos()
             self._debug['col4']['start'] = self._io.pos()
             self.col4 = self._io.read_u1()
             self._debug['col4']['end'] = self._io.pos()
-            self._debug['col5']['start'] = self._io.pos()
-            self.col5 = self._io.read_u1()
-            self._debug['col5']['end'] = self._io.pos()
+            self._debug['gender']['start'] = self._io.pos()
+            self.gender = self._io.read_u1()
+            self._debug['gender']['end'] = self._io.pos()
 
 
     class Character(KaitaiStruct):

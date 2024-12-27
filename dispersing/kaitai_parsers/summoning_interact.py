@@ -51,9 +51,9 @@ class SummoningInteract(KaitaiStruct):
         player_emit_text = 39
         unknown40 = 40
         give_items = 41
-        unknown42 = 42
-        unknown43 = 43
-        unknown44 = 44
+        set_flag_true = 42
+        teach_spell = 43
+        switch_npc_portrait = 44
         unknown45 = 45
         unknown46 = 46
         end_command = 65532

@@ -56,7 +56,7 @@ class SummoningObject(KaitaiStruct):
         self._debug['object']['end'] = self._io.pos()
 
     class ObjectRecord(KaitaiStruct):
-        SEQ_FIELDS = ["ac_bonus", "col0", "object_name_id", "weight", "container_flags", "col4", "col5", "act1_dmg", "act1_flags", "act2_dmg", "act2_flags", "act3_dmg", "act3_flags", "charges", "image_id", "col11", "col12", "obj_type", "col14"]
+        SEQ_FIELDS = ["ac_bonus", "col0", "object_name_id", "weight", "container_flags", "col4", "col5", "act1_dmg", "act1_flags", "act2_dmg", "act2_flags", "act3_dmg", "act3_flags", "charges", "image_id", "col11", "subroutine_id", "obj_type", "col14"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -115,9 +115,9 @@ class SummoningObject(KaitaiStruct):
             self._debug['col11']['start'] = self._io.pos()
             self.col11 = self._io.read_u1()
             self._debug['col11']['end'] = self._io.pos()
-            self._debug['col12']['start'] = self._io.pos()
-            self.col12 = self._io.read_u1()
-            self._debug['col12']['end'] = self._io.pos()
+            self._debug['subroutine_id']['start'] = self._io.pos()
+            self.subroutine_id = self._io.read_u1()
+            self._debug['subroutine_id']['end'] = self._io.pos()
             self._debug['obj_type']['start'] = self._io.pos()
             self.obj_type = KaitaiStream.resolve_enum(SummoningObject.ObjectCategories, self._io.read_u1())
             self._debug['obj_type']['end'] = self._io.pos()

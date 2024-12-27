@@ -1,4 +1,4 @@
-.PHONY: clean clean-test clean-pyc clean-build docs help
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8
 .DEFAULT_GOAL := help
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
@@ -26,6 +26,13 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
+
+KSY_SOURCES := $(shell find dispersing/ksy_files -name '*.ksy')
+COMPILED_KSY := $(subst ksy_files,kaitai_parsers,$(KSY_SOURCES:%.ksy=%.py))
+
+dispersing/kaitai_parsers/%.py : dispersing/ksy_files/%.ksy
+	/usr/bin/kaitai-struct-compiler --target=python --python-package=dispersing.kaitai_parsers --read-pos --outdir=$(dir $@) $<
+
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 
@@ -33,6 +40,7 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
+	rm -fr dispersing/kaitai_parsers/*_*.py
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 
@@ -51,7 +59,7 @@ lint: ## check style with flake8
 	flake8 dispersing tests
 
 test: ## run tests quickly with the default Python
-	
+
 		python setup.py test
 
 test-all: ## run tests on every Python version with tox
@@ -78,10 +86,10 @@ release: clean ## package and upload a release
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
 
-dist: clean ## builds source and wheel package
+dist: clean $(COMPILED_KSY) ## builds source and wheel package
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
 
-install: clean ## install the package to the active Python's site-packages
+install: clean $(COMPILED_KSY) ## install the package to the active Python's site-packages
 	python setup.py install
