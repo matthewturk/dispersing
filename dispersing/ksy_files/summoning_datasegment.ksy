@@ -2,6 +2,9 @@ meta:
   id: summoning_datasegment
   file-extension: .bin
   endian: le
+seq:
+  - id: bytes
+    size: 0xffff
 instances:
   pc_info:
     pos: 0x2325

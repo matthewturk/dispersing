@@ -29,7 +29,7 @@ class SummoningDatasegment(KaitaiStruct):
         staff_of_the_serpent = 202
         polearm = 203
         bow = 204
-    SEQ_FIELDS = []
+    SEQ_FIELDS = ["bytes"]
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -38,7 +38,9 @@ class SummoningDatasegment(KaitaiStruct):
         self._read()
 
     def _read(self):
-        pass
+        self._debug['bytes']['start'] = self._io.pos()
+        self.bytes = self._io.read_bytes(65535)
+        self._debug['bytes']['end'] = self._io.pos()
 
     class CharacterRecord(KaitaiStruct):
         SEQ_FIELDS = ["character_name", "unknown1", "magic_levels", "weapon_levels", "character_level", "current_magic_level_exp", "next_magic_level_exp", "current_weapon_level_exp", "next_weapon_level_exp", "current_experience", "next_experience", "next_level_experience", "unknown2", "hp_current", "hp_max", "mp_current", "mp_max", "armor_class", "current_attributes", "max_attributes"]
