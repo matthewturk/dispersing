@@ -39,7 +39,23 @@ instances:
   keywords_table:
     pos: _root.keywords_table_ptr
     size: 20
+  speech_strings_size:
+    pos: 0x6556
+    type: u2
+  speech_strings:
+    pos: 0x6558
+    size: _root.speech_strings_size
+    type: speech_strings
+  num_level_procedures:
+    pos: 0x6361
+    type: u1
 types:
+  speech_strings:
+    seq:
+      - id: text
+        type: strz
+        encoding: ascii
+        repeat: eos
   spell_info:
     seq:
       - id: elem1
@@ -193,7 +209,7 @@ types:
         type: u2
       - id: final_object
         type: u2
-      - id: maybe_direction
+      - id: mobility # PC is 1, NPCs and enemies are 2, Skulls are 7
         type: u1
       - id: unknown2
         type: u1
@@ -217,9 +233,9 @@ types:
         type: u1
       - id: unknown10
         type: u1
-      - id: unk_field
+      - id: direction # 0 indicates cannot move, I believe
         type: u1
-      - id: base_npc_id
+      - id: base_npc_id # Also speech id for mobility == 7
         type: u1
       - id: unknown11
         type: u1
