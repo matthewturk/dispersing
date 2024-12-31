@@ -29,7 +29,7 @@ class SummoningDatasegment(KaitaiStruct):
         staff_of_the_serpent = 202
         polearm = 203
         bow = 204
-    SEQ_FIELDS = []
+    SEQ_FIELDS = ["bytes"]
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -38,7 +38,33 @@ class SummoningDatasegment(KaitaiStruct):
         self._read()
 
     def _read(self):
-        pass
+        self._debug['bytes']['start'] = self._io.pos()
+        self.bytes = self._io.read_bytes(65535)
+        self._debug['bytes']['end'] = self._io.pos()
+
+    class SpeechStrings(KaitaiStruct):
+        SEQ_FIELDS = ["text"]
+        def __init__(self, _io, _parent=None, _root=None):
+            self._io = _io
+            self._parent = _parent
+            self._root = _root if _root else self
+            self._debug = collections.defaultdict(dict)
+            self._read()
+
+        def _read(self):
+            self._debug['text']['start'] = self._io.pos()
+            self.text = []
+            i = 0
+            while not self._io.is_eof():
+                if not 'arr' in self._debug['text']:
+                    self._debug['text']['arr'] = []
+                self._debug['text']['arr'].append({'start': self._io.pos()})
+                self.text.append((self._io.read_bytes_term(0, False, True, True)).decode(u"ascii"))
+                self._debug['text']['arr'][len(self.text) - 1]['end'] = self._io.pos()
+                i += 1
+
+            self._debug['text']['end'] = self._io.pos()
+
 
     class CharacterRecord(KaitaiStruct):
         SEQ_FIELDS = ["character_name", "unknown1", "magic_levels", "weapon_levels", "character_level", "current_magic_level_exp", "next_magic_level_exp", "current_weapon_level_exp", "next_weapon_level_exp", "current_experience", "next_experience", "next_level_experience", "unknown2", "hp_current", "hp_max", "mp_current", "mp_max", "armor_class", "current_attributes", "max_attributes"]
@@ -155,7 +181,7 @@ class SummoningDatasegment(KaitaiStruct):
 
 
     class CharacterPosition(KaitaiStruct):
-        SEQ_FIELDS = ["x_pos_32", "y_pos_32", "maybe_num_charges", "unknown1", "final_object", "maybe_direction", "unknown2", "unknown3", "unknown4", "maybe_creation_time", "unknown5", "unknown6", "unknown7", "unknown8", "unknown9", "index", "unknown10", "unk_field", "base_npc_id", "unknown11", "sprite_id", "unknown12", "maybe_current_hp", "unknown13", "unknown14"]
+        SEQ_FIELDS = ["x_pos_32", "y_pos_32", "maybe_num_charges", "unknown1", "final_object", "mobility", "unknown2", "unknown3", "unknown4", "maybe_creation_time", "unknown5", "unknown6", "unknown7", "unknown8", "unknown9", "index", "unknown10", "direction", "base_npc_id", "unknown11", "sprite_id", "unknown12", "maybe_current_hp", "unknown13", "unknown14"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -179,9 +205,9 @@ class SummoningDatasegment(KaitaiStruct):
             self._debug['final_object']['start'] = self._io.pos()
             self.final_object = self._io.read_u2le()
             self._debug['final_object']['end'] = self._io.pos()
-            self._debug['maybe_direction']['start'] = self._io.pos()
-            self.maybe_direction = self._io.read_u1()
-            self._debug['maybe_direction']['end'] = self._io.pos()
+            self._debug['mobility']['start'] = self._io.pos()
+            self.mobility = self._io.read_u1()
+            self._debug['mobility']['end'] = self._io.pos()
             self._debug['unknown2']['start'] = self._io.pos()
             self.unknown2 = self._io.read_u1()
             self._debug['unknown2']['end'] = self._io.pos()
@@ -215,9 +241,9 @@ class SummoningDatasegment(KaitaiStruct):
             self._debug['unknown10']['start'] = self._io.pos()
             self.unknown10 = self._io.read_u1()
             self._debug['unknown10']['end'] = self._io.pos()
-            self._debug['unk_field']['start'] = self._io.pos()
-            self.unk_field = self._io.read_u1()
-            self._debug['unk_field']['end'] = self._io.pos()
+            self._debug['direction']['start'] = self._io.pos()
+            self.direction = self._io.read_u1()
+            self._debug['direction']['end'] = self._io.pos()
             self._debug['base_npc_id']['start'] = self._io.pos()
             self.base_npc_id = self._io.read_u1()
             self._debug['base_npc_id']['end'] = self._io.pos()
@@ -432,6 +458,34 @@ class SummoningDatasegment(KaitaiStruct):
         return self._m_object_template_table_ptr if hasattr(self, '_m_object_template_table_ptr') else None
 
     @property
+    def speech_strings_size(self):
+        if hasattr(self, '_m_speech_strings_size'):
+            return self._m_speech_strings_size if hasattr(self, '_m_speech_strings_size') else None
+
+        _pos = self._io.pos()
+        self._io.seek(25942)
+        self._debug['_m_speech_strings_size']['start'] = self._io.pos()
+        self._m_speech_strings_size = self._io.read_u2le()
+        self._debug['_m_speech_strings_size']['end'] = self._io.pos()
+        self._io.seek(_pos)
+        return self._m_speech_strings_size if hasattr(self, '_m_speech_strings_size') else None
+
+    @property
+    def speech_strings(self):
+        if hasattr(self, '_m_speech_strings'):
+            return self._m_speech_strings if hasattr(self, '_m_speech_strings') else None
+
+        _pos = self._io.pos()
+        self._io.seek(25944)
+        self._debug['_m_speech_strings']['start'] = self._io.pos()
+        self._raw__m_speech_strings = self._io.read_bytes(self._root.speech_strings_size)
+        _io__raw__m_speech_strings = KaitaiStream(BytesIO(self._raw__m_speech_strings))
+        self._m_speech_strings = SummoningDatasegment.SpeechStrings(_io__raw__m_speech_strings, self, self._root)
+        self._debug['_m_speech_strings']['end'] = self._io.pos()
+        self._io.seek(_pos)
+        return self._m_speech_strings if hasattr(self, '_m_speech_strings') else None
+
+    @property
     def keywords_table_ptr(self):
         if hasattr(self, '_m_keywords_table_ptr'):
             return self._m_keywords_table_ptr if hasattr(self, '_m_keywords_table_ptr') else None
@@ -509,5 +563,18 @@ class SummoningDatasegment(KaitaiStruct):
         self._debug['_m_object_template_table']['end'] = self._io.pos()
         self._io.seek(_pos)
         return self._m_object_template_table if hasattr(self, '_m_object_template_table') else None
+
+    @property
+    def num_level_procedures(self):
+        if hasattr(self, '_m_num_level_procedures'):
+            return self._m_num_level_procedures if hasattr(self, '_m_num_level_procedures') else None
+
+        _pos = self._io.pos()
+        self._io.seek(25441)
+        self._debug['_m_num_level_procedures']['start'] = self._io.pos()
+        self._m_num_level_procedures = self._io.read_u1()
+        self._debug['_m_num_level_procedures']['end'] = self._io.pos()
+        self._io.seek(_pos)
+        return self._m_num_level_procedures if hasattr(self, '_m_num_level_procedures') else None
 
 

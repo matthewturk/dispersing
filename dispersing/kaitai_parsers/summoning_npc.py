@@ -50,7 +50,7 @@ class SummoningNpc(KaitaiStruct):
         self._debug['npcs']['end'] = self._io.pos()
 
     class Npc(KaitaiStruct):
-        SEQ_FIELDS = ["npc_id", "head_id", "flags", "maybe_n_hit_dice", "damage_resistance", "damage_bonus", "conditionally_hostile", "sprite_id", "col8", "action", "col10", "col11", "magic_attack", "weapon_vulnerabilities", "col14", "behavior_flags"]
+        SEQ_FIELDS = ["npc_id", "head_id", "flags", "maybe_n_hit_dice", "damage_resistance", "damage_bonus", "conditionally_hostile", "sprite_id", "col8", "action", "agility", "col11", "magic_attack", "weapon_vulnerabilities", "col14", "behavior_flags"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
             self._parent = _parent
@@ -89,9 +89,9 @@ class SummoningNpc(KaitaiStruct):
             self._debug['action']['start'] = self._io.pos()
             self.action = self._io.read_u1()
             self._debug['action']['end'] = self._io.pos()
-            self._debug['col10']['start'] = self._io.pos()
-            self.col10 = self._io.read_u1()
-            self._debug['col10']['end'] = self._io.pos()
+            self._debug['agility']['start'] = self._io.pos()
+            self.agility = self._io.read_u1()
+            self._debug['agility']['end'] = self._io.pos()
             self._debug['col11']['start'] = self._io.pos()
             self.col11 = self._io.read_u1()
             self._debug['col11']['end'] = self._io.pos()
