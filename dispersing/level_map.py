@@ -57,6 +57,23 @@ _tile_conversions = {
     255: b'\x20',
 }
 
+_corner_table = [
+    (False, False),
+    (True, False),
+    (True, False),
+    (False, True),
+    (False, True),
+    (True, True),
+    (True, False),
+    (False, True),
+    (True, True),
+    (True, True),
+    (True, False),
+    (False, False),
+    (False, True),
+    (False, False),
+]
+
 def concat_horizontal(im1, im2):
     dst = Image.new('RGBA', (im1.width + im2.width, im1.height))
     dst.paste(im1, (0, 0))
@@ -93,6 +110,20 @@ class TerrainSprites(dict):
         tile = concat_vertical(
             self["wall_tiles"].frames[wall_id],
             self["wall_tiles"].frames[wall_id + 15]
+        )
+        blank = Image.new('RGBA', (16, 8))
+        left, right = _corner_table[wall_id]
+        if left:
+            left_tile = self["wall_corners"].frames[0]
+        else:
+            left_tile = blank
+        if right:
+            right_tile = self["wall_corners"].frames[1]
+        else:
+            right_tile = blank
+        tile = concat_vertical(
+            concat_horizontal(left_tile, right_tile),
+            tile
         )
         if scale > 1:
             nw = round(tile.height * scale)
@@ -277,3 +308,17 @@ class LevelMap:
         floor_tiles += 1
         floor_tiles[self.tiles == 255] = 0
         return floor_tiles
+
+    def print_numpy_array(self):
+        print("     ", end="")
+        for i in range(self.tiles.shape[1]):
+            print(f"{i: 4d} ", end="")
+        print()
+        for row in range(self.tiles.shape[0]):
+            print(f"{row: 4d} ", end="")
+            for col in range(self.tiles.shape[1]):
+                if self.tiles[row, col] == 255:
+                    print(" "*5, end="")
+                    continue
+                print(f"{self.tiles[row, col]: 4d} ", end="")
+            print()
