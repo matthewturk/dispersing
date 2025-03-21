@@ -35,25 +35,8 @@ types:
         type: u1
         repeat: expr
         repeat-expr: n1
-      - id: wall_flags
+      - id: big_wooden
         type: u1
-        enum: tile_flags
-      - id: wall_args
-        if: wall_flags != tile_flags::nothing and wall_flags != tile_flags::movable_object
-        type:
-          switch-on: wall_flags
-          cases:
-            tile_flags::movable_object: u1
-            tile_flags::unknown2: u1
-            tile_flags::teleporter_dest: teleporter_info
-            tile_flags::unknown4: u1
-            tile_flags::unknown5: portal_info
-            tile_flags::unknown6: u2
-            tile_flags::teleporter: teleporter_info
-            tile_flags::level_exit: portal_info
-            tile_flags::npc: u1
-            tile_flags::unknown10: u1
-            tile_flags::mouth: u1
       - id: floor_flags
         type: u1
         enum: tile_flags
@@ -246,14 +229,15 @@ enums:
     11: mouth
   procedure_opcode:
     0: teleporter_enable
-    1: unknown1
-    2: unknown2
+                # 38 is a pit.  39 is a plate.
+    1: unknown1 # Looks for tiles of values 38 and 39.  Maybe pit / plate?
+    2: unknown2 # Looks for tiles of values 38 and 39.  Maybe pit / plate?
     3: unknown3
     4: unknown4
     5: unknown5
     6: unknown6
     7: unknown7
-    8: unknown8
-    9: unknown9
-    10: unknown10
+    8: shoot_projectile
+    9: cast_spell
+    10: unknown10 # it checks the occupied items and then sets a parameter elsewhere. Maybe it moves an object?
     11: create_object
