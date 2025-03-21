@@ -19,6 +19,7 @@ class SpriteResource:
             return
         im = rec_data.reshape((c, h, w))
         im = np.moveaxis(im, 0, -1)
+        self.im = im
         pal1_id = rec.header.field_4 >> 4
         pal2_id = rec.header.field_4 & 15
         palette = np.concatenate([palettes[pal1_id], palettes[pal2_id]], axis=0)

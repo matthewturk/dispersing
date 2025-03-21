@@ -215,10 +215,12 @@ class LevelMap:
         # Setup terrain sprites
         self.terrain_sprites = TerrainSprites(self.game, self.level_asset)
 
-    def to_cp437(self):
+    def to_cp437(self, overrides = None):
         # This is a pretty simple and straightforward mapping of the tiles to cp437.
         tile_map = defaultdict(lambda: b'\xb1')
         tile_map.update(_tile_conversions)
+        if overrides is not None:
+            tile_map.update(overrides)
         new_string = b'\n'.join(b''.join(tile_map[_] for _ in row) for row in self.tiles)
         return new_string.decode('cp437')
 
