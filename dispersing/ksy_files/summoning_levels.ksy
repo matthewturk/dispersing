@@ -47,11 +47,11 @@ types:
           cases:
             tile_flags::movable_object: u1
             tile_flags::unknown2: u1
-            tile_flags::teleporter_dest: teleporter_info
+            tile_flags::teleporter_dest: procedure
             tile_flags::unknown4: u1
             tile_flags::unknown5: portal_info
-            tile_flags::unknown6: u2
-            tile_flags::teleporter: teleporter_info
+            tile_flags::boulder: u2
+            tile_flags::teleporter: procedure
             tile_flags::level_exit: portal_info
             tile_flags::npc: u1
             tile_flags::unknown10: u1
@@ -215,18 +215,17 @@ types:
         type: other_data
 enums:
   tile_flags:
-    0: nothing
-    1: movable_object
-    2: unknown2
-    3: teleporter_dest
-    4: unknown4
-    5: unknown5
-    6: unknown6
-    7: teleporter
-    8: level_exit
-    9: npc
-    10: unknown10
-    11: mouth
+    1: movable_object # "case_0"
+    2: unknown2 # "case_1"
+    3: teleporter_dest # "case_4" -- actually a procedure opcode?
+    4: unknown4 # "case_6"
+    5: unknown5 # "case_10"
+    6: boulder # "case_7"
+    7: teleporter # "case_5"
+    8: level_exit # "case_8"
+    9: npc # "case_2"
+    10: unknown10 # "case_3" -- sets occupied to | 0x20
+    11: mouth # "case_9"
   procedure_opcode:
     0: teleporter_enable
                 # 38 is a pit.  39 is a plate.
