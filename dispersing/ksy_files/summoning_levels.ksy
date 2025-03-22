@@ -45,7 +45,7 @@ types:
         type:
           switch-on: floor_flags
           cases:
-            tile_flags::movable_object: u1
+            tile_flags::display_overlay: u1
             tile_flags::unknown2: u1
             tile_flags::teleporter_dest: procedure
             tile_flags::unknown4: u1
@@ -136,14 +136,10 @@ types:
         type: s2
       - id: door_tiles
         type: s2
-      - id: wall_decor1
+      - id: wall_decor_offsets
         type: s2
-      - id: wall_decor2
-        type: s2
-      - id: wall_decor3
-        type: s2
-      - id: wall_overlay_tiles
-        type: s2
+        repeat: expr
+        repeat-expr: 4
       - id: blank11
         contents: [0, 0]
       - id: unk12
@@ -215,7 +211,7 @@ types:
         type: other_data
 enums:
   tile_flags:
-    1: movable_object # "case_0"
+    1: display_overlay # "case_0" -- floordiv by ten to get offset index, frame is mod by ten
     2: unknown2 # "case_1"
     3: teleporter_dest # "case_4" -- actually a procedure opcode?
     4: unknown4 # "case_6"
