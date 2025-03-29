@@ -34,7 +34,7 @@ types:
         type: u1
       - id: action
         type: u1
-      - id: col10 # maybe accuracy
+      - id: agility
         type: u1
       - id: col11
         type: u1

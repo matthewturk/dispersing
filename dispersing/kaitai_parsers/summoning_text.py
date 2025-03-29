@@ -33,17 +33,22 @@ class SummoningText(KaitaiStruct):
 
         self._debug['offsets']['end'] = self._io.pos()
         self._debug['text']['start'] = self._io.pos()
+        self._raw_text = [None] * (self.count)
+        self._raw__raw_text = [None] * (self.count)
         self.text = [None] * (self.count)
         for i in range(self.count):
             if not 'arr' in self._debug['text']:
                 self._debug['text']['arr'] = []
             self._debug['text']['arr'].append({'start': self._io.pos()})
-            self.text[i] = SummoningText.Xorstr(self._io, self, self._root)
+            self._raw__raw_text[i] = self._io.read_bytes_term(0, False, True, True)
+            self._raw_text[i] = KaitaiStream.process_xor_one(self._raw__raw_text[i], 218)
+            _io__raw_text = KaitaiStream(BytesIO(self._raw_text[i]))
+            self.text[i] = SummoningText.XorstrWrapper(_io__raw_text, self, self._root)
             self._debug['text']['arr'][i]['end'] = self._io.pos()
 
         self._debug['text']['end'] = self._io.pos()
 
-    class Xorstrz(KaitaiStruct):
+    class XorstrWrapper(KaitaiStruct):
         SEQ_FIELDS = ["text"]
         def __init__(self, _io, _parent=None, _root=None):
             self._io = _io
@@ -54,32 +59,8 @@ class SummoningText(KaitaiStruct):
 
         def _read(self):
             self._debug['text']['start'] = self._io.pos()
-            self.text = (self._io.read_bytes_term(218, False, True, True)).decode(u"ascii")
+            self.text = (self._io.read_bytes_full()).decode(u"ascii")
             self._debug['text']['end'] = self._io.pos()
-
-
-    class Xorstr(KaitaiStruct):
-        SEQ_FIELDS = ["text"]
-        def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
-            self._parent = _parent
-            self._root = _root if _root else self
-            self._debug = collections.defaultdict(dict)
-            self._read()
-
-        def _read(self):
-            self._debug['text']['start'] = self._io.pos()
-            self._raw_text = self._io.read_bytes_term(0, False, True, True)
-            self.text = KaitaiStream.process_xor_one(self._raw_text, 218)
-            self._debug['text']['end'] = self._io.pos()
-
-        @property
-        def value(self):
-            if hasattr(self, '_m_value'):
-                return self._m_value if hasattr(self, '_m_value') else None
-
-            self._m_value = self.text
-            return self._m_value if hasattr(self, '_m_value') else None
 
 
 
