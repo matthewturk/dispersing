@@ -57,6 +57,16 @@ instances:
   num_level_procedures:
     pos: 0x6361
     type: u1
+  level_map:
+    pos: 0x3f99
+    type: level_row
+    repeat: expr
+    repeat-expr: 64
+  inmemory_level_map:
+    pos: 0x4f99
+    type: level_row
+    repeat: expr
+    repeat-expr: 64
   level_tile_hash_table_start:
     pos: 0x306e
     type: level_tile_hash_entry
@@ -88,6 +98,10 @@ instances:
     repeat: expr
     repeat-expr: 41
 types:
+  level_row:
+    seq:
+      - id: row_contents
+        size: 64
   speech_strings:
     seq:
       - id: text
