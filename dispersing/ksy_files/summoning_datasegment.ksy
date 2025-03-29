@@ -14,6 +14,14 @@ instances:
     type: character_position
     repeat: expr
     repeat-expr: 99
+  npc_count:
+    pos: 0x18c7
+    type: u2
+  npc_records:
+    pos: 0x18c9
+    type: npc_record
+    repeat: expr
+    repeat-expr: 127
   character_info:
     pos: 0x6d29
     type: character_record
@@ -49,6 +57,36 @@ instances:
   num_level_procedures:
     pos: 0x6361
     type: u1
+  level_tile_hash_table_start:
+    pos: 0x306e
+    type: level_tile_hash_entry
+    repeat: expr
+    repeat-expr: 0x287
+  currently_memorized_spells:
+    pos: 0x6fc5
+    type: u1
+    repeat: expr
+    repeat-expr: 4
+  inventory_occupancy_map:
+    pos: 0x7aac
+    type: u1
+    repeat: expr
+    repeat-expr: 41
+  inventory_1:
+    pos: 0x7ad7
+    type: u1
+    repeat: expr
+    repeat-expr: 40
+  inventory_2:
+    pos: 0x7aff
+    type: u1
+    repeat: expr
+    repeat-expr: 40
+  inventory_3:
+    pos: 0x7b27
+    type: u1
+    repeat: expr
+    repeat-expr: 41
 types:
   speech_strings:
     seq:
@@ -249,7 +287,56 @@ types:
         type: u1
       - id: unknown14
         type: u1
-
+  level_tile_hash_entry:
+    seq:
+      - id: x_pos
+        type: u1
+      - id: y_pos
+        type: u1
+      - id: occupied
+        type: u1
+      - id: first_object
+        type: u2
+      - id: level_procedure_index
+        type: u1
+  npc_record:
+    seq:
+      - id: npc_id
+        type: u1
+      - id: head_id
+        type: u1
+      - id: flags
+        type: u1
+      - id: maybe_n_hit_dice
+        type: u1
+      - id: damage_resistance
+        type: u1
+      - id: damage_bonus
+        type: u1
+      - id: conditionally_hostile
+        type: u1
+      - id: sprite_id
+        type: u1
+      - id: col8
+        type: u1
+      - id: action_info
+        type: action_info
+      - id: agility
+        type: u1
+      - id: col11
+        type: u1
+      - id: magic_attack
+        type: u1
+      - id: weapon_vulnerabilities
+        type: u1
+      - id: maybe_behavior_flags
+        type: u2
+  action_info:
+    seq:
+      - id: ndice
+        type: b4
+      - id: nsides
+        type: b4
 enums:
   object_categories:
     0: helmet
