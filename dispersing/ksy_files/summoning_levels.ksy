@@ -142,7 +142,7 @@ types:
         repeat-expr: 4
       - id: blank11
         contents: [0, 0]
-      - id: unk12
+      - id: environment_effects
         type: s2
       - id: big_wooden_thing
         type: s2
