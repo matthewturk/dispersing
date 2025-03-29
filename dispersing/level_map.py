@@ -26,35 +26,35 @@ _wall_attrs = (
 )
 
 _tile_conversions = {
-    0: b'\xc9',
-    1: b'\xcd',
-    2: b'\xbb',
-    3: b'\xba',
-    4: b'\xc8',
-    5: b'\xbc',
-    6: b'\xcb',
-    7: b'\xcc',
-    8: b'\xb9',
-    9: b'\xca',
-    10: b'\xce',
-    11: b'\xcd', # bit too thick
-    12: b'\xcd',
-    13: b'\xba', # bit too thick
-    14: b'\xba',
-    15: b'\x45',
-    16: b'\xb3',
-    17: b'\xc4',
-    27: b'\xb0',
-    28: b'\xb1',
-    31: b'\xdf',
-    32: b'\xdc',
-    33: b'\xe4',
-    34: b'\xe5',
-    35: b'\xe6',
-    36: b'\xf8',
-    37: b'\x76',
-    53: b'\x41',
-    255: b'\x20',
+    0: b"\xc9",
+    1: b"\xcd",
+    2: b"\xbb",
+    3: b"\xba",
+    4: b"\xc8",
+    5: b"\xbc",
+    6: b"\xcb",
+    7: b"\xcc",
+    8: b"\xb9",
+    9: b"\xca",
+    10: b"\xce",
+    11: b"\xcd",  # bit too thick
+    12: b"\xcd",
+    13: b"\xba",  # bit too thick
+    14: b"\xba",
+    15: b"\x45",
+    16: b"\xb3",
+    17: b"\xc4",
+    27: b"\xb0",
+    28: b"\xb1",
+    31: b"\xdf",
+    32: b"\xdc",
+    33: b"\xe4",
+    34: b"\xe5",
+    35: b"\xe6",
+    36: b"\xf8",
+    37: b"\x76",
+    53: b"\x41",
+    255: b"\x20",
 }
 
 _corner_table = [
@@ -74,17 +74,20 @@ _corner_table = [
     (False, False),
 ]
 
+
 def concat_horizontal(im1, im2):
-    dst = Image.new('RGBA', (im1.width + im2.width, im1.height))
+    dst = Image.new("RGBA", (im1.width + im2.width, im1.height))
     dst.paste(im1, (0, 0))
     dst.paste(im2, (im1.width, 0))
     return dst
 
+
 def concat_vertical(im1, im2):
-    dst = Image.new('RGBA', (im1.width, im1.height + im2.height))
+    dst = Image.new("RGBA", (im1.width, im1.height + im2.height))
     dst.paste(im1, (0, 0))
     dst.paste(im2, (0, im1.height))
     return dst
+
 
 class TerrainSprites(dict):
     def __init__(self, game, level_asset):
@@ -101,17 +104,16 @@ class TerrainSprites(dict):
         for attr in _wall_attrs:
             self[attr] = sprites[offset + getattr(props, attr)]
 
-    def get_wall_sprite(self, wall_id, scale = 1, aspect_ratio = 1.0):
+    def get_wall_sprite(self, wall_id, scale=1, aspect_ratio=1.0):
         # This returns the full 32x32 sprite of the wall
         # But it also requires that wall_id be between 0 .. 14.
         if wall_id < 0 or wall_id > 14:
             raise KeyError(wall_id)
         # We concatenate the two PIL images
         tile = concat_vertical(
-            self["wall_tiles"].frames[wall_id],
-            self["wall_tiles"].frames[wall_id + 15]
+            self["wall_tiles"].frames[wall_id], self["wall_tiles"].frames[wall_id + 15]
         )
-        blank = Image.new('RGBA', (16, 8))
+        blank = Image.new("RGBA", (16, 8))
         left, right = _corner_table[wall_id]
         if left:
             left_tile = self["wall_corners"].frames[0]
@@ -121,17 +123,14 @@ class TerrainSprites(dict):
             right_tile = self["wall_corners"].frames[1]
         else:
             right_tile = blank
-        tile = concat_vertical(
-            concat_horizontal(left_tile, right_tile),
-            tile
-        )
+        tile = concat_vertical(concat_horizontal(left_tile, right_tile), tile)
         if scale > 1:
             nw = round(tile.height * scale)
             nh = round(tile.height * scale * aspect_ratio)
-            tile = tile.resize((nw, nh), resample = Image.NEAREST)
+            tile = tile.resize((nw, nh), resample=Image.NEAREST)
         return tile
 
-    def get_floor_sprite(self, floor_id, scale = 1, aspect_ratio = 1.0):
+    def get_floor_sprite(self, floor_id, scale=1, aspect_ratio=1.0):
         # This returns a 32x32 sprite of the floor
         # But it also requires that the floor_id be between 0 .. 3
         if floor_id < 0 or floor_id > 3:
@@ -144,7 +143,7 @@ class TerrainSprites(dict):
         if scale > 1:
             nw = round(tile.height * scale)
             nh = round(tile.height * scale * aspect_ratio)
-            tile = tile.resize((nw, nh), resample = Image.NEAREST)
+            tile = tile.resize((nw, nh), resample=Image.NEAREST)
         return tile
 
     def _ipython_display_(self):
@@ -215,14 +214,25 @@ class LevelMap:
         # Setup terrain sprites
         self.terrain_sprites = TerrainSprites(self.game, self.level_asset)
 
-    def to_cp437(self, overrides = None):
+    def to_cp437(self, overrides=None):
         # This is a pretty simple and straightforward mapping of the tiles to cp437.
-        tile_map = defaultdict(lambda: b'\xb1')
+        tile_map = defaultdict(lambda: b"\xb1")
         tile_map.update(_tile_conversions)
         if overrides is not None:
             tile_map.update(overrides)
-        new_string = b'\n'.join(b''.join(tile_map[_] for _ in row) for row in self.tiles)
-        return new_string.decode('cp437')
+        new_string_components = [
+            b"".join(
+                [b" "]
+                + [str(i)[-1].encode("cp437") for i in range(self.tiles.shape[1])]
+            )
+        ]
+        for i, row in enumerate(self.tiles):
+            cols = [str(i)[-1].encode("cp437")]
+            for col in row:
+                cols.append(tile_map[col])
+            new_string_components.append(b"".join(cols))
+        new_string = b"\n".join(new_string_components)
+        return new_string.decode("cp437")
 
     def create_map(self):
         # OK!  This will be our really hard part.  We have to do an isometric draw.
@@ -284,9 +294,9 @@ class LevelMap:
                         # if tile_key & 1 == 1:
                         #    tile_offsets.append((-1, (-1, 0, None)))
                         for foff, (xoff, yoff, r) in tile_offsets:
-                            tile_frame = self.terrain_sprites[
-                                "wall_tiles"
-                            ].frames[tile_key + foff]
+                            tile_frame = self.terrain_sprites["wall_tiles"].frames[
+                                tile_key + foff
+                            ]
                             if r:
                                 tile_frame = tile_frame.transpose(method=r)
                             image.alpha_composite(
@@ -296,7 +306,9 @@ class LevelMap:
                     else:
                         if p == 0:
                             continue
-                        tile_frame = self.terrain_sprites["floor_tiles"].frames[tile_key & 7]
+                        tile_frame = self.terrain_sprites["floor_tiles"].frames[
+                            tile_key & 7
+                        ]
                         # image.alpha_composite(tile_frame, (start_x, start_y + h // 2))
         return image
 
@@ -320,7 +332,7 @@ class LevelMap:
             print(f"{row: 4d} ", end="")
             for col in range(self.tiles.shape[1]):
                 if self.tiles[row, col] == 255:
-                    print(" "*5, end="")
+                    print(" " * 5, end="")
                     continue
                 print(f"{self.tiles[row, col]: 4d} ", end="")
             print()
