@@ -40,8 +40,14 @@ class SpriteResource:
         im = rec_data.reshape((c, h, w))
         im = np.moveaxis(im, 0, -1)
         self.im = im
-        pal1_id = rec.header.field_4 >> 4
-        pal2_id = rec.header.field_4 & 15
+        sprite_id = getattr(rec, 'i', -1)
+        # This is currently hardcoded for the summoning's palimpsest
+        if sprite_id >= 0x4b and sprite_id <= 0x51:
+            pal1_id = 2
+            pal2_id = 3
+        else:
+            pal1_id = 0
+            pal2_id = 1
         palette = np.concatenate([palettes[pal1_id], palettes[pal2_id]], axis=0)
         for frame in range(im.shape[-1]):
             self.frames.append(PIL.Image.fromarray(palette[im[:, :, frame]]))

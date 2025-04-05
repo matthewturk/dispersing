@@ -54,7 +54,7 @@ class TheSummoning(Game):
 
     def setup_resources(self):
         self.palettes = []
-        for i, palette in enumerate(self.assets["COLORS"].palettes[::-1]):
+        for i, palette in enumerate(self.assets["COLORS"].palettes):
             rgba = np.array(
                 [(_.red * 4, _.green * 4, _.blue * 4, 255) for _ in palette.colors],
                 dtype="u1",
