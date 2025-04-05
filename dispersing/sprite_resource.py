@@ -13,7 +13,27 @@ class SpriteResource:
         w = rec.header.width_over_eight * 8
         c = rec.header.count
         self.frames = []
-        if rec.header.algo == 3:
+        if rec.header.algo == 1:
+            # This is definitely not as fast or efficient as it could be, but
+            # I wanted to translate precisely as-is before going further.
+            contents = np.frombuffer(rec.contents, dtype='i1').tolist()
+            buff = []
+            values = []
+            next_run_length = 0
+            for i in range(rec.header.height * rec.header.width):
+                if next_run_length == 0:
+                    v = contents.pop(0)
+                    if v < 0:
+                        next_run_length = 1 - v
+                        v0 = contents.pop(0)
+                        buff.extend([v0 for _ in range(next_run_length)])
+                    else:
+                        next_run_length = v + 1
+                        buff.extend([contents.pop(0) for _ in range(next_run_length)])
+                next_run_length -= 1
+                values.append(buff.pop(0))
+            rec_data = np.array(values, dtype='i1').view('u1')
+        elif rec.header.algo == 3:
             rec_data = unpack_sprite_algo3(rec.contents, c * h * w)
         else:
             return
