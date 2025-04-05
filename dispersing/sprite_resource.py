@@ -39,7 +39,7 @@ class SpriteResource:
             return
         im = rec_data.reshape((c, h, w))
         im = np.moveaxis(im, 0, -1)
-        self.im = im
+        self.bitmap = im
         sprite_id = getattr(rec, 'i', -1)
         # This is currently hardcoded for the summoning's palimpsest
         if sprite_id >= 0x4b and sprite_id <= 0x51:
