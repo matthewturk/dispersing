@@ -10,21 +10,15 @@ seq:
     repeat: expr
     repeat-expr: count
   - id: text
-    type: xorstr
+    type: xorstr_wrapper
+    process: xor(0xda)
+    terminator: 0x0
     repeat: expr
     repeat-expr: count
 types:
-  xorstrz:
+  xorstr_wrapper:
     seq:
      - id: text
        type: str
+       size-eos: true
        encoding: ascii
-       terminator: 0xda
-  xorstr:
-    seq:
-     - id: text
-       process: xor(218)
-       terminator: 0x0
-    instances:
-      value:
-        value: text.as<xorstrz>
