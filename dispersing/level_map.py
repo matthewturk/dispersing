@@ -136,14 +136,24 @@ class TerrainSprites(dict):
             tile = tile.resize((nw, nh), resample=Image.NEAREST)
         return tile
 
-    def get_floor_sprite(self, floor_id, scale=1, aspect_ratio=1.0):
+    def get_floor_sprite(self, floor_id, scale=1, aspect_ratio=1.0, crop=None):
         if floor_id < 0 or floor_id > 7:
             raise KeyError(floor_id)
 
         frames = self["floor_tiles"].frames
-        tile = frames[floor_id * 2]
-        if len(frames) > floor_id * 2 + 1:
-            tile = concat_vertical(tile, frames[floor_id * 2 + 1])
+        if crop == "top":
+            tile = frames[floor_id * 2]
+        elif crop == "bottom":
+            tile = frames[floor_id * 2 + 1]
+        else:
+            tile = frames[floor_id * 2]
+            if len(frames) > floor_id * 2 + 1:
+                tile = concat_vertical(tile, frames[floor_id * 2 + 1])
+
+        arr = np.array(tile)
+        mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
+        arr[mask] = [0, 0, 0, 0]
+        tile = Image.fromarray(arr)
 
         if scale > 1:
             nw = round(tile.width * scale)
@@ -155,6 +165,12 @@ class TerrainSprites(dict):
         if floor_id < 0 or floor_id > 7:
             raise KeyError(floor_id)
         tile = self["floor_special_tiles"].frames[floor_id]
+
+        arr = np.array(tile)
+        mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
+        arr[mask] = [0, 0, 0, 0]
+        tile = Image.fromarray(arr)
+
         if scale > 1:
             nw = round(tile.width * scale)
             nh = round(tile.height * scale * aspect_ratio)
@@ -467,75 +483,113 @@ class LevelMap:
                 print(f"{self.tiles[row, col]: 4d} ", end="")
             print()
 
-    def render_to_png(self, filename):
-        # Standard isometric tile dimensions
-        scale = 1
+    def render(self, scale=1, include_floor=True):
+        width = self.level_asset.width
+        height = self.level_asset.height
+
         tile_w = 32 * scale
         tile_h = 16 * scale
 
-        rows, cols = self.tiles.shape
+        min_x = -(height - 1) * tile_w
+        max_x = (width - 1) * tile_w
+        max_y = (width + height - 2) * tile_h
 
-        # Calculate canvas dimensions based on isometric projection
-        # x = (col - row) * (tile_w / 2)
-        # y = (col + row) * (tile_h / 2)
+        top_margin = 40 * scale
+        side_margin = 32 * scale
 
-        # Min x is at (row=max, col=0)
-        min_x = (0 - (rows - 1)) * (tile_w // 2)
-        # Max x is at (row=0, col=max)
-        max_x = (cols - 1) * (tile_w // 2)
+        canvas_width = (max_x - min_x) + tile_w + side_margin * 2
+        canvas_height = max_y + tile_h + top_margin * 2
 
-        # Max y is at (row=max, col=max)
-        max_y = (rows + cols - 2) * (tile_h // 2)
+        img = Image.new("RGBA", (int(canvas_width), int(canvas_height)))
 
-        # Margins to accommodate sprite height (walls extend upwards)
-        margin_x = 32 * scale
-        margin_y = 64 * scale
+        offset_x = -min_x + side_margin
+        offset_y = top_margin
 
-        width = max_x - min_x + tile_w + margin_x
-        height = max_y + tile_h + margin_y
-
-        image = Image.new("RGBA", (int(width), int(height)))
-
-        # Offsets to center the map in the image
-        offset_x = -min_x + margin_x // 2
-        offset_y = margin_y
-
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(height):
+            for col in range(width):
                 tile_val = self.tiles[row, col]
                 if tile_val == 255:
                     continue
 
-                sprite = None
+                sprites = []
                 # Determine if wall or floor
-                if (tile_val & (15 << 4)) == 0:
-                    # Wall
-                    try:
-                        sprite = self.terrain_sprites.get_wall_sprite(
-                            tile_val, scale=scale
+                if (tile_val & 0xF0) == 0:
+                    if include_floor:
+                        # Wall
+                        void_above = (row - 1 < 0) or (self.tiles[row - 1, col] == 255)
+                        void_left = (col - 1 < 0) or (self.tiles[row, col - 1] == 255)
+                        void_below = (row + 1 >= height) or (
+                            self.tiles[row + 1, col] == 255
                         )
-                    except (KeyError, IndexError):
-                        continue
-                else:
-                    # Floor
-                    floor_idx = tile_val & 7
-                    is_special = (tile_val & 8) != 0
-                    try:
-                        if is_special:
-                            sprite = self.terrain_sprites.get_special_floor_sprite(
-                                floor_idx, scale=scale
-                            )
-                        else:
-                            sprite = self.terrain_sprites.get_floor_sprite(
-                                floor_idx, scale=scale
-                            )
-                    except (KeyError, IndexError):
-                        continue
+                        void_right = (col + 1 >= width) or (
+                            self.tiles[row, col + 1] == 255
+                        )
 
-                if sprite:
+                        crop = None
+                        should_render = True
+                        if void_above and void_left:
+                            should_render = False
+                        elif void_below and void_right:
+                            should_render = False
+                        elif void_above or void_left:
+                            crop = "top"
+                        elif void_below or void_right:
+                            crop = "bottom"
+
+                        if should_render:
+                            sprites.append(
+                                self.terrain_sprites.get_floor_sprite(
+                                    0, scale=scale, crop=crop
+                                )
+                            )
+                    sprites.append(
+                        self.terrain_sprites.get_wall_sprite(tile_val, scale=scale)
+                    )
+                else:
+                    if include_floor:
+                        # Floor
+                        if 31 <= tile_val <= 40:
+                            floor_idx = (tile_val + 1) & 0x07
+                            sprites.append(
+                                self.terrain_sprites.get_floor_sprite(0, scale=scale)
+                            )
+                            sprites.append(
+                                self.terrain_sprites.get_special_floor_sprite(
+                                    floor_idx, scale=scale
+                                )
+                            )
+                        elif tile_val & 0x10:
+                            if 27 <= tile_val <= 30:
+                                floor_idx = (tile_val + 5) & 0x07
+                                sprites.append(
+                                    self.terrain_sprites.get_floor_sprite(
+                                        floor_idx, scale=scale
+                                    )
+                                )
+                            elif tile_val == 25:
+                                floor_idx = (tile_val + 1) & 0x07
+                                sprites.append(
+                                    self.terrain_sprites.get_floor_sprite(
+                                        0, scale=scale
+                                    )
+                                )
+                                sprites.append(
+                                    self.terrain_sprites.get_special_floor_sprite(
+                                        floor_idx, scale=scale
+                                    )
+                                )
+                            else:
+                                floor_idx = tile_val & 0x03
+                                sprites.append(
+                                    self.terrain_sprites.get_floor_sprite(
+                                        floor_idx, scale=scale
+                                    )
+                                )
+
+                for sprite in sprites:
                     # Calculate screen position for the tile footprint (top-left)
-                    screen_x = (col - row) * (tile_w // 2) + offset_x
-                    screen_y = (col + row) * (tile_h // 2) + offset_y
+                    screen_x = (col - row) * tile_w + offset_x
+                    screen_y = (col + row) * tile_h + offset_y
 
                     # Center horizontally based on sprite width vs tile width
                     draw_x = screen_x + (tile_w - sprite.width) // 2
@@ -544,6 +598,9 @@ class LevelMap:
                     # Tile footprint bottom is at screen_y + tile_h
                     draw_y = screen_y + tile_h - sprite.height
 
-                    image.alpha_composite(sprite, (int(draw_x), int(draw_y)))
+                    img.alpha_composite(sprite, (int(draw_x), int(draw_y)))
 
-        image.save(filename)
+        return img
+
+    def render_to_png(self, filename):
+        self.render().save(filename)
