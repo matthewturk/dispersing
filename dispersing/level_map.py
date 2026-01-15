@@ -417,43 +417,74 @@ class LevelMap:
         map_elem = ET.Element("map")
         map_elem.set("version", "1.0")
         map_elem.set("tiledversion", "1.0.0")
-        map_elem.set("orientation", "orthogonal")
+        map_elem.set("orientation", "isometric")
         map_elem.set("renderorder", "right-down")
         map_elem.set("width", str(self.level_asset.width))
         map_elem.set("height", str(self.level_asset.height))
-        map_elem.set("tilewidth", "32")
+        map_elem.set("tilewidth", "64")
         map_elem.set("tileheight", "32")
 
         tileset_elem.set("firstgid", "1")
         map_elem.append(tileset_elem)
 
-        layer_elem = ET.SubElement(map_elem, "layer")
-        layer_elem.set("name", "Tile Layer 1")
-        layer_elem.set("width", str(self.level_asset.width))
-        layer_elem.set("height", str(self.level_asset.height))
+        # Layer 1: Base
+        layer1_elem = ET.SubElement(map_elem, "layer")
+        layer1_elem.set("name", "Base Layer")
+        layer1_elem.set("width", str(self.level_asset.width))
+        layer1_elem.set("height", str(self.level_asset.height))
 
-        data_elem = ET.SubElement(layer_elem, "data")
-        data_elem.set("encoding", "csv")
+        data1_elem = ET.SubElement(layer1_elem, "data")
+        data1_elem.set("encoding", "csv")
 
-        data_csv = []
+        # Layer 2: Overlay
+        layer2_elem = ET.SubElement(map_elem, "layer")
+        layer2_elem.set("name", "Overlay Layer")
+        layer2_elem.set("width", str(self.level_asset.width))
+        layer2_elem.set("height", str(self.level_asset.height))
+
+        data2_elem = ET.SubElement(layer2_elem, "data")
+        data2_elem.set("encoding", "csv")
+
+        data1_csv = []
+        data2_csv = []
+
         for row in self.tiles:
-            row_data = []
+            row_data1 = []
+            row_data2 = []
             for tile_val in row:
-                gid = 0
-                if tile_val == 255:
-                    gid = 0
-                elif (tile_val & (15 << 4)) == 0:
-                    gid = tile_mapping.get(("wall", tile_val), 0)
-                else:
-                    f_idx = tile_val & 7
-                    if tile_val & 8:
-                        gid = tile_mapping.get(("floor_special", f_idx), 0)
-                    else:
-                        gid = tile_mapping.get(("floor", f_idx), 0)
-                row_data.append(str(gid))
-            data_csv.append(",".join(row_data))
+                gid1 = 0
+                gid2 = 0
 
-        data_elem.text = "\n" + ",\n".join(data_csv) + "\n"
+                if tile_val == 255:
+                    pass
+                elif (tile_val & 0xF0) == 0:
+                    gid1 = tile_mapping.get(("floor", 0), 0)
+                    gid2 = tile_mapping.get(("wall", tile_val), 0)
+                else:
+                    if 31 <= tile_val <= 40:
+                        floor_idx = (tile_val + 1) & 0x07
+                        gid1 = tile_mapping.get(("floor", 0), 0)
+                        gid2 = tile_mapping.get(("floor_special", floor_idx), 0)
+                    elif tile_val & 0x10:
+                        if 27 <= tile_val <= 30:
+                            floor_idx = (tile_val + 5) & 0x07
+                            gid1 = tile_mapping.get(("floor", floor_idx), 0)
+                        elif tile_val == 25:
+                            floor_idx = (tile_val + 1) & 0x07
+                            gid1 = tile_mapping.get(("floor", 0), 0)
+                            gid2 = tile_mapping.get(("floor_special", floor_idx), 0)
+                        else:
+                            floor_idx = tile_val & 0x03
+                            gid1 = tile_mapping.get(("floor", floor_idx), 0)
+
+                row_data1.append(str(gid1))
+                row_data2.append(str(gid2))
+
+            data1_csv.append(",".join(row_data1))
+            data2_csv.append(",".join(row_data2))
+
+        data1_elem.text = "\n" + ",\n".join(data1_csv) + "\n"
+        data2_elem.text = "\n" + ",\n".join(data2_csv) + "\n"
 
         tree = ET.ElementTree(map_elem)
         tree.write(filename, encoding="UTF-8", xml_declaration=True)
@@ -528,13 +559,15 @@ class LevelMap:
                         crop = None
                         should_render = True
                         if void_above and void_left:
+                            crop = "bottom"
+                        elif void_below and void_left:
                             should_render = False
-                        elif void_below and void_right:
-                            should_render = False
-                        elif void_above or void_left:
+                        elif void_above and void_right:
                             crop = "top"
                         elif void_below or void_right:
                             crop = "bottom"
+                        elif void_above or void_left:
+                            crop = "top"
 
                         if should_render:
                             sprites.append(
