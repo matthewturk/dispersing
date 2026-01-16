@@ -141,16 +141,15 @@ class TerrainSprites(dict):
             raise KeyError(floor_id)
 
         frames = self["floor_tiles"].frames
-        if crop == "top":
-            tile = frames[floor_id * 2]
-        elif crop == "bottom":
-            tile = frames[floor_id * 2 + 1]
-        else:
-            tile = frames[floor_id * 2]
-            if len(frames) > floor_id * 2 + 1:
-                tile = concat_vertical(tile, frames[floor_id * 2 + 1])
-
+        tile = frames[floor_id * 2]
+        tile = concat_vertical(tile, frames[floor_id * 2 + 1])
         arr = np.array(tile)
+        half = tile.width // 2
+        if crop == "top":
+            arr[:half, :, :] = 0
+        elif crop == "bottom":
+            arr[half:, :, :] = 0
+
         mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
         arr[mask] = [0, 0, 0, 0]
         tile = Image.fromarray(arr)
@@ -546,7 +545,9 @@ class LevelMap:
                 # Determine if wall or floor
                 if (tile_val & 0xF0) == 0:
                     if include_floor:
+                        # We first check the axis.
                         # Wall
+                        vertical = (tile_val & 0x02) == 0
                         void_above = (row - 1 < 0) or (self.tiles[row - 1, col] == 255)
                         void_left = (col - 1 < 0) or (self.tiles[row, col - 1] == 255)
                         void_below = (row + 1 >= height) or (
@@ -555,20 +556,24 @@ class LevelMap:
                         void_right = (col + 1 >= width) or (
                             self.tiles[row, col + 1] == 255
                         )
-
-                        crop = None
                         should_render = True
-                        if void_above and void_left:
-                            crop = "bottom"
-                        elif void_below and void_left:
+                        crop = None
+                        if void_below and void_left:
                             should_render = False
                         elif void_above and void_right:
+                            should_render = False
+                        elif void_below and void_right:
+                            should_render = False
+                        elif void_above and void_left:
                             crop = "top"
-                        elif void_below or void_right:
+                        elif void_left:
+                            crop = "top"
+                        elif void_right:
                             crop = "bottom"
-                        elif void_above or void_left:
+                        elif void_above:
                             crop = "top"
-
+                        elif void_below:
+                            crop = "bottom"
                         if should_render:
                             sprites.append(
                                 self.terrain_sprites.get_floor_sprite(
