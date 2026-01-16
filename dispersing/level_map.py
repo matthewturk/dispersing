@@ -556,14 +556,21 @@ class LevelMap:
                         void_right = (col + 1 >= width) or (
                             self.tiles[row, col + 1] == 255
                         )
+                        down_corner = (
+                            (row + 1 < height)
+                            and (col + 1 < width)
+                            and (self.tiles[row + 1, col + 1] == 255)
+                        )
                         should_render = True
                         crop = None
-                        if void_below and void_left:
+                        if tile_val == 0 and down_corner:
+                            crop = "bottom"
+                        elif void_below and void_left:
                             should_render = False
                         elif void_above and void_right:
                             should_render = False
                         elif void_below and void_right:
-                            should_render = False
+                            crop = "bottom"
                         elif void_above and void_left:
                             crop = "top"
                         elif void_left:
