@@ -59,22 +59,22 @@ _tile_conversions = {
 }
 
 _corner_table = [
-    (False, False),
-    (True, False),
-    (True, False),
-    (False, True),
-    (False, True),
-    (True, True),
-    (True, False),
-    (False, True),
-    (True, True),
-    (True, True),
-    (True, False),
-    (False, False),
-    (False, True),
-    (False, False),
-    (False, False),
-    (False, False),
+    (False, False),  # 0
+    (True, False),  # 1
+    (True, False),  # 2
+    (False, True),  # 3
+    (False, True),  # 4
+    (True, True),  # 5
+    (True, False),  # 6
+    (False, True),  # 7
+    (True, True),  # 8
+    (True, True),  # 9
+    (True, True),  # 10
+    (True, False),  # 11
+    (False, False),  # 12
+    (False, True),  # 13
+    (False, False),  # 14
+    (False, False),  # 15
 ]
 
 
@@ -563,24 +563,16 @@ class LevelMap:
                         )
                         should_render = True
                         crop = None
-                        if tile_val == 0 and down_corner:
+                        if tile_val in (0, 6, 7, 10) and down_corner:
                             crop = "bottom"
                         elif void_below and void_left:
                             should_render = False
                         elif void_above and void_right:
                             should_render = False
-                        elif void_below and void_right:
+                        elif void_below or void_right:
                             crop = "bottom"
-                        elif void_above and void_left:
+                        elif void_above or void_left:
                             crop = "top"
-                        elif void_left:
-                            crop = "top"
-                        elif void_right:
-                            crop = "bottom"
-                        elif void_above:
-                            crop = "top"
-                        elif void_below:
-                            crop = "bottom"
                         if should_render:
                             sprites.append(
                                 self.terrain_sprites.get_floor_sprite(
