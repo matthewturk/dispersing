@@ -12,18 +12,18 @@ if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
 
 class SummoningLevels(KaitaiStruct):
 
-    class TileFlags(Enum):
-        nothing = 0
+    class OverlayFlags(Enum):
+        item_stack = 0
         decoration = 1
-        unknown2 = 2
-        teleporter_dest = 3
-        unknown4 = 4
-        unknown5 = 5
-        unknown6 = 6
-        teleporter = 7
+        container = 2
+        teleporter_hidden = 3
+        floor_hazard = 4
+        unused = 5
+        toggle = 6
+        teleporter_active = 7
         level_exit = 8
         npc = 9
-        unknown10 = 10
+        pressure_plate = 10
         mouth = 11
 
     class ProcedureOpcode(Enum):
@@ -359,33 +359,33 @@ class SummoningLevels(KaitaiStruct):
             self.temporary_overlay = self._io.read_u1()
             self._debug['temporary_overlay']['end'] = self._io.pos()
             self._debug['overlay_flags']['start'] = self._io.pos()
-            self.overlay_flags = KaitaiStream.resolve_enum(SummoningLevels.TileFlags, self._io.read_u1())
+            self.overlay_flags = KaitaiStream.resolve_enum(SummoningLevels.OverlayFlags, self._io.read_u1())
             self._debug['overlay_flags']['end'] = self._io.pos()
-            if self.overlay_flags != SummoningLevels.TileFlags.nothing:
+            if self.overlay_flags != SummoningLevels.OverlayFlags.item_stack:
                 self._debug['floor_args']['start'] = self._io.pos()
                 _on = self.overlay_flags
-                if _on == SummoningLevels.TileFlags.teleporter:
-                    self.floor_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.unknown4:
+                if _on == SummoningLevels.OverlayFlags.container:
                     self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown6:
+                elif _on == SummoningLevels.OverlayFlags.unused:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.OverlayFlags.level_exit:
+                    self.floor_args = SummoningLevels.PortalInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.OverlayFlags.teleporter_hidden:
+                    self.floor_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.OverlayFlags.pressure_plate:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.OverlayFlags.mouth:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.OverlayFlags.npc:
+                    self.floor_args = self._io.read_u1()
+                elif _on == SummoningLevels.OverlayFlags.toggle:
                     self.floor_args = self._io.read_u2le()
-                elif _on == SummoningLevels.TileFlags.mouth:
+                elif _on == SummoningLevels.OverlayFlags.floor_hazard:
                     self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown10:
-                    self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.level_exit:
-                    self.floor_args = SummoningLevels.PortalInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.unknown2:
-                    self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.unknown5:
-                    self.floor_args = SummoningLevels.PortalInfo(self._io, self, self._root)
-                elif _on == SummoningLevels.TileFlags.npc:
-                    self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.decoration:
-                    self.floor_args = self._io.read_u1()
-                elif _on == SummoningLevels.TileFlags.teleporter_dest:
+                elif _on == SummoningLevels.OverlayFlags.teleporter_active:
                     self.floor_args = SummoningLevels.TeleporterInfo(self._io, self, self._root)
+                elif _on == SummoningLevels.OverlayFlags.decoration:
+                    self.floor_args = self._io.read_u1()
                 self._debug['floor_args']['end'] = self._io.pos()
 
 

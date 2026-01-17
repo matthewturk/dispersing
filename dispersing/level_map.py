@@ -3,6 +3,7 @@ import ipywidgets
 from IPython.display import display
 from collections import defaultdict
 import PIL.Image as Image
+from PIL import ImageDraw
 import os
 import xml.etree.ElementTree as ET
 
@@ -176,6 +177,19 @@ class TerrainSprites(dict):
             tile = tile.resize((nw, nh), resample=Image.NEAREST)
         return tile
 
+    def get_sprite(self, category, index, scale=1, aspect_ratio=1.0):
+        if category not in self:
+            raise KeyError(category)
+        frames = self[category].frames
+        if index >= len(frames):
+            raise IndexError(f"Index {index} out of range for category {category}")
+        tile = frames[index]
+        if scale != 1 or aspect_ratio != 1.0:
+            nw = round(tile.width * scale)
+            nh = round(tile.height * scale * aspect_ratio)
+            tile = tile.resize((nw, nh), resample=Image.NEAREST)
+        return tile
+
     def _ipython_display_(self):
         children = []
         titles = []
@@ -205,10 +219,9 @@ class TileInfo:
         self.x = tile_item_record.x
         self.y = tile_item_record.y
         self.items = [game.objects[_] for _ in tile_item_record.info.items]
-        self.wall_flags = tile_item_record.info.wall_flags
-        self.wall_args = getattr(tile_item_record.info, "wall_args", None)
-        self.floor_flags = tile_item_record.info.floor_flags
-        self.floor_args = getattr(tile_item_record.info, "floor_args", None)
+        self.temporary_overlay = tile_item_record.info.temporary_overlay
+        self.overlay_flags = tile_item_record.info.overlay_flags
+        self.overlay_args = getattr(tile_item_record.info, "overlay_args", None)
 
     def _ipython_display_(self):
         output = []
@@ -515,13 +528,13 @@ class LevelMap:
 
     def _retrieve_overlay(self, tile_info, bounds, coords):
         # For now, we only support wall decorations
+        return None, (0, 0)
         for i, flag in enumerate(tile_info.wall_flags):
             if flag.startswith("wall_decor"):
                 sprite = self.terrain_sprites["wall_decor" + str(i + 1)]
                 return sprite, (0, -sprite.height // 2)
-        return None, (0, 0)
 
-    def render(self, scale=1, include_floor=True):
+    def render(self, scale=1, include_floor=True, debug_text=None):
         width = self.level_asset.width
         height = self.level_asset.height
 
@@ -539,6 +552,10 @@ class LevelMap:
         canvas_height = max_y + tile_h + top_margin * 2
 
         img = Image.new("RGBA", (int(canvas_width), int(canvas_height)))
+
+        draw = None
+        if debug_text:
+            draw = ImageDraw.Draw(img)
 
         offset_x = -min_x + side_margin
         offset_y = top_margin
@@ -587,12 +604,15 @@ class LevelMap:
                             crop = "top"
                         if should_render:
                             sprites.append(
-                                self.terrain_sprites.get_floor_sprite(
-                                    0, scale=scale, crop=crop
+                                (
+                                    self.terrain_sprites.get_floor_sprite(
+                                        0, scale=scale, crop=crop
+                                    ),
+                                    0,
                                 )
                             )
                     sprites.append(
-                        self.terrain_sprites.get_wall_sprite(tile_val, scale=scale)
+                        (self.terrain_sprites.get_wall_sprite(tile_val, scale=scale), 0)
                     )
                 else:
                     if include_floor:
@@ -600,48 +620,68 @@ class LevelMap:
                         if 31 <= tile_val <= 40:
                             floor_idx = (tile_val + 1) & 0x07
                             sprites.append(
-                                self.terrain_sprites.get_floor_sprite(0, scale=scale)
+                                (
+                                    self.terrain_sprites.get_floor_sprite(
+                                        0, scale=scale
+                                    ),
+                                    0,
+                                )
                             )
                             sprites.append(
-                                self.terrain_sprites.get_special_floor_sprite(
-                                    floor_idx, scale=scale
+                                (
+                                    self.terrain_sprites.get_special_floor_sprite(
+                                        floor_idx, scale=scale
+                                    ),
+                                    8 * scale,
                                 )
                             )
                         elif tile_val & 0x10:
                             if 27 <= tile_val <= 30:
                                 floor_idx = (tile_val + 5) & 0x07
                                 sprites.append(
-                                    self.terrain_sprites.get_floor_sprite(
-                                        floor_idx, scale=scale
+                                    (
+                                        self.terrain_sprites.get_floor_sprite(
+                                            floor_idx, scale=scale
+                                        ),
+                                        0,
                                     )
                                 )
-                            elif tile_val == 25:
+                            elif 23 <= tile_val <= 26:
                                 floor_idx = (tile_val + 1) & 0x07
                                 sprites.append(
-                                    self.terrain_sprites.get_floor_sprite(
-                                        0, scale=scale
+                                    (
+                                        self.terrain_sprites.get_floor_sprite(
+                                            0, scale=scale
+                                        ),
+                                        0,
                                     )
                                 )
                                 sprites.append(
-                                    self.terrain_sprites.get_special_floor_sprite(
-                                        floor_idx, scale=scale
+                                    (
+                                        self.terrain_sprites.get_special_floor_sprite(
+                                            floor_idx, scale=scale
+                                        ),
+                                        16 * scale,
                                     )
                                 )
                             else:
                                 floor_idx = tile_val & 0x03
                                 sprites.append(
-                                    self.terrain_sprites.get_floor_sprite(
-                                        floor_idx, scale=scale
+                                    (
+                                        self.terrain_sprites.get_floor_sprite(
+                                            floor_idx, scale=scale
+                                        ),
+                                        0,
                                     )
                                 )
 
-                for sprite in sprites:
+                for sprite, y_off in sprites:
                     # Center horizontally based on sprite width vs tile width
                     draw_x = screen_x + (tile_w - sprite.width) // 2
 
                     # Align the bottom of the sprite to the bottom of the tile footprint
                     # Tile footprint bottom is at screen_y + tile_h
-                    draw_y = screen_y + tile_h - sprite.height
+                    draw_y = screen_y + tile_h - sprite.height + y_off
 
                     img.alpha_composite(sprite, (int(draw_x), int(draw_y)))
 
@@ -656,6 +696,20 @@ class LevelMap:
                                 int(screen_x + overlay_offset[0]),
                                 int(screen_y + overlay_offset[1]),
                             ),
+                        )
+
+                if debug_text:
+                    text = ""
+                    if debug_text == "type":
+                        text = str(tile_val)
+                    elif debug_text == "coords":
+                        text = f"{col},{row}"
+                    if text:
+                        draw.text(
+                            (screen_x + tile_w // 2, screen_y + tile_h // 2),
+                            text,
+                            fill="white",
+                            anchor="mm",
                         )
 
         return img

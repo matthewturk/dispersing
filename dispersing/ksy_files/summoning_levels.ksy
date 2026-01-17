@@ -39,23 +39,23 @@ types:
         type: u1
       - id: overlay_flags
         type: u1
-        enum: tile_flags
+        enum: overlay_flags
       - id: floor_args
-        if: overlay_flags != tile_flags::nothing
+        if: overlay_flags != overlay_flags::item_stack
         type:
           switch-on: overlay_flags
           cases:
-            tile_flags::decoration: u1
-            tile_flags::unknown2: u1
-            tile_flags::teleporter_dest: teleporter_info
-            tile_flags::unknown4: u1
-            tile_flags::unknown5: portal_info
-            tile_flags::unknown6: u2
-            tile_flags::teleporter: teleporter_info
-            tile_flags::level_exit: portal_info
-            tile_flags::npc: u1
-            tile_flags::unknown10: u1
-            tile_flags::mouth: u1
+            overlay_flags::decoration: u1
+            overlay_flags::container: u1
+            overlay_flags::teleporter_hidden: teleporter_info
+            overlay_flags::floor_hazard: u1
+            overlay_flags::unused: u1
+            overlay_flags::toggle: u2
+            overlay_flags::teleporter_active: teleporter_info
+            overlay_flags::level_exit: portal_info
+            overlay_flags::npc: u1
+            overlay_flags::pressure_plate: u1
+            overlay_flags::mouth: u1
   portal_info:
     seq:
       - id: opcode
@@ -126,6 +126,13 @@ types:
     seq:
       - id: wall_tiles
         type: s2
+      # A few notes!
+      # The tile types 40 through 53 (inclusive) are special cases.
+      # Tile 40 is the seal hole, which also somehow will change with pieces
+      # added to it, which is in Broken Seal One.
+      # Tiles 41 through 53 are the big gate in End Five.
+      # I think that 23 is a keyhole, 24 is a hole, 25 is a switch, 26 is the
+      # opposite switch.
       - id: floor_tiles
         type: s2
       - id: floor_special_tiles
@@ -214,18 +221,18 @@ types:
       - id: other
         type: other_data
 enums:
-  tile_flags:
-    0: nothing
+  overlay_flags:
+    0: item_stack
     1: decoration
-    2: unknown2
-    3: teleporter_dest
-    4: unknown4
-    5: unknown5
-    6: unknown6
-    7: teleporter
+    2: container
+    3: teleporter_hidden
+    4: floor_hazard
+    5: unused
+    6: toggle
+    7: teleporter_active
     8: level_exit
     9: npc
-    10: unknown10
+    10: pressure_plate
     11: mouth
   procedure_opcode:
     0: teleporter_enable
