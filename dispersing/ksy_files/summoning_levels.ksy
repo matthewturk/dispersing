@@ -35,34 +35,17 @@ types:
         type: u1
         repeat: expr
         repeat-expr: n1
-      - id: wall_flags
+      - id: temporary_overlay
         type: u1
-        enum: tile_flags
-      - id: wall_args
-        if: wall_flags != tile_flags::nothing and wall_flags != tile_flags::movable_object
-        type:
-          switch-on: wall_flags
-          cases:
-            tile_flags::movable_object: u1
-            tile_flags::unknown2: u1
-            tile_flags::teleporter_dest: teleporter_info
-            tile_flags::unknown4: u1
-            tile_flags::unknown5: portal_info
-            tile_flags::unknown6: u2
-            tile_flags::teleporter: teleporter_info
-            tile_flags::level_exit: portal_info
-            tile_flags::npc: u1
-            tile_flags::unknown10: u1
-            tile_flags::mouth: u1
-      - id: floor_flags
+      - id: overlay_flags
         type: u1
         enum: tile_flags
       - id: floor_args
-        if: floor_flags != tile_flags::nothing
+        if: overlay_flags != tile_flags::nothing
         type:
-          switch-on: floor_flags
+          switch-on: overlay_flags
           cases:
-            tile_flags::movable_object: u1
+            tile_flags::decoration: u1
             tile_flags::unknown2: u1
             tile_flags::teleporter_dest: teleporter_info
             tile_flags::unknown4: u1
@@ -233,7 +216,7 @@ types:
 enums:
   tile_flags:
     0: nothing
-    1: movable_object
+    1: decoration
     2: unknown2
     3: teleporter_dest
     4: unknown4

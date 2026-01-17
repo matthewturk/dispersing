@@ -513,6 +513,14 @@ class LevelMap:
                 print(f"{self.tiles[row, col]: 4d} ", end="")
             print()
 
+    def _retrieve_overlay(self, tile_info, bounds, coords):
+        # For now, we only support wall decorations
+        for i, flag in enumerate(tile_info.wall_flags):
+            if flag.startswith("wall_decor"):
+                sprite = self.terrain_sprites["wall_decor" + str(i + 1)]
+                return sprite, (0, -sprite.height // 2)
+        return None, (0, 0)
+
     def render(self, scale=1, include_floor=True):
         width = self.level_asset.width
         height = self.level_asset.height
@@ -540,6 +548,10 @@ class LevelMap:
                 tile_val = self.tiles[row, col]
                 if tile_val == 255:
                     continue
+
+                # Calculate screen position for the tile footprint (top-left)
+                screen_x = (col - row) * tile_w + offset_x
+                screen_y = (col + row) * tile_h + offset_y
 
                 sprites = []
                 # Determine if wall or floor
@@ -624,10 +636,6 @@ class LevelMap:
                                 )
 
                 for sprite in sprites:
-                    # Calculate screen position for the tile footprint (top-left)
-                    screen_x = (col - row) * tile_w + offset_x
-                    screen_y = (col + row) * tile_h + offset_y
-
                     # Center horizontally based on sprite width vs tile width
                     draw_x = screen_x + (tile_w - sprite.width) // 2
 
@@ -636,6 +644,19 @@ class LevelMap:
                     draw_y = screen_y + tile_h - sprite.height
 
                     img.alpha_composite(sprite, (int(draw_x), int(draw_y)))
+
+                if (col, row) in self.info:
+                    overlay_img, overlay_offset = self._retrieve_overlay(
+                        self.info[col, row], (canvas_width, canvas_height), (col, row)
+                    )
+                    if overlay_img:
+                        img.alpha_composite(
+                            overlay_img,
+                            (
+                                int(screen_x + overlay_offset[0]),
+                                int(screen_y + overlay_offset[1]),
+                            ),
+                        )
 
         return img
 
