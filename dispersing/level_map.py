@@ -78,6 +78,13 @@ _corner_table = [
     (False, False),  # 15
 ]
 
+_decor_indices = {
+    0: "wall_decor1",
+    1: "wall_decor2",
+    2: "wall_decor3",
+    3: "wall_overlay_tiles",
+}
+
 
 def concat_horizontal(im1, im2):
     dst = Image.new("RGBA", (im1.width + im2.width, im1.height))
@@ -108,82 +115,64 @@ class TerrainSprites(dict):
         for attr in _wall_attrs:
             self[attr] = sprites[offset + getattr(props, attr)]
 
-    def get_wall_sprite(self, wall_id, scale=1, aspect_ratio=1.0):
-        # This returns the full 32x32 sprite of the wall
-        # But it also requires that wall_id be between 0 .. 14.
-        if wall_id < 0 or wall_id >= len(_corner_table):
-            raise KeyError(wall_id)
+    def get_sprite(self, category, index, scale=1, aspect_ratio=1.0, crop=None):
+        if category == "wall_tiles":
+            # This returns the full 32x32 sprite of the wall
+            # But it also requires that wall_id be between 0 .. 14.
+            if index < 0 or index >= len(_corner_table):
+                raise KeyError(index)
 
-        frames = self["wall_tiles"].frames
-        tile = frames[wall_id]
-        # Try to append the bottom part of the wall if it exists
-        if len(frames) > wall_id + 15:
-            tile = concat_vertical(tile, frames[wall_id + 15])
+            frames = self["wall_tiles"].frames
+            tile = frames[index]
+            # Try to append the bottom part of the wall if it exists
+            if len(frames) > index + 15:
+                tile = concat_vertical(tile, frames[index + 15])
 
-        blank = Image.new("RGBA", (16, 8))
-        left, right = _corner_table[wall_id]
-        if left:
-            left_tile = self["wall_corners"].frames[0]
+            blank = Image.new("RGBA", (16, 8))
+            left, right = _corner_table[index]
+            if left:
+                left_tile = self["wall_corners"].frames[0]
+            else:
+                left_tile = blank
+            if right:
+                right_tile = self["wall_corners"].frames[1]
+            else:
+                right_tile = blank
+            tile = concat_vertical(concat_horizontal(left_tile, right_tile), tile)
+        elif category == "floor_tiles":
+            if index < 0 or index > 7:
+                raise KeyError(index)
+
+            frames = self["floor_tiles"].frames
+            tile = frames[index * 2]
+            tile = concat_vertical(tile, frames[index * 2 + 1])
+            arr = np.array(tile)
+            half = tile.width // 2
+            if crop == "top":
+                arr[:half, :, :] = 0
+            elif crop == "bottom":
+                arr[half:, :, :] = 0
+
+            mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
+            arr[mask] = [0, 0, 0, 0]
+            tile = Image.fromarray(arr)
+        elif category == "floor_special_tiles":
+            if index < 0 or index > 7:
+                raise KeyError(index)
+            tile = self["floor_special_tiles"].frames[index]
+
+            arr = np.array(tile)
+            mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
+            arr[mask] = [0, 0, 0, 0]
+            tile = Image.fromarray(arr)
         else:
-            left_tile = blank
-        if right:
-            right_tile = self["wall_corners"].frames[1]
-        else:
-            right_tile = blank
-        tile = concat_vertical(concat_horizontal(left_tile, right_tile), tile)
-        if scale > 1:
-            nw = round(tile.width * scale)
-            nh = round(tile.height * scale * aspect_ratio)
-            tile = tile.resize((nw, nh), resample=Image.NEAREST)
-        return tile
+            if category not in self:
+                raise KeyError(category)
+            frames = self[category].frames
+            if index >= len(frames):
+                raise IndexError(f"Index {index} out of range for category {category}")
+            tile = frames[index]
 
-    def get_floor_sprite(self, floor_id, scale=1, aspect_ratio=1.0, crop=None):
-        if floor_id < 0 or floor_id > 7:
-            raise KeyError(floor_id)
-
-        frames = self["floor_tiles"].frames
-        tile = frames[floor_id * 2]
-        tile = concat_vertical(tile, frames[floor_id * 2 + 1])
-        arr = np.array(tile)
-        half = tile.width // 2
-        if crop == "top":
-            arr[:half, :, :] = 0
-        elif crop == "bottom":
-            arr[half:, :, :] = 0
-
-        mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
-        arr[mask] = [0, 0, 0, 0]
-        tile = Image.fromarray(arr)
-
-        if scale > 1:
-            nw = round(tile.width * scale)
-            nh = round(tile.height * scale * aspect_ratio)
-            tile = tile.resize((nw, nh), resample=Image.NEAREST)
-        return tile
-
-    def get_special_floor_sprite(self, floor_id, scale=1, aspect_ratio=1.0):
-        if floor_id < 0 or floor_id > 7:
-            raise KeyError(floor_id)
-        tile = self["floor_special_tiles"].frames[floor_id]
-
-        arr = np.array(tile)
-        mask = (arr[:, :, 0] >= 250) & (arr[:, :, 1] >= 250) & (arr[:, :, 2] >= 250)
-        arr[mask] = [0, 0, 0, 0]
-        tile = Image.fromarray(arr)
-
-        if scale > 1:
-            nw = round(tile.width * scale)
-            nh = round(tile.height * scale * aspect_ratio)
-            tile = tile.resize((nw, nh), resample=Image.NEAREST)
-        return tile
-
-    def get_sprite(self, category, index, scale=1, aspect_ratio=1.0):
-        if category not in self:
-            raise KeyError(category)
-        frames = self[category].frames
-        if index >= len(frames):
-            raise IndexError(f"Index {index} out of range for category {category}")
-        tile = frames[index]
         if scale != 1 or aspect_ratio != 1.0:
             nw = round(tile.width * scale)
             nh = round(tile.height * scale * aspect_ratio)
@@ -362,7 +351,7 @@ class LevelMap:
                 start_y = i * h + j * h
                 if tile_key & (15 << 4) == 0:
                     # Floor tile?
-                    tile_frame = self.terrain_sprites.get_floor_sprite
+                    tile_frame = self.terrain_sprites.get_sprite("floor_tiles", 0)
                 image.alpha_composite(
                     tile_frame,
                     (start_x + int(w * xoff), start_y + int(h * yoff)),
@@ -405,21 +394,21 @@ class LevelMap:
 
         for i in range(16):
             try:
-                sprite = self.terrain_sprites.get_wall_sprite(i)
+                sprite = self.terrain_sprites.get_sprite("wall_tiles", i)
                 add_tile("wall", i, sprite)
             except Exception:
                 pass
 
         for i in range(8):
             try:
-                sprite = self.terrain_sprites.get_floor_sprite(i)
+                sprite = self.terrain_sprites.get_sprite("floor_tiles", i)
                 add_tile("floor", i, sprite)
             except Exception:
                 pass
 
         for i in range(8):
             try:
-                sprite = self.terrain_sprites.get_special_floor_sprite(i)
+                sprite = self.terrain_sprites.get_sprite("floor_special_tiles", i)
                 add_tile("floor_special", i, sprite)
             except Exception:
                 pass
@@ -528,11 +517,13 @@ class LevelMap:
 
     def _retrieve_overlay(self, tile_info, bounds, coords):
         # For now, we only support wall decorations
+        if tile_info.overlay_flags.name == "decoration":
+            sprite_type = _decor_indices[tile_info.overlay_args // 10]
+            sprite = self.terrain_sprites[sprite_type].frames[
+                tile_info.overlay_args % 10
+            ]
+            return sprite, (sprite.width // 2, -sprite.height // 2)
         return None, (0, 0)
-        for i, flag in enumerate(tile_info.wall_flags):
-            if flag.startswith("wall_decor"):
-                sprite = self.terrain_sprites["wall_decor" + str(i + 1)]
-                return sprite, (0, -sprite.height // 2)
 
     def render(self, scale=1, include_floor=True, debug_text=None):
         width = self.level_asset.width
@@ -576,7 +567,6 @@ class LevelMap:
                     if include_floor:
                         # We first check the axis.
                         # Wall
-                        vertical = (tile_val & 0x02) == 0
                         void_above = (row - 1 < 0) or (self.tiles[row - 1, col] == 255)
                         void_left = (col - 1 < 0) or (self.tiles[row, col - 1] == 255)
                         void_below = (row + 1 >= height) or (
@@ -605,14 +595,19 @@ class LevelMap:
                         if should_render:
                             sprites.append(
                                 (
-                                    self.terrain_sprites.get_floor_sprite(
-                                        0, scale=scale, crop=crop
+                                    self.terrain_sprites.get_sprite(
+                                        "floor_tiles", 0, scale=scale, crop=crop
                                     ),
                                     0,
                                 )
                             )
                     sprites.append(
-                        (self.terrain_sprites.get_wall_sprite(tile_val, scale=scale), 0)
+                        (
+                            self.terrain_sprites.get_sprite(
+                                "wall_tiles", tile_val, scale=scale
+                            ),
+                            0,
+                        )
                     )
                 else:
                     if include_floor:
@@ -621,16 +616,16 @@ class LevelMap:
                             floor_idx = (tile_val + 1) & 0x07
                             sprites.append(
                                 (
-                                    self.terrain_sprites.get_floor_sprite(
-                                        0, scale=scale
+                                    self.terrain_sprites.get_sprite(
+                                        "floor_tiles", 0, scale=scale
                                     ),
                                     0,
                                 )
                             )
                             sprites.append(
                                 (
-                                    self.terrain_sprites.get_special_floor_sprite(
-                                        floor_idx, scale=scale
+                                    self.terrain_sprites.get_sprite(
+                                        "floor_special_tiles", floor_idx, scale=scale
                                     ),
                                     8 * scale,
                                 )
@@ -640,8 +635,8 @@ class LevelMap:
                                 floor_idx = (tile_val + 5) & 0x07
                                 sprites.append(
                                     (
-                                        self.terrain_sprites.get_floor_sprite(
-                                            floor_idx, scale=scale
+                                        self.terrain_sprites.get_sprite(
+                                            "floor_tiles", floor_idx, scale=scale
                                         ),
                                         0,
                                     )
@@ -650,26 +645,28 @@ class LevelMap:
                                 floor_idx = (tile_val + 1) & 0x07
                                 sprites.append(
                                     (
-                                        self.terrain_sprites.get_floor_sprite(
-                                            0, scale=scale
+                                        self.terrain_sprites.get_sprite(
+                                            "floor_tiles", 0, scale=scale
                                         ),
                                         0,
                                     )
                                 )
                                 sprites.append(
                                     (
-                                        self.terrain_sprites.get_special_floor_sprite(
-                                            floor_idx, scale=scale
+                                        self.terrain_sprites.get_sprite(
+                                            "keys_switches",
+                                            floor_idx,
+                                            scale=scale,
                                         ),
-                                        16 * scale,
+                                        -12 * scale,
                                     )
                                 )
                             else:
                                 floor_idx = tile_val & 0x03
                                 sprites.append(
                                     (
-                                        self.terrain_sprites.get_floor_sprite(
-                                            floor_idx, scale=scale
+                                        self.terrain_sprites.get_sprite(
+                                            "floor_tiles", floor_idx, scale=scale
                                         ),
                                         0,
                                     )
@@ -685,9 +682,9 @@ class LevelMap:
 
                     img.alpha_composite(sprite, (int(draw_x), int(draw_y)))
 
-                if (col, row) in self.info:
+                if (row, col) in self.info:
                     overlay_img, overlay_offset = self._retrieve_overlay(
-                        self.info[col, row], (canvas_width, canvas_height), (col, row)
+                        self.info[row, col], (canvas_width, canvas_height), (col, row)
                     )
                     if overlay_img:
                         img.alpha_composite(

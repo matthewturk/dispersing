@@ -40,7 +40,7 @@ types:
       - id: overlay_flags
         type: u1
         enum: overlay_flags
-      - id: floor_args
+      - id: overlay_args
         if: overlay_flags != overlay_flags::item_stack
         type:
           switch-on: overlay_flags
