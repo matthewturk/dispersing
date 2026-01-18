@@ -368,52 +368,7 @@ class LevelMap:
             os.makedirs(images_dir)
 
         tile_mapping = {}
-        next_local_id = 0
-
-        tileset_elem = ET.Element("tileset")
-        tileset_elem.set("name", "level_tiles")
-        tileset_elem.set("tilewidth", "32")
-        tileset_elem.set("tileheight", "32")
-        tileset_elem.set("tilecount", "0")
-        tileset_elem.set("columns", "0")
-
-        def add_tile(category, index, sprite):
-            nonlocal next_local_id
-            img_name = f"{category}_{index}.png"
-            sprite.save(os.path.join(images_dir, img_name))
-
-            tile_elem = ET.SubElement(tileset_elem, "tile")
-            tile_elem.set("id", str(next_local_id))
-            img_elem = ET.SubElement(tile_elem, "image")
-            img_elem.set("source", f"images/{img_name}")
-            img_elem.set("width", str(sprite.width))
-            img_elem.set("height", str(sprite.height))
-
-            tile_mapping[(category, index)] = next_local_id + 1
-            next_local_id += 1
-
-        for i in range(16):
-            try:
-                sprite = self.terrain_sprites.get_sprite("wall_tiles", i)
-                add_tile("wall", i, sprite)
-            except Exception:
-                pass
-
-        for i in range(8):
-            try:
-                sprite = self.terrain_sprites.get_sprite("floor_tiles", i)
-                add_tile("floor", i, sprite)
-            except Exception:
-                pass
-
-        for i in range(8):
-            try:
-                sprite = self.terrain_sprites.get_sprite("floor_special_tiles", i)
-                add_tile("floor_special", i, sprite)
-            except Exception:
-                pass
-
-        tileset_elem.set("tilecount", str(next_local_id))
+        next_gid = 1
 
         map_elem = ET.Element("map")
         map_elem.set("version", "1.0")
@@ -425,67 +380,244 @@ class LevelMap:
         map_elem.set("tilewidth", "64")
         map_elem.set("tileheight", "32")
 
-        tileset_elem.set("firstgid", "1")
-        map_elem.append(tileset_elem)
+        # Helper to add a tileset
+        def add_tileset(name, sprites_list, offset=None):
+            nonlocal next_gid
+            tileset_elem = ET.SubElement(map_elem, "tileset")
+            tileset_elem.set("firstgid", str(next_gid))
+            tileset_elem.set("name", name)
+            tileset_elem.set("tilewidth", "32")
+            tileset_elem.set("tileheight", "32")
+            tileset_elem.set("tilecount", str(len(sprites_list)))
+            tileset_elem.set("columns", "0")
 
-        # Layer 1: Base
-        layer1_elem = ET.SubElement(map_elem, "layer")
-        layer1_elem.set("name", "Base Layer")
-        layer1_elem.set("width", str(self.level_asset.width))
-        layer1_elem.set("height", str(self.level_asset.height))
+            if offset:
+                offset_elem = ET.SubElement(tileset_elem, "tileoffset")
+                offset_elem.set("x", str(offset[0]))
+                offset_elem.set("y", str(offset[1]))
 
-        data1_elem = ET.SubElement(layer1_elem, "data")
-        data1_elem.set("encoding", "csv")
+            local_id = 0
+            for key, sprite in sprites_list:
+                img_name = f"{key[0]}_{key[1]}"
+                if key[2]:
+                    img_name += f"_{key[2]}"
+                img_name += ".png"
 
-        # Layer 2: Overlay
-        layer2_elem = ET.SubElement(map_elem, "layer")
-        layer2_elem.set("name", "Overlay Layer")
-        layer2_elem.set("width", str(self.level_asset.width))
-        layer2_elem.set("height", str(self.level_asset.height))
+                sprite.save(os.path.join(images_dir, img_name))
 
-        data2_elem = ET.SubElement(layer2_elem, "data")
-        data2_elem.set("encoding", "csv")
+                tile_elem = ET.SubElement(tileset_elem, "tile")
+                tile_elem.set("id", str(local_id))
+                img_elem = ET.SubElement(tile_elem, "image")
+                img_elem.set("source", f"images/{img_name}")
+                img_elem.set("width", str(sprite.width))
+                img_elem.set("height", str(sprite.height))
 
-        data1_csv = []
-        data2_csv = []
+                tile_mapping[key] = next_gid
+                next_gid += 1
+                local_id += 1
 
-        for row in self.tiles:
-            row_data1 = []
-            row_data2 = []
-            for tile_val in row:
-                gid1 = 0
-                gid2 = 0
+        # 1. Floor Tileset
+        floor_sprites = []
+        for i in range(8):
+            try:
+                s = self.terrain_sprites.get_sprite("floor_tiles", i)
+                floor_sprites.append((("floor", i, None), s))
+            except Exception:
+                pass
+        for crop in ["top", "bottom"]:
+            try:
+                s = self.terrain_sprites.get_sprite("floor_tiles", 0, crop=crop)
+                floor_sprites.append((("floor", 0, crop), s))
+            except Exception:
+                pass
+        for i in range(8):
+            try:
+                s = self.terrain_sprites.get_sprite("floor_special_tiles", i)
+                floor_sprites.append((("floor_special", i, None), s))
+            except Exception:
+                pass
+        add_tileset("floors", floor_sprites)
+
+        # 2. Wall Tileset
+        wall_sprites = []
+        for i in range(16):
+            try:
+                s = self.terrain_sprites.get_sprite("wall_tiles", i)
+                wall_sprites.append((("wall", i, None), s))
+            except Exception:
+                pass
+        add_tileset("walls", wall_sprites)
+
+        # 3. Keys/Switches Tileset
+        keys_switches_sprites = []
+        try:
+            count = len(self.terrain_sprites["keys_switches"].frames)
+            for i in range(count):
+                s = self.terrain_sprites.get_sprite("keys_switches", i)
+                keys_switches_sprites.append((("keys_switches", i, None), s))
+        except Exception:
+            pass
+        add_tileset("keys_switches", keys_switches_sprites, offset=(0, -12))
+
+        # 3. Decoration Tilesets
+        decor_categories = [
+            (0, "wall_decor1"),
+            (1, "wall_decor2"),
+            (2, "wall_decor3"),
+            (3, "wall_overlay_tiles"),
+        ]
+
+        for cat_idx, cat_name in decor_categories:
+            if cat_name not in self.terrain_sprites:
+                continue
+
+            d_sprites = []
+            try:
+                count = len(self.terrain_sprites[cat_name].frames)
+                for i in range(count):
+                    sprite = self.terrain_sprites.get_sprite(cat_name, i)
+                    w, h = sprite.width, sprite.height
+
+                    # Padding logic to align center-bottom of sprite with center-bottom of tile
+                    # Target: Sprite Top-Left at (screen_x + w//2, screen_y - h//2)
+                    # Tiled Anchor: (screen_x + 32, screen_y + 32)
+                    # Image Size: W, H
+                    # Sprite Pos in Image: px, py
+                    # px = W/2 + w/2 - 32
+                    # py = H - h/2 - 32
+
+                    W = max(64, w + 64)
+                    if W % 2 != 0:
+                        W += 1
+                    H = max(64, h + 64)
+
+                    px = int(W / 2 + w / 2 - 32)
+                    py = int(H - h / 2 - 32)
+
+                    padded = Image.new("RGBA", (W, H))
+                    padded.paste(sprite, (px, py))
+
+                    d_sprites.append(((cat_name, i, None), padded))
+            except Exception:
+                pass
+
+            add_tileset(cat_name, d_sprites)
+
+        # Layers
+        layers = [
+            ("Floor Layer", []),
+            ("Floor Detail Layer", []),
+            ("Wall Layer", []),
+            ("Decor 1 Layer", []),
+            ("Decor 2 Layer", []),
+            ("Decor 3 Layer", []),
+            ("Overlay Tiles Layer", []),
+        ]
+
+        height = self.level_asset.height
+        width = self.level_asset.width
+
+        layer_grids = [
+            [[0 for _ in range(width)] for _ in range(height)] for _ in layers
+        ]
+
+        for row in range(height):
+            for col in range(width):
+                tile_val = self.tiles[row, col]
+
+                gid_floor = 0
+                gid_detail = 0
+                gid_wall = 0
 
                 if tile_val == 255:
                     pass
                 elif (tile_val & 0xF0) == 0:
-                    gid1 = tile_mapping.get(("floor", 0), 0)
-                    gid2 = tile_mapping.get(("wall", tile_val), 0)
+                    # Wall logic
+                    void_above = (row - 1 < 0) or (self.tiles[row - 1, col] == 255)
+                    void_left = (col - 1 < 0) or (self.tiles[row, col - 1] == 255)
+                    void_below = (row + 1 >= height) or (
+                        self.tiles[row + 1, col] == 255
+                    )
+                    void_right = (col + 1 >= width) or (
+                        self.tiles[row, col + 1] == 255
+                    )
+                    down_corner = (
+                        (row + 1 < height)
+                        and (col + 1 < width)
+                        and (self.tiles[row + 1, col + 1] == 255)
+                    )
+                    should_render = True
+                    crop = None
+                    if tile_val in (0, 6, 7, 10) and down_corner:
+                        crop = "bottom"
+                    elif void_below and void_left:
+                        should_render = False
+                    elif void_above and void_right:
+                        should_render = False
+                    elif void_below or void_right:
+                        crop = "bottom"
+                    elif void_above or void_left:
+                        crop = "top"
+
+                    if should_render:
+                        gid_floor = tile_mapping.get(("floor", 0, crop), 0)
+                    gid_wall = tile_mapping.get(("wall", tile_val, None), 0)
                 else:
                     if 31 <= tile_val <= 40:
                         floor_idx = (tile_val + 1) & 0x07
-                        gid1 = tile_mapping.get(("floor", 0), 0)
-                        gid2 = tile_mapping.get(("floor_special", floor_idx), 0)
+                        gid_floor = tile_mapping.get(("floor", 0, None), 0)
+                        gid_detail = tile_mapping.get(
+                            ("floor_special", floor_idx, None), 0
+                        )
                     elif tile_val & 0x10:
                         if 27 <= tile_val <= 30:
                             floor_idx = (tile_val + 5) & 0x07
-                            gid1 = tile_mapping.get(("floor", floor_idx), 0)
-                        elif tile_val == 25:
+                            gid_floor = tile_mapping.get(("floor", floor_idx, None), 0)
+                        elif 23 <= tile_val <= 26:
                             floor_idx = (tile_val + 1) & 0x07
-                            gid1 = tile_mapping.get(("floor", 0), 0)
-                            gid2 = tile_mapping.get(("floor_special", floor_idx), 0)
+                            gid_floor = tile_mapping.get(("floor", 0, None), 0)
+                            gid_detail = tile_mapping.get(
+                                ("keys_switches", floor_idx, None), 0
+                            )
                         else:
                             floor_idx = tile_val & 0x03
-                            gid1 = tile_mapping.get(("floor", floor_idx), 0)
+                            gid_floor = tile_mapping.get(("floor", floor_idx, None), 0)
 
-                row_data1.append(str(gid1))
-                row_data2.append(str(gid2))
+                layer_grids[0][row][col] = gid_floor
+                layer_grids[1][row][col] = gid_detail
+                layer_grids[2][row][col] = gid_wall
 
-            data1_csv.append(",".join(row_data1))
-            data2_csv.append(",".join(row_data2))
+                if (row, col) in self.info:
+                    info = self.info[row, col]
+                    if info.overlay_flags.name == "decoration":
+                        cat_idx = info.overlay_args // 10
+                        frame_idx = info.overlay_args % 10
+                        if 0 <= cat_idx <= 3:
+                            cat_name = decor_categories[cat_idx][1]
+                            gid = tile_mapping.get((cat_name, frame_idx, None), 0)
+                            layer_grids[3 + cat_idx][row][col] = gid
 
-        data1_elem.text = "\n" + ",\n".join(data1_csv) + "\n"
-        data2_elem.text = "\n" + ",\n".join(data2_csv) + "\n"
+        for (layer_name, _), grid in zip(layers, layer_grids):
+            layer_elem = ET.SubElement(map_elem, "layer")
+            layer_elem.set("name", layer_name)
+            layer_elem.set("width", str(width))
+            layer_elem.set("height", str(height))
+            if layer_name in (
+                "Decor 1 Layer",
+                "Decor 2 Layer",
+                "Decor 3 Layer",
+                "Overlay Tiles Layer",
+            ):
+                layer_elem.set("offsetx", "-8")
+                layer_elem.set("offsety", "16")
+
+            data_elem = ET.SubElement(layer_elem, "data")
+            data_elem.set("encoding", "csv")
+
+            csv_lines = []
+            for r in grid:
+                csv_lines.append(",".join(map(str, r)))
+            data_elem.text = "\n" + ",\n".join(csv_lines) + "\n"
 
         tree = ET.ElementTree(map_elem)
         tree.write(filename, encoding="UTF-8", xml_declaration=True)
