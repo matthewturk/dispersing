@@ -1,9 +1,11 @@
-from .fast_utilities import unpack_sprite_algo3
+import io
+
+import ipywidgets
 import numpy as np
 import PIL.Image
-import io
-import ipywidgets
 from IPython.display import display
+
+from .fast_utilities import unpack_sprite_algo3
 
 
 class SpriteResource:
@@ -16,11 +18,11 @@ class SpriteResource:
         if rec.header.algo == 1:
             # This is definitely not as fast or efficient as it could be, but
             # I wanted to translate precisely as-is before going further.
-            contents = np.frombuffer(rec.contents, dtype='i1').tolist()
+            contents = np.frombuffer(rec.contents, dtype="i1").tolist()
             buff = []
             values = []
             next_run_length = 0
-            for i in range(rec.header.height * rec.header.width):
+            for _ in range(rec.header.height * rec.header.width):
                 if next_run_length == 0:
                     v = contents.pop(0)
                     if v < 0:
@@ -32,7 +34,7 @@ class SpriteResource:
                         buff.extend([contents.pop(0) for _ in range(next_run_length)])
                 next_run_length -= 1
                 values.append(buff.pop(0))
-            rec_data = np.array(values, dtype='i1').view('u1')
+            rec_data = np.array(values, dtype="i1").view("u1")
         elif rec.header.algo == 3:
             rec_data = unpack_sprite_algo3(rec.contents, c * h * w)
         else:
@@ -40,9 +42,9 @@ class SpriteResource:
         im = rec_data.reshape((c, h, w))
         im = np.moveaxis(im, 0, -1)
         self.bitmap = im
-        sprite_id = getattr(rec, 'i', -1)
+        sprite_id = getattr(rec, "i", -1)
         # This is currently hardcoded for the summoning's palimpsest
-        if sprite_id >= 0x4b and sprite_id <= 0x51:
+        if sprite_id >= 0x4B and sprite_id <= 0x51:
             pal1_id = 2
             pal2_id = 3
         else:
@@ -61,9 +63,7 @@ class SpriteResource:
                 png_images.append(output.read())
         frame_slider = ipywidgets.IntSlider(min=0, max=len(png_images) - 1, step=1)
         im = ipywidgets.Image(value=b"", format="png", height=200)
-        html = (
-            "<style>.dispersing-pixelated {image-rendering: pixelated;} img.vga-aspect-ratio {aspect-ratio: 4/3;}</style><table>"
-        )
+        html = "<style>.dispersing-pixelated {image-rendering: pixelated;} img.vga-aspect-ratio {aspect-ratio: 4/3;}</style><table>"
         display(ipywidgets.HTML(html))
 
         def update_image(change):

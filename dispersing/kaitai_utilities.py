@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def common_attributes(obj_collection):
     shared_attributes = set()
     for obj in obj_collection:

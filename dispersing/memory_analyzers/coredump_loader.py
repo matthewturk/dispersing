@@ -1,7 +1,8 @@
-import traitlets
-import ipywidgets
-import IPython.display
 import struct
+
+import IPython.display
+import ipywidgets
+import traitlets
 
 try:
     from jupyterlab_kaitai import HexViewer
@@ -72,20 +73,19 @@ class Coredump(traitlets.HasTraits):
             children.append(HexViewer(self.data))
 
         if len(self.labels) > 0:
-            rows = []
             attrs = ("name", "display_address", "data_type", "display_value")
             gs = ipywidgets.GridspecLayout(
                 n_rows=len(self.labels), n_columns=len(attrs)
             )
             for i, mem_label in enumerate(self.labels):
                 for j, attr in enumerate(attrs):
-                    l = ipywidgets.Label()
+                    label = ipywidgets.Label()
                     traitlets.link(
                         (mem_label, attr),
-                        (l, "value"),
+                        (label, "value"),
                         (lambda a: str(a), lambda a: str(a)),
                     )
-                    gs[i, j] = l
+                    gs[i, j] = label
             children.append(gs)
 
         IPython.display.display(ipywidgets.VBox(children))

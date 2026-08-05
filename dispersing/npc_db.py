@@ -37,7 +37,7 @@ class ConversationCommandList:
         kw = self.conversation.db.keyword_asset.keyword
         text = self.conversation.db.text_records
         for c in self.command_list:
-            for t, arg in zip(c.args.targs, c.args.args):
+            for t, arg in zip(c.args.targs, c.args.args, strict=True):
                 if t == "k":
                     print("KEYWORD", kw[arg])
                 elif t == "t":
@@ -52,7 +52,7 @@ class Conversation:
         self.components = [ConversationCommandList(self, cl) for cl in operations]
 
     def __repr__(self):
-        return "Conversation with {}".format(self.npc_name)
+        return f"Conversation with {self.npc_name}"
 
 
 class ConversationDatabase:

@@ -1,6 +1,6 @@
-# Cython files
-fast_utilities.c
-fast_utilities.html
+# Cython build artifacts
+dispersing/fast_utilities.c
+dispersing/fast_utilities.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -10,12 +10,15 @@ __pycache__/
 # C extensions
 *.so
 
-# Distribution / packaging
-.Python
+# Virtual environments
+.venv/
+venv/
 env/
+
+# Distribution / packaging
 build/
-develop-eggs/
 dist/
+develop-eggs/
 downloads/
 eggs/
 .eggs/
@@ -28,15 +31,10 @@ var/
 .installed.cfg
 *.egg
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Tool caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
 
 # Unit test / coverage reports
 htmlcov/
@@ -46,21 +44,18 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 
 # Translations
 *.mo
 *.pot
 
-# Django stuff:
+# Logs
 *.log
 
 # Sphinx documentation
 docs/_build/
-
-# PyBuilder
-target/
 
 # pyenv python configuration file
 .python-version

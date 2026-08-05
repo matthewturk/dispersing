@@ -1,7 +1,8 @@
-from .sprite_resource import SpriteResource
+import numpy as np
+
 from .font_resource import FontResource
 from .music_resource import MusicResource
-import numpy as np
+from .sprite_resource import SpriteResource
 
 
 class ResourceMap:

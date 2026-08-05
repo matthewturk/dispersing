@@ -22,7 +22,7 @@ seq:
     repeat: expr
     repeat-expr: count
 types:
-  frecord: 
+  frecord:
     seq:
       - id: col1
         type: u1

@@ -1,97 +1,49 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 ksyrebuild
+.PHONY: help clean sync install test lint format build dist ksyrebuild docs release
 .DEFAULT_GOAL := help
-define BROWSER_PYSCRIPT
-import os, webbrowser, sys
-try:
-	from urllib import pathname2url
-except:
-	from urllib.request import pathname2url
 
-webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
-endef
-export BROWSER_PYSCRIPT
-
-define PRINT_HELP_PYSCRIPT
-import re, sys
-
-for line in sys.stdin:
-	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
-	if match:
-		target, help = match.groups()
-		print("%-20s %s" % (target, help))
-endef
-export PRINT_HELP_PYSCRIPT
-BROWSER := python -c "$$BROWSER_PYSCRIPT"
-
-help:
-	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
-
+PYTHON ?= uv run python
 
 KSY_SOURCES := $(shell find dispersing/ksy_files -name '*.ksy')
 COMPILED_KSY := $(subst ksy_files,kaitai_parsers,$(KSY_SOURCES:%.ksy=%.py))
 
 dispersing/kaitai_parsers/%.py : dispersing/ksy_files/%.ksy
-	/usr/bin/kaitai-struct-compiler --target=python --python-package=dispersing.kaitai_parsers --read-pos --outdir=$(dir $@) $<
+	kaitai-struct-compiler --target=python --python-package=dispersing.kaitai_parsers --read-pos --outdir=$(dir $@) $<
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
-
-clean-build: ## remove build artifacts
-	rm -fr build/
-	rm -fr dist/
-	rm -fr .eggs/
-	rm -fr dispersing/kaitai_parsers/*_*.py
+clean: ## Remove build, test, coverage and Python artifacts
+	rm -fr build/ dist/ .venv/ .eggs/ htmlcov/
+	rm -f .coverage
 	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
-
-clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
+sync: ## Create the environment and install all dependencies with uv
+	uv sync --dev
 
-lint: ## check style with flake8
-	flake8 dispersing tests
+install: sync ## Install the package (editable) into a uv-managed environment
 
-test: ## run tests quickly with the default Python
+test: ## Run the test suite
+	uv run pytest
 
-		python setup.py test
+lint: ## Lint the code with ruff
+	uv run ruff check dispersing tests
 
-test-all: ## run tests on every Python version with tox
-	tox
+format: ## Format the code with ruff
+	uv run ruff format dispersing tests
 
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source dispersing setup.py test
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+build: ksyrebuild ## Build source and wheel distributions
+	uv build
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/dispersing.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ dispersing
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+dist: build ## Alias for `build`
 
-servedocs: docs ## compile the docs watching for changes
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+ksyrebuild: $(COMPILED_KSY) ## Regenerate Kaitai parsers from .ksy definitions
 
-release: clean ## package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+docs: ## Build the Sphinx documentation
+	rm -f docs/dispersing.rst docs/modules.rst
+	uv run sphinx-apidoc -o docs/ dispersing
+	uv run sphinx-build -b html docs docs/_build/html
 
-ksyrebuild: $(COMPILED_KSY)
-
-dist: clean $(COMPILED_KSY) ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
-
-install: clean $(COMPILED_KSY) ## install the package to the active Python's site-packages
-	python setup.py install
+release: clean ksyrebuild ## Package and upload a release
+	uv publish

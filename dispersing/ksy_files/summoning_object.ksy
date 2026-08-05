@@ -41,7 +41,7 @@ types:
         type: b4
       # So I *think* the way this works (according to the functions at 1f74:4c67
       # 1f74:4bad, and 1f74:43c0) is that if this value is greater than 100,
-      # they subtract 100 from it and divide by 10 and add 1.  
+      # they subtract 100 from it and divide by 10 and add 1.
       - id: act1_icon
         type: u1
       - id: act2_icon
