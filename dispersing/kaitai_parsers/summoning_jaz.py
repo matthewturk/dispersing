@@ -1,20 +1,20 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
+# type: ignore
 
-from pkg_resources import parse_version
 import kaitaistruct
 from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 import collections
 
 
-if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
+if getattr(kaitaistruct, 'API_VERSION', (0, 9)) < (0, 11):
+    raise Exception("Incompatible Kaitai Struct Python API: 0.11 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningJaz(KaitaiStruct):
     SEQ_FIELDS = ["count", "unknown1", "unknown2"]
     def __init__(self, _io, _parent=None, _root=None):
-        self._io = _io
+        super(SummoningJaz, self).__init__(_io)
         self._parent = _parent
-        self._root = _root if _root else self
+        self._root = _root or self
         self._debug = collections.defaultdict(dict)
         self._read()
 
@@ -29,12 +29,16 @@ class SummoningJaz(KaitaiStruct):
         self.unknown2 = self._io.read_u2le()
         self._debug['unknown2']['end'] = self._io.pos()
 
+
+    def _fetch_instances(self):
+        pass
+
     class Frecord(KaitaiStruct):
         SEQ_FIELDS = ["col1", "col2", "col3", "col4", "col5", "col6", "col7", "col8", "col9", "col10", "col11", "col12", "col13", "col14", "col15", "col16"]
         def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
+            super(SummoningJaz.Frecord, self).__init__(_io)
             self._parent = _parent
-            self._root = _root if _root else self
+            self._root = _root
             self._debug = collections.defaultdict(dict)
             self._read()
 
@@ -87,6 +91,10 @@ class SummoningJaz(KaitaiStruct):
             self._debug['col16']['start'] = self._io.pos()
             self.col16 = self._io.read_u1()
             self._debug['col16']['end'] = self._io.pos()
+
+
+        def _fetch_instances(self):
+            pass
 
 
 

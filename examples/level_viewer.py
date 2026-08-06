@@ -1,24 +1,31 @@
-from rich.segment import Segment
-from rich.style import Style
 from collections import defaultdict
-from textual.reactive import reactive
+
+from rich.segment import Segment
 from textual.app import App, ComposeResult
 from textual.coordinate import Coordinate
 from textual.geometry import Region
+from textual.reactive import reactive
 from textual.strip import Strip
 from textual.widget import Widget
-from textual.widgets import Header, Footer, DataTable, Static
+from textual.widgets import Footer, Header
+
 import dispersing
-ts = dispersing.games.TheSummoning("the-summoning/")
 from dispersing.level_map import _tile_conversions
-tile_map = defaultdict(lambda: '\u2592')
-tile_map.update({k: v.decode('cp437').encode('utf-8').decode('utf-8') for
-                    k, v in _tile_conversions.items()})
+
+ts = dispersing.games.TheSummoning("the-summoning/")
+
+tile_map = defaultdict(lambda: "\u2592")
+tile_map.update(
+    {
+        k: v.decode("cp437").encode("utf-8").decode("utf-8")
+        for k, v in _tile_conversions.items()
+    }
+)
+
 
 class LevelViewer(Widget):
-
     level_id: int = reactive(0)
-    coord: Coordinate = reactive(Coordinate(0,0))
+    coord: Coordinate = reactive(Coordinate(0, 0))
 
     COMPONENT_CLASSES = {
         "level-viewer--wall",
@@ -29,7 +36,7 @@ class LevelViewer(Widget):
     }
 
     def watch_level_id(self, level_id: int) -> None:
-        self.coord = Coordinate(0,0)
+        self.coord = Coordinate(0, 0)
         self.render()
 
     def render_line(self, y: int) -> Strip:
@@ -45,7 +52,8 @@ class LevelViewer(Widget):
             return f"{tile_map[tile_id]}", style
 
         tiles = ts.levels[self.level_id].tiles
-        if y >= tiles.shape[0]: return Strip([])
+        if y >= tiles.shape[0]:
+            return Strip([])
         segments = [Segment(*colorize(_)) for _ in tiles[y, :]]
         if self.coord.row == y:
             highlighted = self.get_component_rich_style("level-viewer--highlighted")
@@ -61,15 +69,18 @@ class LevelViewer(Widget):
         tiles = ts.levels[self.level_id].tiles
         column = max(min(coord.column, tiles.shape[1] - 1), 0)
         row = max(min(coord.row, tiles.shape[0] - 1), 0)
-        return Coordinate(row = row, column = column)
+        return Coordinate(row=row, column=column)
+
 
 class LevelViewerApp(App):
-    BINDINGS = [("j", "next_level", "Go to next level"),
-                ("k", "prev_level", "Go to previous level"),
-                ("up", "move_up", ""),
-                ("down", "move_down", ""),
-                ("left", "move_left", ""),
-                ("right", "move_right", "")]
+    BINDINGS = [
+        ("j", "next_level", "Go to next level"),
+        ("k", "prev_level", "Go to previous level"),
+        ("up", "move_up", ""),
+        ("down", "move_down", ""),
+        ("left", "move_left", ""),
+        ("right", "move_right", ""),
+    ]
     CSS_PATH = "level_viewer.css"
 
     def compose(self) -> ComposeResult:
@@ -88,19 +99,20 @@ class LevelViewerApp(App):
 
     def action_move_up(self) -> None:
         lv = self.query_one(LevelViewer)
-        lv.coord = Coordinate(column = lv.coord.column, row = lv.coord.row - 1)
+        lv.coord = Coordinate(column=lv.coord.column, row=lv.coord.row - 1)
 
     def action_move_down(self) -> None:
         lv = self.query_one(LevelViewer)
-        lv.coord = Coordinate(column = lv.coord.column, row = lv.coord.row + 1)
+        lv.coord = Coordinate(column=lv.coord.column, row=lv.coord.row + 1)
 
     def action_move_left(self) -> None:
         lv = self.query_one(LevelViewer)
-        lv.coord = Coordinate(column = lv.coord.column - 1, row = lv.coord.row)
+        lv.coord = Coordinate(column=lv.coord.column - 1, row=lv.coord.row)
 
     def action_move_right(self) -> None:
         lv = self.query_one(LevelViewer)
-        lv.coord = Coordinate(column = lv.coord.column + 1, row = lv.coord.row)
+        lv.coord = Coordinate(column=lv.coord.column + 1, row=lv.coord.row)
+
 
 if __name__ == "__main__":
     app = LevelViewerApp()

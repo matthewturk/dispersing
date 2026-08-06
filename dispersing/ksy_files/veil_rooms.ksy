@@ -40,7 +40,7 @@ types:
         enum: tile_flags
       - id: tile_args
         if: floor_flags != tile_flags::nothing and floor_flags != tile_flags::movable_object
-        type: 
+        type:
           switch-on: floor_flags
           cases:
             tile_flags::movable_object: u1
@@ -59,7 +59,7 @@ types:
         enum: tile_flags
       - id: wall_args
         if: wall_flags != tile_flags::nothing
-        type: 
+        type:
           switch-on: wall_flags
           cases:
             tile_flags::movable_object: u1

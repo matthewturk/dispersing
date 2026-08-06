@@ -1,18 +1,23 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
+# type: ignore
 
-from pkg_resources import parse_version
 import kaitaistruct
 from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
-from enum import Enum
+from enum import IntEnum
 import collections
 
 
-if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
+if getattr(kaitaistruct, 'API_VERSION', (0, 9)) < (0, 11):
+    raise Exception("Incompatible Kaitai Struct Python API: 0.11 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningInteract(KaitaiStruct):
 
-    class Iopcode(Enum):
+    class ConvFlags(IntEnum):
+        speak_again = 4
+        speak_first = 5
+        again_fully_healed = 13
+
+    class Iopcode(IntEnum):
         unknown4 = 4
         unknown5 = 5
         receive_keyword = 6
@@ -60,16 +65,11 @@ class SummoningInteract(KaitaiStruct):
         continue_conversation = 65533
         start_conversation = 65534
         end_commandlist = 65535
-
-    class ConvFlags(Enum):
-        speak_again = 4
-        speak_first = 5
-        again_fully_healed = 13
     SEQ_FIELDS = ["file_header", "npc_interactions"]
     def __init__(self, _io, _parent=None, _root=None):
-        self._io = _io
+        super(SummoningInteract, self).__init__(_io)
         self._parent = _parent
-        self._root = _root if _root else self
+        self._root = _root or self
         self._debug = collections.defaultdict(dict)
         self._read()
 
@@ -78,108 +78,335 @@ class SummoningInteract(KaitaiStruct):
         self.file_header = SummoningInteract.Header(self._io, self, self._root)
         self._debug['file_header']['end'] = self._io.pos()
         self._debug['npc_interactions']['start'] = self._io.pos()
-        self.npc_interactions = [None] * (self.file_header.count)
+        self._debug['npc_interactions']['arr'] = []
+        self.npc_interactions = []
         for i in range(self.file_header.count):
-            if not 'arr' in self._debug['npc_interactions']:
-                self._debug['npc_interactions']['arr'] = []
             self._debug['npc_interactions']['arr'].append({'start': self._io.pos()})
-            self.npc_interactions[i] = SummoningInteract.NpcInteraction(self._io, self, self._root)
+            self.npc_interactions.append(SummoningInteract.NpcInteraction(self._io, self, self._root))
             self._debug['npc_interactions']['arr'][i]['end'] = self._io.pos()
 
         self._debug['npc_interactions']['end'] = self._io.pos()
 
-    class OpcodeArgs(KaitaiStruct):
-        SEQ_FIELDS = ["args"]
-        def __init__(self, targs, _io, _parent=None, _root=None):
-            self._io = _io
+
+    def _fetch_instances(self):
+        pass
+        self.file_header._fetch_instances()
+        for i in range(len(self.npc_interactions)):
+            pass
+            self.npc_interactions[i]._fetch_instances()
+
+
+    class ConvOpcode(KaitaiStruct):
+        SEQ_FIELDS = ["opcode", "args"]
+        def __init__(self, _io, _parent=None, _root=None):
+            super(SummoningInteract.ConvOpcode, self).__init__(_io)
             self._parent = _parent
-            self._root = _root if _root else self
-            self.targs = targs
+            self._root = _root
             self._debug = collections.defaultdict(dict)
             self._read()
 
         def _read(self):
+            self._debug['opcode']['start'] = self._io.pos()
+            self.opcode = KaitaiStream.resolve_enum(SummoningInteract.Iopcode, self._io.read_u2le())
+            self._debug['opcode']['end'] = self._io.pos()
             self._debug['args']['start'] = self._io.pos()
-            self.args = [None] * (len(self.targs))
-            for i in range(len(self.targs)):
-                if not 'arr' in self._debug['args']:
-                    self._debug['args']['arr'] = []
-                self._debug['args']['arr'].append({'start': self._io.pos()})
-                self.args[i] = self._io.read_s2le()
-                self._debug['args']['arr'][i]['end'] = self._io.pos()
-
+            _on = self.opcode
+            if _on == SummoningInteract.Iopcode.check_item_wearing:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.check_items:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uuu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.check_var_eq:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.check_var_neq:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.continue_conversation:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.emit_keyword:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.emit_text:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.end_command:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.end_commandlist:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.give_item:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.give_items:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"oooooo", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.heal_character:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.player_emit_text:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.receive_keyword:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.restore:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.run_procedure:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.set_flag_true:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.set_variable:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"Vv", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.start_conversation:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.switch_npc_portrait:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.take_item:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.teach_spell:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.terminate_reset:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown12:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown13:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown14:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown15:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown17:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown23:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown25:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown27:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown28:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown29:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown30:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown34:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown35:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown37:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown38:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown4:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown40:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown45:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown46:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown5:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unknown7:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unused11:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unused32:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
+            elif _on == SummoningInteract.Iopcode.unused33:
+                pass
+                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
             self._debug['args']['end'] = self._io.pos()
 
 
-    class NpcInteraction(KaitaiStruct):
-        SEQ_FIELDS = ["npc_name", "size", "operations"]
-        def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
-            self._parent = _parent
-            self._root = _root if _root else self
-            self._debug = collections.defaultdict(dict)
-            self._read()
-
-        def _read(self):
-            self._debug['npc_name']['start'] = self._io.pos()
-            self.npc_name = (self._io.read_bytes(20)).decode(u"ASCII")
-            self._debug['npc_name']['end'] = self._io.pos()
-            self._debug['size']['start'] = self._io.pos()
-            self.size = self._io.read_u2le()
-            self._debug['size']['end'] = self._io.pos()
-            self._debug['operations']['start'] = self._io.pos()
-            self.operations = []
-            i = 0
-            while True:
-                if not 'arr' in self._debug['operations']:
-                    self._debug['operations']['arr'] = []
-                self._debug['operations']['arr'].append({'start': self._io.pos()})
-                _ = SummoningInteract.Sequence(self._io, self, self._root)
-                self.operations.append(_)
-                self._debug['operations']['arr'][len(self.operations) - 1]['end'] = self._io.pos()
-                if _.base_opcode == SummoningInteract.Iopcode.end_commandlist:
-                    break
-                i += 1
-            self._debug['operations']['end'] = self._io.pos()
-
-
-    class Sequence(KaitaiStruct):
-        SEQ_FIELDS = ["base_opcode", "contents"]
-        def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
-            self._parent = _parent
-            self._root = _root if _root else self
-            self._debug = collections.defaultdict(dict)
-            self._read()
-
-        def _read(self):
-            self._debug['base_opcode']['start'] = self._io.pos()
-            self.base_opcode = KaitaiStream.resolve_enum(SummoningInteract.Iopcode, self._io.read_u2le())
-            self._debug['base_opcode']['end'] = self._io.pos()
-            if self.base_opcode != SummoningInteract.Iopcode.end_commandlist:
-                self._debug['contents']['start'] = self._io.pos()
-                self.contents = []
-                i = 0
-                while True:
-                    if not 'arr' in self._debug['contents']:
-                        self._debug['contents']['arr'] = []
-                    self._debug['contents']['arr'].append({'start': self._io.pos()})
-                    _ = SummoningInteract.ConvOpcode(self._io, self, self._root)
-                    self.contents.append(_)
-                    self._debug['contents']['arr'][len(self.contents) - 1]['end'] = self._io.pos()
-                    if _.opcode == SummoningInteract.Iopcode.end_command:
-                        break
-                    i += 1
-                self._debug['contents']['end'] = self._io.pos()
-
+        def _fetch_instances(self):
+            pass
+            _on = self.opcode
+            if _on == SummoningInteract.Iopcode.check_item_wearing:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.check_items:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.check_var_eq:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.check_var_neq:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.continue_conversation:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.emit_keyword:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.emit_text:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.end_command:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.end_commandlist:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.give_item:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.give_items:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.heal_character:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.player_emit_text:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.receive_keyword:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.restore:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.run_procedure:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.set_flag_true:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.set_variable:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.start_conversation:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.switch_npc_portrait:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.take_item:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.teach_spell:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.terminate_reset:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown12:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown13:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown14:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown15:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown17:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown23:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown25:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown27:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown28:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown29:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown30:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown34:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown35:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown37:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown38:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown4:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown40:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown45:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown46:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown5:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unknown7:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unused11:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unused32:
+                pass
+                self.args._fetch_instances()
+            elif _on == SummoningInteract.Iopcode.unused33:
+                pass
+                self.args._fetch_instances()
 
 
     class Header(KaitaiStruct):
         SEQ_FIELDS = ["count", "text_offset", "offsets"]
         def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
+            super(SummoningInteract.Header, self).__init__(_io)
             self._parent = _parent
-            self._root = _root if _root else self
+            self._root = _root
             self._debug = collections.defaultdict(dict)
             self._read()
 
@@ -191,127 +418,131 @@ class SummoningInteract(KaitaiStruct):
             self.text_offset = self._io.read_u2le()
             self._debug['text_offset']['end'] = self._io.pos()
             self._debug['offsets']['start'] = self._io.pos()
-            self.offsets = [None] * (self.count)
+            self._debug['offsets']['arr'] = []
+            self.offsets = []
             for i in range(self.count):
-                if not 'arr' in self._debug['offsets']:
-                    self._debug['offsets']['arr'] = []
                 self._debug['offsets']['arr'].append({'start': self._io.pos()})
-                self.offsets[i] = self._io.read_u4le()
+                self.offsets.append(self._io.read_u4le())
                 self._debug['offsets']['arr'][i]['end'] = self._io.pos()
 
             self._debug['offsets']['end'] = self._io.pos()
 
 
-    class ConvOpcode(KaitaiStruct):
-        SEQ_FIELDS = ["opcode", "args"]
+        def _fetch_instances(self):
+            pass
+            for i in range(len(self.offsets)):
+                pass
+
+
+
+    class NpcInteraction(KaitaiStruct):
+        SEQ_FIELDS = ["npc_name", "size", "operations"]
         def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
+            super(SummoningInteract.NpcInteraction, self).__init__(_io)
             self._parent = _parent
-            self._root = _root if _root else self
+            self._root = _root
             self._debug = collections.defaultdict(dict)
             self._read()
 
         def _read(self):
-            self._debug['opcode']['start'] = self._io.pos()
-            self.opcode = KaitaiStream.resolve_enum(SummoningInteract.Iopcode, self._io.read_u2le())
-            self._debug['opcode']['end'] = self._io.pos()
+            self._debug['npc_name']['start'] = self._io.pos()
+            self.npc_name = (self._io.read_bytes(20)).decode(u"ASCII")
+            self._debug['npc_name']['end'] = self._io.pos()
+            self._debug['size']['start'] = self._io.pos()
+            self.size = self._io.read_u2le()
+            self._debug['size']['end'] = self._io.pos()
+            self._debug['operations']['start'] = self._io.pos()
+            self._debug['operations']['arr'] = []
+            self.operations = []
+            i = 0
+            while True:
+                self._debug['operations']['arr'].append({'start': self._io.pos()})
+                _ = SummoningInteract.Sequence(self._io, self, self._root)
+                self.operations.append(_)
+                self._debug['operations']['arr'][len(self.operations) - 1]['end'] = self._io.pos()
+                if _.base_opcode == SummoningInteract.Iopcode.end_commandlist:
+                    break
+                i += 1
+            self._debug['operations']['end'] = self._io.pos()
+
+
+        def _fetch_instances(self):
+            pass
+            for i in range(len(self.operations)):
+                pass
+                self.operations[i]._fetch_instances()
+
+
+
+    class OpcodeArgs(KaitaiStruct):
+        SEQ_FIELDS = ["args"]
+        def __init__(self, targs, _io, _parent=None, _root=None):
+            super(SummoningInteract.OpcodeArgs, self).__init__(_io)
+            self._parent = _parent
+            self._root = _root
+            self.targs = targs
+            self._debug = collections.defaultdict(dict)
+            self._read()
+
+        def _read(self):
             self._debug['args']['start'] = self._io.pos()
-            _on = self.opcode
-            if _on == SummoningInteract.Iopcode.unknown38:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.run_procedure:
-                self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.give_item:
-                self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown40:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.emit_keyword:
-                self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unused11:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown37:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.set_flag_true:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.set_variable:
-                self.args = SummoningInteract.OpcodeArgs(u"Vv", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown35:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.receive_keyword:
-                self.args = SummoningInteract.OpcodeArgs(u"k", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown7:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown28:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unused33:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.check_items:
-                self.args = SummoningInteract.OpcodeArgs(u"uuu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.terminate_reset:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown17:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown12:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unused32:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.heal_character:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.player_emit_text:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.start_conversation:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.emit_text:
-                self.args = SummoningInteract.OpcodeArgs(u"t", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown13:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown14:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown46:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.end_command:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.take_item:
-                self.args = SummoningInteract.OpcodeArgs(u"o", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown34:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown5:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown4:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown23:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown27:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.continue_conversation:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown30:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.teach_spell:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown29:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.switch_npc_portrait:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.end_commandlist:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.check_var_neq:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.restore:
-                self.args = SummoningInteract.OpcodeArgs(u"", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown45:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown15:
-                self.args = SummoningInteract.OpcodeArgs(u"u", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.give_items:
-                self.args = SummoningInteract.OpcodeArgs(u"oooooo", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.check_item_wearing:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.unknown25:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
-            elif _on == SummoningInteract.Iopcode.check_var_eq:
-                self.args = SummoningInteract.OpcodeArgs(u"uu", self._io, self, self._root)
+            self._debug['args']['arr'] = []
+            self.args = []
+            for i in range(len(self.targs)):
+                self._debug['args']['arr'].append({'start': self._io.pos()})
+                self.args.append(self._io.read_s2le())
+                self._debug['args']['arr'][i]['end'] = self._io.pos()
+
             self._debug['args']['end'] = self._io.pos()
+
+
+        def _fetch_instances(self):
+            pass
+            for i in range(len(self.args)):
+                pass
+
+
+
+    class Sequence(KaitaiStruct):
+        SEQ_FIELDS = ["base_opcode", "contents"]
+        def __init__(self, _io, _parent=None, _root=None):
+            super(SummoningInteract.Sequence, self).__init__(_io)
+            self._parent = _parent
+            self._root = _root
+            self._debug = collections.defaultdict(dict)
+            self._read()
+
+        def _read(self):
+            self._debug['base_opcode']['start'] = self._io.pos()
+            self.base_opcode = KaitaiStream.resolve_enum(SummoningInteract.Iopcode, self._io.read_u2le())
+            self._debug['base_opcode']['end'] = self._io.pos()
+            if self.base_opcode != SummoningInteract.Iopcode.end_commandlist:
+                pass
+                self._debug['contents']['start'] = self._io.pos()
+                self._debug['contents']['arr'] = []
+                self.contents = []
+                i = 0
+                while True:
+                    self._debug['contents']['arr'].append({'start': self._io.pos()})
+                    _ = SummoningInteract.ConvOpcode(self._io, self, self._root)
+                    self.contents.append(_)
+                    self._debug['contents']['arr'][len(self.contents) - 1]['end'] = self._io.pos()
+                    if _.opcode == SummoningInteract.Iopcode.end_command:
+                        break
+                    i += 1
+                self._debug['contents']['end'] = self._io.pos()
+
+
+
+        def _fetch_instances(self):
+            pass
+            if self.base_opcode != SummoningInteract.Iopcode.end_commandlist:
+                pass
+                for i in range(len(self.contents)):
+                    pass
+                    self.contents[i]._fetch_instances()
+
+
 
 
 
