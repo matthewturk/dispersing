@@ -1,20 +1,20 @@
 # This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
+# type: ignore
 
-from packaging.version import parse as parse_version
 import kaitaistruct
 from kaitaistruct import KaitaiStruct, KaitaiStream, BytesIO
 import collections
 
 
-if parse_version(kaitaistruct.__version__) < parse_version('0.9'):
-    raise Exception("Incompatible Kaitai Struct Python API: 0.9 or later is required, but you have %s" % (kaitaistruct.__version__))
+if getattr(kaitaistruct, 'API_VERSION', (0, 9)) < (0, 11):
+    raise Exception("Incompatible Kaitai Struct Python API: 0.11 or later is required, but you have %s" % (kaitaistruct.__version__))
 
 class SummoningF(KaitaiStruct):
     SEQ_FIELDS = ["num_portraits", "portraits_offset", "unknown2", "num_character", "portraits", "characters"]
     def __init__(self, _io, _parent=None, _root=None):
-        self._io = _io
+        super(SummoningF, self).__init__(_io)
         self._parent = _parent
-        self._root = _root if _root else self
+        self._root = _root or self
         self._debug = collections.defaultdict(dict)
         self._read()
 
@@ -32,59 +32,42 @@ class SummoningF(KaitaiStruct):
         self.num_character = self._io.read_u2le()
         self._debug['num_character']['end'] = self._io.pos()
         self._debug['portraits']['start'] = self._io.pos()
-        self.portraits = [None] * (self.num_portraits)
+        self._debug['portraits']['arr'] = []
+        self.portraits = []
         for i in range(self.num_portraits):
-            if not 'arr' in self._debug['portraits']:
-                self._debug['portraits']['arr'] = []
             self._debug['portraits']['arr'].append({'start': self._io.pos()})
-            self.portraits[i] = SummoningF.Portrait(self._io, self, self._root)
+            self.portraits.append(SummoningF.Portrait(self._io, self, self._root))
             self._debug['portraits']['arr'][i]['end'] = self._io.pos()
 
         self._debug['portraits']['end'] = self._io.pos()
         self._debug['characters']['start'] = self._io.pos()
-        self.characters = [None] * (self.num_character)
+        self._debug['characters']['arr'] = []
+        self.characters = []
         for i in range(self.num_character):
-            if not 'arr' in self._debug['characters']:
-                self._debug['characters']['arr'] = []
             self._debug['characters']['arr'].append({'start': self._io.pos()})
-            self.characters[i] = SummoningF.Character(self._io, self, self._root)
+            self.characters.append(SummoningF.Character(self._io, self, self._root))
             self._debug['characters']['arr'][i]['end'] = self._io.pos()
 
         self._debug['characters']['end'] = self._io.pos()
 
-    class Portrait(KaitaiStruct):
-        SEQ_FIELDS = ["col1", "col2", "portrait_id", "col4", "gender"]
-        def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
-            self._parent = _parent
-            self._root = _root if _root else self
-            self._debug = collections.defaultdict(dict)
-            self._read()
 
-        def _read(self):
-            self._debug['col1']['start'] = self._io.pos()
-            self.col1 = self._io.read_u1()
-            self._debug['col1']['end'] = self._io.pos()
-            self._debug['col2']['start'] = self._io.pos()
-            self.col2 = self._io.read_bytes(4)
-            self._debug['col2']['end'] = self._io.pos()
-            self._debug['portrait_id']['start'] = self._io.pos()
-            self.portrait_id = self._io.read_u1()
-            self._debug['portrait_id']['end'] = self._io.pos()
-            self._debug['col4']['start'] = self._io.pos()
-            self.col4 = self._io.read_u1()
-            self._debug['col4']['end'] = self._io.pos()
-            self._debug['gender']['start'] = self._io.pos()
-            self.gender = self._io.read_u1()
-            self._debug['gender']['end'] = self._io.pos()
+    def _fetch_instances(self):
+        pass
+        for i in range(len(self.portraits)):
+            pass
+            self.portraits[i]._fetch_instances()
+
+        for i in range(len(self.characters)):
+            pass
+            self.characters[i]._fetch_instances()
 
 
     class Character(KaitaiStruct):
         SEQ_FIELDS = ["name", "portrait", "strength", "agility", "endurance", "accuracy", "talent", "power", "spell_type", "weapon_type"]
         def __init__(self, _io, _parent=None, _root=None):
-            self._io = _io
+            super(SummoningF.Character, self).__init__(_io)
             self._parent = _parent
-            self._root = _root if _root else self
+            self._root = _root
             self._debug = collections.defaultdict(dict)
             self._read()
 
@@ -119,6 +102,41 @@ class SummoningF(KaitaiStruct):
             self._debug['weapon_type']['start'] = self._io.pos()
             self.weapon_type = self._io.read_u1()
             self._debug['weapon_type']['end'] = self._io.pos()
+
+
+        def _fetch_instances(self):
+            pass
+
+
+    class Portrait(KaitaiStruct):
+        SEQ_FIELDS = ["col1", "col2", "portrait_id", "col4", "gender"]
+        def __init__(self, _io, _parent=None, _root=None):
+            super(SummoningF.Portrait, self).__init__(_io)
+            self._parent = _parent
+            self._root = _root
+            self._debug = collections.defaultdict(dict)
+            self._read()
+
+        def _read(self):
+            self._debug['col1']['start'] = self._io.pos()
+            self.col1 = self._io.read_u1()
+            self._debug['col1']['end'] = self._io.pos()
+            self._debug['col2']['start'] = self._io.pos()
+            self.col2 = self._io.read_bytes(4)
+            self._debug['col2']['end'] = self._io.pos()
+            self._debug['portrait_id']['start'] = self._io.pos()
+            self.portrait_id = self._io.read_u1()
+            self._debug['portrait_id']['end'] = self._io.pos()
+            self._debug['col4']['start'] = self._io.pos()
+            self.col4 = self._io.read_u1()
+            self._debug['col4']['end'] = self._io.pos()
+            self._debug['gender']['start'] = self._io.pos()
+            self.gender = self._io.read_u1()
+            self._debug['gender']['end'] = self._io.pos()
+
+
+        def _fetch_instances(self):
+            pass
 
 
 
