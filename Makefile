@@ -6,6 +6,10 @@ PYTHON ?= uv run python
 KSY_SOURCES := $(shell find dispersing/ksy_files -name '*.ksy')
 COMPILED_KSY := $(subst ksy_files,kaitai_parsers,$(KSY_SOURCES:%.ksy=%.py))
 
+# The generated parsers assume the kaitai-struct-compiler 0.11 output
+# (in particular, a runtime >= 0.11 and no pkg_resources usage). Install the
+# compiler from https://kaitai.io/ (or brew/apt); uv cannot install it, as it
+# is a JVM tool that is not published on PyPI.
 dispersing/kaitai_parsers/%.py : dispersing/ksy_files/%.ksy
 	kaitai-struct-compiler --target=python --python-package=dispersing.kaitai_parsers --read-pos --outdir=$(dir $@) $<
 
