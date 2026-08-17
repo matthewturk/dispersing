@@ -26,7 +26,7 @@ types:
         type: u1
         # seems like this is 0 or 2, where 2 requires specific conditions like
         # footwear removal and shadow weaver costume.  col6
-      - id: conditionally_hostile 
+      - id: conditionally_hostile
         type: u1
       - id: sprite_id
         type: u1

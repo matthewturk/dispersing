@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import pygame
 
@@ -23,14 +21,13 @@ class SpriteDisplay:
         self.switch_obj(obj_id)
 
     def switch_frame(self, inc):
-        self.current_sprite_set
         new_frame_id = self.frame_id + inc
         print("New frame", new_frame_id, len(self.current_sprite_set))
         if new_frame_id >= len(self.current_sprite_set) or new_frame_id < 0:
             return
         self.new_frame_id = new_frame_id
         self._update_sprite(self.current_sprite_set[self.new_frame_id])
-        self.sprite.set_palette(palette)
+        self.sprite.set_palette(self._current_palette)
 
     def switch_obj(self, obj_id):
         if obj_id not in ts.objects:

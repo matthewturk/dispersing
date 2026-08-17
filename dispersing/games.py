@@ -6,14 +6,14 @@ import pandas as pd
 from . import kaitai_utilities as ku
 from .kaitai_parsers import summoning
 from .level_map import LevelMap
-from .object_db import ObjectDatabase
 from .npc_db import NPCDatabase
+from .object_db import ObjectDatabase
 from .resource_files import ResourceMap
 
 
-def make_df(l):
-    cattr = ku.common_attributes(l)
-    flattened = ku.collect_attributes(l, cattr)
+def make_df(records):
+    cattr = ku.common_attributes(records)
+    flattened = ku.collect_attributes(records, cattr)
     return pd.DataFrame(flattened)
 
 
@@ -369,7 +369,7 @@ class TheSummoning(Game):
 
     def setup_resources(self):
         self.palettes = []
-        for i, palette in enumerate(self.assets["COLORS"].palettes):
+        for palette in self.assets["COLORS"].palettes:
             rgba = np.array(
                 [(_.red * 4, _.green * 4, _.blue * 4, 255) for _ in palette.colors],
                 dtype="u1",

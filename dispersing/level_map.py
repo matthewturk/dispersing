@@ -1,11 +1,12 @@
-import numpy as np
-import ipywidgets
-from IPython.display import display
-from collections import defaultdict
-import PIL.Image as Image
-from PIL import ImageDraw
 import os
 import xml.etree.ElementTree as ET
+from collections import defaultdict
+
+import ipywidgets
+import numpy as np
+import PIL.Image as Image
+from IPython.display import display
+from PIL import ImageDraw
 
 _terrain_attrs = (
     "wall_tiles",
@@ -337,6 +338,8 @@ class LevelMap:
 
     def create_map(self):
         w, h = 32, 16
+        offset = 0
+        xoff = yoff = 0
         image_shape = (
             (self.tiles.shape[0] + self.tiles.shape[1] + 1) * w,
             (self.tiles.shape[0] + self.tiles.shape[1] + 1) * h,
@@ -467,7 +470,7 @@ class LevelMap:
             (3, "wall_overlay_tiles"),
         ]
 
-        for cat_idx, cat_name in decor_categories:
+        for _, cat_name in decor_categories:
             if cat_name not in self.terrain_sprites:
                 continue
 
@@ -538,9 +541,7 @@ class LevelMap:
                     void_below = (row + 1 >= height) or (
                         self.tiles[row + 1, col] == 255
                     )
-                    void_right = (col + 1 >= width) or (
-                        self.tiles[row, col + 1] == 255
-                    )
+                    void_right = (col + 1 >= width) or (self.tiles[row, col + 1] == 255)
                     down_corner = (
                         (row + 1 < height)
                         and (col + 1 < width)
@@ -597,7 +598,7 @@ class LevelMap:
                             gid = tile_mapping.get((cat_name, frame_idx, None), 0)
                             layer_grids[3 + cat_idx][row][col] = gid
 
-        for (layer_name, _), grid in zip(layers, layer_grids):
+        for (layer_name, _), grid in zip(layers, layer_grids, strict=True):
             layer_elem = ET.SubElement(map_elem, "layer")
             layer_elem.set("name", layer_name)
             layer_elem.set("width", str(width))

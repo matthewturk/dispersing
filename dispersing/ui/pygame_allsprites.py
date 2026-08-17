@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import pygame
 
@@ -24,7 +22,6 @@ class SpriteDisplay:
         self.switch_sprite(sprite_id)
 
     def switch_frame(self, inc):
-        self.current_sprite_set
         new_frame_id = self.frame_id + inc
         print("New frame", new_frame_id, len(self.current_sprite_set))
         if new_frame_id >= len(self.current_sprite_set) or new_frame_id < 0:
@@ -37,7 +34,7 @@ class SpriteDisplay:
         sprite_id = self.sprite_ids[sprite_ind]
         if sprite_id not in self.game.resources.palette_sprites:
             return
-        print("Switching to sprite_id {} (real: {})".format(sprite_ind, sprite_id))
+        print(f"Switching to sprite_id {sprite_ind} (real: {sprite_id})")
         self.frame_id = 0
         self.sprite_id = sprite_ind
         pal1_id, pal2_id, buff = self.game.resources.palette_sprites[sprite_id]

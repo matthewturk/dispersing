@@ -1,59 +1,90 @@
 [build-system]
-# See https://github.com/scipy/scipy/pull/10431 for the AIX issue.
 requires = [
-  "setuptools>=19.6",
-  "wheel",
+    "setuptools>=77",
+    "wheel",
+    "Cython>=3.0",
+    "numpy>=1.23",
+]
+build-backend = "setuptools.build_meta"
 
-  # keep in sync with travis.yml "minimal" specs (Cython and numpy for py36)
-
-  # cython version is imposed by that of numpy, see release notes
-  # https://github.com/numpy/numpy/releases/tag/v1.19.2
-  "Cython>=0.26.1; python_version=='3.6'",
-  "Cython>=0.29.21; python_version>='3.7'",
-  "numpy==1.13.3; python_version=='3.6' and platform_system!='AIX'",
-  "numpy>=1.19.2; python_version>='3.7' and platform_system!='AIX'",
+[project]
+name = "dispersing"
+version = "0.1.0"
+description = "A game asset extractor for The Summoning"
+readme = "README.rst"
+authors = [{ name = "Matthew Turk", email = "matthewturk@gmail.com" }]
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+keywords = ["dispersing", "games", "the-summoning"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "click>=8.0",
+    "ipython>=8.0",
+    "ipywidgets>=7.6",
+    "kaitaistruct>=0.11",
+    "numpy>=1.23",
+    "packaging>=21.0",
+    "pandas>=1.5",
+    "pillow>=9.0",
 ]
 
-# To be kept consistent with "Code Style" section in CONTRIBUTING.rst
-[tool.black]
+[project.scripts]
+dispersing = "dispersing.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/matthewturk/dispersing"
+Documentation = "https://dispersing.readthedocs.io"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.0",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "sphinx>=7.0",
+]
+
+[tool.setuptools]
+# setup.py declares the Cython extension; all package metadata lives here.
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["dispersing*"]
+
+[tool.setuptools.package-data]
+dispersing = ["ksy_files/*.ksy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["dispersing"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.ruff]
 line-length = 88
-# note : 'py39' is not an available option as of black 19.10b0
-target-version = ['py36', 'py37', 'py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
-
-
-# To be kept consistent with "Import Formatting" section in CONTRIBUTING.rst
-[tool.isort]
-profile = "black"
-combine_as_imports = true
-skip =  ["venv", "benchmarks"]
-known_third_party = [
-  "IPython",
-  "nose",
-  "numpy",
-  "sympy",
-  "matplotlib",
-  "unyt",
-  "git",
-  "yaml",
-  "dateutil",
-  "requests",
-  "coverage",
-  "pytest"
+target-version = "py310"
+exclude = [
+    "docs",
+    "dispersing/kaitai_parsers",
 ]
-known_first_party = []
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+extend-exclude = ["*.pyx"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "W"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["dispersing"]

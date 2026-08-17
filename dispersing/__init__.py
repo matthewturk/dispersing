@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Top-level package for The Dispersing."""
 
 __author__ = """Matthew Turk"""

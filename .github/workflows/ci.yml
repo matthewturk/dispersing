@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Verify the package builds
+        run: uv build
+
+  kaitai-freshness:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install kaitai-struct-compiler
+        run: |
+          curl -fsSL -o ksc.zip \
+            https://github.com/kaitai-io/kaitai_struct_compiler/releases/download/0.11/kaitai-struct-compiler-0.11.zip
+          unzip -q ksc.zip -d ksc
+          echo "$(pwd)/ksc/kaitai-struct-compiler-0.11/bin" >> "$GITHUB_PATH"
+
+      - name: Regenerate parsers and check the committed files are up to date
+        run: |
+          make ksyrebuild
+          git diff --exit-code -- dispersing/kaitai_parsers

@@ -1,7 +1,8 @@
 import io
+
 import ipywidgets
-from IPython.display import display
 import pandas as pd
+from IPython.display import display
 
 _display_fields = (
     ("Name", "name"),
@@ -74,7 +75,7 @@ class ObjectDatabase(dict):
         ]
         fields.sort()
         records = []
-        for n, orec in sorted(self.objects_by_id.items()):
+        for _, orec in sorted(self.objects_by_id.items()):
             rec = {_: getattr(orec, _) for _ in fields}
             rec["obj_type"] = orec.obj_type.name
             records.append(rec)
